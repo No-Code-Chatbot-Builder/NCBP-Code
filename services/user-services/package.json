@@ -2,10 +2,10 @@
   "name": "serversetting",
   "version": "1.0.0",
   "description": "",
-  "main": "source/server.ts",
+  "main": "src/server.ts",
   "scripts": {
-    "dev": "nodemon source/server.ts",
-    "build": "rm -rf build/ && prettier --write source/ && tsc"
+    "dev": "nodemon src/server.ts",
+    "build": "rm -rf build/ && prettier --write src/ && tsc"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +25,7 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@types/aws-sdk": "^2.7.0"
+    "@types/aws-sdk": "^2.7.0",
+    "@types/jsonwebtoken": "^9.0.5"
   }
 }

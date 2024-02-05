@@ -7,6 +7,6 @@ AWS.config.update({
 export const CognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
 export const poolData = {
-  UserPoolId: 'us-east-1_W8UbOJVze',
-  ClientId: '51b74ccn6l83arrqlu683bcatu',
+  UserPoolId: 'us-east-1_meGLNeg9U',
+  ClientId: '5p1eg9par17nb5bncfboerni8b',
 };

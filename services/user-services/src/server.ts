@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { signUpHandler } from './auth/cognito-signup';
+//import { signUpHandler } from './auth/cognito-signup';
 import dotenv from 'dotenv';
 
 dotenv.config();
