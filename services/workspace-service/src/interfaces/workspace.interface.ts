@@ -1,14 +1,14 @@
-interface Workspace {
+interface IWorkspace {
     id: string;
     name: string;
-    admin: WorkspaceUser[]; // an array of admin users
+    admin: IWorkspaceUser[]; // an array of admin users
     website?: string; // optional
     description?: string; // optional
 }
 
-interface WorkspaceUser {
+interface IWorkspaceUser {
     id: string;
     email: string;
 }
 
-export { Workspace, WorkspaceUser };
+export { IWorkspace, IWorkspaceUser };
