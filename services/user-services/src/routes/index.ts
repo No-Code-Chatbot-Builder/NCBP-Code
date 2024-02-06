@@ -4,6 +4,7 @@ import { getAllUser} from '../controller/testController';
 import {createUser, getUser, updateUser} from '../controller/userController';
 import {signUpHandler} from '../auth/cognito-signup';
 import {loginHandler} from '../auth/cognito-login';
+import {updateUserHandler} from '../auth/cognito-updateUser';
 
 const router = express.Router();
 
@@ -16,5 +17,6 @@ router.post('/update', updateUser);
 // Cognito
 router.post('/signup', signUpHandler);
 router.post('/login', loginHandler);
+router.put('/update', updateUserHandler);
 
 module.exports = router;
