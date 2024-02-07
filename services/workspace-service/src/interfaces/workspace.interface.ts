@@ -20,7 +20,13 @@ enum Role {
     OWNER = 'owner',
     ADMIN = 'admin',
     MEMBER = 'member',
-    PENDING = 'pending'
+    PENDING = 'pending',
+    REJECTED = 'rejected'
+}
+
+enum Response {
+    ACCEPTED = 'accepted',
+    REJECTED = 'rejected'
 }
 
 interface IWorkspaceUser {
@@ -28,4 +34,4 @@ interface IWorkspaceUser {
     email: string;
 }
 
-export { IWorkspace, IWorkspaceUser, IMembership, Role};
+export { IWorkspace, IWorkspaceUser, IMembership, Role, Response};

@@ -12,6 +12,8 @@ import {
   CreateWorkspaceRequest,
   DeleteWorkspaceRequest,
   GetWorkspaceRequest,
+  RemoveUserFromWorkspaceRequest,
+  RespondToWorkspaceInviteRequest,
   UpdateWorkspaceRequest,
 } from '../interfaces/request.interface';
 import { createWorkspaceHandler } from '../controller/create-workspace.controller';
@@ -21,6 +23,8 @@ import { updateWorkspaceHandler } from '../controller/update-workspace.controlle
 import { deleteWorkspaceHandler } from '../controller/delete-workspace.controller';
 import { authorize } from '../middlewares/role-authorization.middleware';
 import { createUserHandler } from '../controller/create-user.controller';
+import { respondInviteHandler } from '../controller/respond-invite.controller';
+import { removeUserHandler } from '../controller/remove-user.controller';
 
 const workspaceRouter = express.Router();
 
@@ -52,9 +56,20 @@ workspaceRouter.post('/invite', authorize, validateAddUserToWorkspace, async (re
   res.status(statusCode).json(JSON.parse(body));
 });
 
-// TODO: POST respond to invite of a workspace
+// POST respond to invite of a workspace
 workspaceRouter.post('/respond', async (req, res) => {
-  res.status(200).json({ message: 'respond to invite' });
+  const input: RespondToWorkspaceInviteRequest = req.body;
+
+  const { statusCode, body } = await respondInviteHandler(input);
+  res.status(statusCode).json(JSON.parse(body));
+});
+
+// POST remove user from a workspace
+workspaceRouter.post('/remove', async (req, res) => {
+  const input: RemoveUserFromWorkspaceRequest = req.body;
+
+  const { statusCode, body } = await removeUserHandler(input);
+  res.status(statusCode).json(JSON.parse(body));
 });
 
 // PUT update a workspace
@@ -78,8 +93,6 @@ workspaceRouter.get('/:workspaceName', validateGetWorkspace, async (req, res) =>
   const input: GetWorkspaceRequest = {
     workspaceName: req.params.workspaceName as string,
   };
-
-  console.log(input);
 
   const { statusCode, body } = await getWorkspaceHandler(input);
   res.status(statusCode).json(JSON.parse(body));

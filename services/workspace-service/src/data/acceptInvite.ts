@@ -1,19 +1,32 @@
 import { Membership } from '../entities/membership';
+import { Role } from '../interfaces/workspace.interface';
 import { dynamoDB } from '../utils/db';
 
-export const inviteUser = async (membership: Membership) => {
+export const acceptInvite = async (membership: Membership) => {
+  // TODO: Append User record
+
   const paramsMembership = {
     TableName: process.env.TABLE_NAME as string,
-    Item: membership.toItem(),
-    ConditionExpression: 'attribute_not_exists(PK) AND attribute_not_exists(SK)',
+    Key: {
+      ...membership.key(),
+    },
+    UpdateExpression: 'set #role = :role',
+    ExpressionAttributeNames: {
+      '#role': 'role',
+    },
+    ExpressionAttributeValues: {
+      ':role': membership.role,
+    },
+    ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)',
+    ReturnValues: 'ALL_NEW',
   };
 
   try {
-    await dynamoDB
+    dynamoDB
       .transactWrite({
         TransactItems: [
           {
-            Put: paramsMembership,
+            Update: paramsMembership,
           },
         ],
       })
@@ -25,7 +38,7 @@ export const inviteUser = async (membership: Membership) => {
   } catch (error: any) {
     console.log(error);
 
-    let errorMessage = 'Could not create workspace.';
+    let errorMessage = 'Could not accept invite.';
 
     if (error.code === 'TransactionCanceledException') {
       if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {

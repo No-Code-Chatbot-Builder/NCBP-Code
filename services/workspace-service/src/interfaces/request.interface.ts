@@ -1,3 +1,5 @@
+import { Response } from "./workspace.interface";
+
 interface CreateWorkspaceRequest {
     name: string;
     userId: string;
@@ -24,6 +26,13 @@ interface AddUserToWorkspaceRequest {
     userEmail: string;
 }
 
+interface RespondToWorkspaceInviteRequest {
+    userId: string;
+    workspaceName: string;
+    userEmail: string;
+    response: Response;
+}
+
 interface RemoveUserFromWorkspaceRequest {
     userId: string;
     workspaceName: string;
@@ -45,4 +54,4 @@ interface DeleteWorkspaceRequest {
     workspaceName: string;
 }
 
-export { CreateWorkspaceRequest, CreateUserRequest, GetWorkspaceRequest, AddUserToWorkspaceRequest, RemoveUserFromWorkspaceRequest, UpdateWorkspaceRequest, DeleteWorkspaceRequest };
+export { CreateWorkspaceRequest, CreateUserRequest, GetWorkspaceRequest, AddUserToWorkspaceRequest, RemoveUserFromWorkspaceRequest, RespondToWorkspaceInviteRequest, UpdateWorkspaceRequest, DeleteWorkspaceRequest };
