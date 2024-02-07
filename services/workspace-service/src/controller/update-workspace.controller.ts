@@ -1,25 +1,23 @@
-import { v4 as uuidv4 } from 'uuid';
-
-import { CreateWorkspaceRequest } from '../interfaces/request.interface';
+import {  UpdateWorkspaceRequest } from '../interfaces/request.interface';
 import { Workspace } from '../entities/workspace';
-import { createWorkspace } from '../data/createWorkspace';
+import { updateWorkspace } from '../data/updateWorkspace';
 
 
-export const createWorkspaceHandler = async (input: CreateWorkspaceRequest) => {
+export const updateWorkspaceHandler = async (input: UpdateWorkspaceRequest) => {
   const workspace = new Workspace({
-    name: input.name,
+    name: input.workspaceName,
     owner: {
       id: input.userId,
       email: input.userEmail
     },
-    members: 1,
+    members: input.members,
     website: input.website,
     description: input.description,
-    createdAt: new Date().toISOString(),
+    createdAt: input.createdAt,
     updatedAt: new Date().toISOString()
   })
 
-  const { error } = await createWorkspace(workspace)
+  const { error } = await updateWorkspace(workspace)
 
   const statusCode = error ? 500 : 200
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ workspace })

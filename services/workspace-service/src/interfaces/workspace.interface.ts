@@ -1,9 +1,26 @@
 interface IWorkspace {
-    id: string;
     name: string;
-    admin: IWorkspaceUser[]; // an array of admin users
+    owner: IWorkspaceUser; // owner
+    members: number;
+    createdAt: string;
+    updatedAt: string;
     website?: string; // optional
     description?: string; // optional
+}
+
+interface IMembership {
+    workspaceName: string;
+    userId: string;
+    userEmail: string;
+    role: Role;
+    createdAt: string;
+}
+
+enum Role {
+    OWNER = 'owner',
+    ADMIN = 'admin',
+    MEMBER = 'member',
+    PENDING = 'pending'
 }
 
 interface IWorkspaceUser {
@@ -11,4 +28,4 @@ interface IWorkspaceUser {
     email: string;
 }
 
-export { IWorkspace, IWorkspaceUser };
+export { IWorkspace, IWorkspaceUser, IMembership, Role};

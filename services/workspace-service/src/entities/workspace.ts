@@ -1,56 +1,58 @@
 import { IWorkspace, IWorkspaceUser } from "../interfaces/workspace.interface"
 
 class Workspace implements IWorkspace {
-    id: string
     name: string
-    admin: WorkspaceUser[]
+    owner: WorkspaceUser
+    members: number
     website?: string = ""
     description?: string = ""
+    createdAt: string;
+    updatedAt: string;
     
-    constructor({ id, name, admin, description, website }: IWorkspace) {
-        this.id = id
+    constructor({ name, owner, description, website, members, createdAt, updatedAt }: IWorkspace) {
         this.name = name
-        this.admin = this.admins(admin)
+        this.owner = new WorkspaceUser(owner)
         this.description = description
         this.website = website
+        this.members = members
+        this.createdAt = createdAt
+        this.updatedAt = updatedAt
+    }
+
+    pk() {
+        return `WORKSPACE#${this.name.toLowerCase()}`
     }
 
     key() {
         return {
-            'PK': `USER#${this.admin[0].id}`,
-            'SK': `WORKSPACE#${this.name}`
-        }
-    }
-
-    gsiInverseKey() {
-        return {
-            'PK': `WORKSPACE#${this.name}`,
-            'SK': `USER#${this.admin[0].id}`
+            'PK': this.pk(),
+            'SK': `WORKSPACE#${this.name.toLowerCase()}`
         }
     }
 
     toItem() {
         return {
             ...this.key(),
-            id: this.id,
             name: this.name,
-            admin: this.admin,
+            owner: this.owner,
+            members: this.members.toString(),
             website: this.website,
-            description: this.description
+            description: this.description,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+            type: 'workspace'
         }
-    }
-
-    admins(admin: IWorkspaceUser[]) {
-        return admin.map(admin => new WorkspaceUser(admin))
     }
     
     static fromItem(item: IWorkspace) {
         return new Workspace({
-            id: item.id,
             name: item.name,
-            admin: item.admin,
+            owner: item.owner,
+            members: item.members,
             description: item.description,
-            website: item.website
+            website: item.website,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt
         })
     }
 }

@@ -1,24 +1,9 @@
 import { Membership } from '../entities/membership';
-import { Workspace } from '../entities/workspace';
-import { Role } from '../interfaces/workspace.interface';
 import { dynamoDB } from '../utils/db';
 
-export const createWorkspace = async (workspace: Workspace) => {
+export const inviteUser = async (membership: Membership) => {
   // TODO: Append User record
 
-  const membership = new Membership({
-    workspaceName: workspace.name,
-    userId: workspace.owner.id,
-    userEmail: workspace.owner.email,
-    role: Role.OWNER,
-    createdAt: new Date().toISOString(),
-  });
-
-  const paramsWorkspace = {
-    TableName: process.env.TABLE_NAME as string,
-    Item: workspace.toItem(),
-    ConditionExpression: 'attribute_not_exists(PK) AND attribute_not_exists(SK)',
-  };
 
   const paramsMembership = {
     TableName: process.env.TABLE_NAME as string,
@@ -31,9 +16,6 @@ export const createWorkspace = async (workspace: Workspace) => {
       .transactWrite({
         TransactItems: [
           {
-            Put: paramsWorkspace,
-          },
-          {
             Put: paramsMembership,
           },
         ],
@@ -41,7 +23,7 @@ export const createWorkspace = async (workspace: Workspace) => {
       .promise();
 
     return {
-      workspace,
+      membership,
     };
   } catch (error: any) {
     console.log(error);
@@ -50,8 +32,6 @@ export const createWorkspace = async (workspace: Workspace) => {
 
     if (error.code === 'TransactionCanceledException') {
       if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
-        errorMessage = 'Workspace with this name already exists.';
-      } else if (error.cancellationReasons[1].Code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
       }
     }

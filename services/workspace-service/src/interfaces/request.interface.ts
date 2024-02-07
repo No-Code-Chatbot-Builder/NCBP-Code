@@ -6,8 +6,15 @@ interface CreateWorkspaceRequest {
     description?: string;
 }
 
-interface GetWorkspaceRequest {
+interface CreateUserRequest {
     userId: string;
+    fullName: string;
+    email: string;
+    dateOfBirth: string;
+    address: string;
+}
+
+interface GetWorkspaceRequest {
     workspaceName: string;
 }
 
@@ -24,9 +31,12 @@ interface RemoveUserFromWorkspaceRequest {
 }
 
 interface UpdateWorkspaceRequest {
+    userId: string;
+    userEmail: string;
+    members: number;
+    createdAt: string;
     website?: string;
     description?: string;
-    userId: string;
     workspaceName: string;
 }
 
@@ -35,4 +45,4 @@ interface DeleteWorkspaceRequest {
     workspaceName: string;
 }
 
-export { CreateWorkspaceRequest, GetWorkspaceRequest, AddUserToWorkspaceRequest, RemoveUserFromWorkspaceRequest, UpdateWorkspaceRequest, DeleteWorkspaceRequest };
+export { CreateWorkspaceRequest, CreateUserRequest, GetWorkspaceRequest, AddUserToWorkspaceRequest, RemoveUserFromWorkspaceRequest, UpdateWorkspaceRequest, DeleteWorkspaceRequest };

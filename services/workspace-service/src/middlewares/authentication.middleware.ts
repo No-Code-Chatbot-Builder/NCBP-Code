@@ -9,8 +9,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   try {
     const decoded  = await verifyToken(token);
 
-
-    if (req.body.userId !== decoded.sub) {
+    if (req.body.userId !== decoded.sub && req.headers["x-user-id"] !== decoded.sub) {
         throw new Error('UserIds do not match');
     }
     next();

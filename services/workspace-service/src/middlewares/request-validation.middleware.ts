@@ -58,6 +58,9 @@ const validateRemoveUserFromWorkspace = (req: Request, res: Response, next: Next
 
 const validateUpdateWorkspace = (req: Request, res: Response, next: NextFunction) => {
   body('userId').notEmpty().isString();
+  body('members').notEmpty().isNumeric();
+  body('createdAt').notEmpty().isString();
+  body("userEmail").notEmpty().isEmail();
   body('workspaceName').notEmpty().isString();
   body('website').optional().isString();
   body('description').optional().isString();
