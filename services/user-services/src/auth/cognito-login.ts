@@ -30,20 +30,19 @@ export const loginHandler = (req: Request, res: Response) => {
   CognitoIdentityServiceProvider.initiateAuth(authParams, (err, data) => {
     if (err) {
       console.error(err);
-      res.status(401).json({ error: 'Authentication failed' });
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+
+    if (data?.AuthenticationResult?.IdToken) {
+      const token = data.AuthenticationResult.IdToken;
+
+      // Extract user attributes from the decoded token
+      const decodedToken = jwt.decode(token, { complete: true });
+      const userAttributes = decodedToken?.payload;
+
+      return res.status(200).json({ message: 'User authenticated successfully', token, userAttributes });
     } else {
-      console.log(data);
-
-      if (data.AuthenticationResult?.IdToken) {
-        const decodedToken = jwt.decode(data.AuthenticationResult.IdToken, { complete: true });
-
-        // Extract user attributes from the decoded token
-        const userAttributes = decodedToken?.payload;
-
-        res.status(200).json({ message: 'User authenticated successfully', userAttributes });
-      } else {
-        res.status(401).json({ error: 'Authentication failed' });
-      }
+      return res.status(401).json({ error: 'Authentication failed' });
     }
   });
 };
