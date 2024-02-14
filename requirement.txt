@@ -1,0 +1,14 @@
+fastapi
+wget==3.2
+numpy==1.22.4
+pydantic==1.9.1
+torch
+torchvision
+Pillow==9.1.1
+flask==2.1.2
+tensorflow
+locust
+tensorflow_hub
+pytest
+gunicorn
+uvicorn[standard]
