@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
-import { DynamoDB } from 'aws-sdk'; // Import DynamoDB from AWS SDK
+import { DynamoDB } from 'aws-sdk';
 
 @Injectable()
 export class Middleware implements NestMiddleware {
@@ -19,14 +19,13 @@ export class Middleware implements NestMiddleware {
     }
 
     try {
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET); // Verify token
-      
+      const decoded: any = jwt.verify(token, process.env.JWT_SECRET); 
       if (decoded.sub) {
         // Define DynamoDB parameters
         const params: DynamoDB.DocumentClient.GetItemInput = {
           TableName: 'demoTable', 
           Key: {
-            'sub': decoded.sub, // Key to search 
+            'sub': decoded.sub,  
           },
         };
 
@@ -38,7 +37,7 @@ export class Middleware implements NestMiddleware {
           } else {
             if (data.Item) {
               //req.user = data.Item; // Store user details in the request object
-              next(); // Call next middleware or route handler
+              next(); // Call next route handler
             } else {
               return res.status(404).json({ message: 'User not found' });
             }
@@ -48,7 +47,6 @@ export class Middleware implements NestMiddleware {
         return res.status(401).json({ message: 'Invalid token: sub not found' });
       }
     } catch (error) {
-      // Handle token verification errors
       console.error(error);
       return res.status(401).json({ message: 'Invalid token' });
     }
