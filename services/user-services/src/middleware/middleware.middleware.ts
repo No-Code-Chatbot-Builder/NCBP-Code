@@ -33,7 +33,7 @@ export class Middleware implements NestMiddleware {
         // Fetch user details from DynamoDB table
         this.dynamoDb.get(params, (err, data) => {
           if (err) {
-            console.error("Unable to read item. Error:", JSON.stringify(err, null, 2));
+            console.error("Unable to read item. Error:");
             return res.status(500).json({ message: 'Error fetching user details' });
           } else {
             if (data.Item) {
