@@ -22,7 +22,7 @@ export class AppController {
     return await this.userService.getUserById(sub);
   }
 
-  @Post('/updateUserField')
+  @Post('/specificUser')
   async updateUserField(@Body() body: { sub: string, [key: string]: any }): Promise<any> {
       const { sub, ...fieldsToUpdate } = body;
       return await this.userService.updateUserFields(sub, fieldsToUpdate);
