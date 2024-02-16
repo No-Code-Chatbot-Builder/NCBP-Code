@@ -25,7 +25,7 @@ export class Middleware implements NestMiddleware {
       if (decoded.sub) {
         // Define DynamoDB parameters
         const params: DynamoDB.DocumentClient.GetItemInput = {
-          TableName: 'yourTableName', // Replace with your table name
+          TableName: 'demoTable', // Replace with your table name
           Key: {
             'sub': decoded.sub, // Key to search for in the table
           },
