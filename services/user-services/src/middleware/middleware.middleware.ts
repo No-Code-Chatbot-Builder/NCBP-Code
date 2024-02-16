@@ -8,12 +8,11 @@ export class Middleware implements NestMiddleware {
   private readonly dynamoDb: DynamoDB.DocumentClient;
 
   constructor() {
-    // Initialize DynamoDB Document Client
     this.dynamoDb = new DynamoDB.DocumentClient();
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+    const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization 
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
@@ -25,9 +24,9 @@ export class Middleware implements NestMiddleware {
       if (decoded.sub) {
         // Define DynamoDB parameters
         const params: DynamoDB.DocumentClient.GetItemInput = {
-          TableName: 'demoTable', // Replace with your table name
+          TableName: 'demoTable', 
           Key: {
-            'sub': decoded.sub, // Key to search for in the table
+            'sub': decoded.sub, // Key to search 
           },
         };
 
