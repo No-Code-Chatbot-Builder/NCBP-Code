@@ -15,22 +15,38 @@ export class DynamoDbService {
         });
     }
 
-    async createDataset(workspaceId: string, userId: string, name: string, description: string): Promise<void>
+    async createDataset(workspaceId: string, userId: string, name: string, description: string): Promise<any>
     {
+        const datasetId = `DATASET#${GenerateIdService.generateId()}`;
         const datasetDetails = {
-          PK: `DATASET#${GenerateIdService.generateId()}`, 
+          PK: datasetId, 
           SK: `WORKSPACEID#${workspaceId}`,
           userId: userId,
           name: name,
           description: description
         }
         const params = {
-            TableName: this.configService.get<string>('DYANMODB_TABLE_NAME'),
+            // TableName: this.configService.get<string>('DYANMODB_TABLE_NAME'),
+            TableName: "ncbp",
             Item: datasetDetails,
           };
       
           try {
             const data = await this.dynamodb.put(params).promise();
+
+            const response = {
+              success: true,
+              message: "Dataset created successfully.",
+              workspaceId: workspaceId,
+              datasetDetails: {
+                  name: name,
+                  description: description,
+                  workspaceId: workspaceId,
+                  datasetId: datasetId
+              },
+          };
+
+          return response; // Return the response object
             
           } catch (error) {
             
