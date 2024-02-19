@@ -67,17 +67,20 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
       <SheetContent
         showX={!defaultOpen}
         side={"left"}
-        className={clsx("backdrop-blur-xl fixed top-0 border-r-[1px] p-6", {
-          "hidden md:inline-block z-0 w-[300px]": defaultOpen,
-          "inline-block md:hidden z-[100] w-full": !defaultOpen,
-        })}
+        className={clsx(
+          "backdrop-blur-xl fixed top-0 p-6 bg-sidebar shadow-none",
+          {
+            "hidden md:inline-block z-0 w-[300px]": defaultOpen,
+            "inline-block md:hidden z-[100] w-full": !defaultOpen,
+          }
+        )}
       >
         <div className="flex flex-col h-full">
           <nav className="flex flex-col justify-between h-full">
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  className="p-10 mb-10 bg-transparent border-none hover:bg-card"
+                  className="p-10 mb-10 bg-transparent border-none group hover:bg-sidebar-hover"
                   variant={"outline"}
                 >
                   <div className="flex flex-row md:w-[250px] w-full gap-4 items-center justify-between">
@@ -94,13 +97,15 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
                       </div>
 
                       <div className="flex flex-col justify-start items-start">
-                        <h1 className="text-xl font-bold">NoCodeBot.ai</h1>
+                        <h1 className="text-xl font-bold text-secondary-foreground">
+                          NoCodeBot.ai
+                        </h1>
                         <p className="text-muted-foreground text-sm font-normal">
                           Workspace 1
                         </p>
                       </div>
                     </div>
-                    <ChevronsUpDown className="w-5 h-5 text-muted-foreground" />
+                    <ChevronsUpDown className="w-5 h-5 text-muted-foreground group-hover:text-secondary-foreground" />
                   </div>
                 </Button>
               </PopoverTrigger>
@@ -150,9 +155,9 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
                           <CommandItem
                             key={option.name}
                             className={clsx(
-                              "md:w-[250px] w-full text-muted-foreground font-normal",
+                              "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1",
                               {
-                                "bg-card text-secondary  ":
+                                "bg-sidebar-hover text-sidebar-foreground  ":
                                   pathname === option.link,
                               }
                             )}
