@@ -121,7 +121,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Role",
     cell: ({ row }) => (
       <div className="capitalize w-20 ">
-        <div className="bg-primary/40 rounded-lg border border-primary flex justify-center py-1">
+        <div className="bg-primary/10 dark:bg-primary/40 rounded-lg border border-primary flex justify-center py-1 text-primary dark:text-white">
           {row.getValue("role")}
         </div>
       </div>
@@ -155,7 +155,7 @@ export const columns: ColumnDef<User>[] = [
   },
 ];
 
-export default function InviteUsersForm() {
+export default function ManageUsersCard() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -197,13 +197,13 @@ export default function InviteUsersForm() {
             onChange={(event) =>
               table.getColumn("email")?.setFilterValue(event.target.value)
             }
-            className="max-w-sm border-primary/50 bg-card"
+            className="max-w-sm dark:border-primary/50 bg-card"
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="border-primary/50 bg-card ml-2 "
+                className="dark:border-primary/50 bg-card ml-2 "
               >
                 Columns <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
@@ -229,7 +229,7 @@ export default function InviteUsersForm() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="rounded-md border border-primary/50">
+        <div className="rounded-md border dark:border-primary/50">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

@@ -26,7 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const ManageWorkspaceForm = () => {
+const ManageWorkspaceCard = () => {
   const { toast } = useToast();
 
   const FormSchema = z.object({
@@ -76,12 +76,12 @@ const ManageWorkspaceForm = () => {
                 name="workspaceId"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="text-primary">Workspace ID</FormLabel>
+                    <FormLabel className="">Workspace ID</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="83927392dfeudnski8"
                         {...field}
-                        className="bg-card border-primary/50"
+                        className="bg-card dark:border-primary/50"
                       />
                     </FormControl>
                     <FormMessage className="text-red-600 text-xs px-1" />
@@ -94,14 +94,12 @@ const ManageWorkspaceForm = () => {
                 name="workspaceName"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="text-primary">
-                      Workspace Name
-                    </FormLabel>
+                    <FormLabel className="">Workspace Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Ibrahim's Workspace"
                         {...field}
-                        className="bg-card border-primary/50"
+                        className="bg-card dark:border-primary/50"
                       />
                     </FormControl>
                     <FormMessage className="text-red-600 text-xs px-1" />
@@ -114,14 +112,12 @@ const ManageWorkspaceForm = () => {
                 name="workspaceDescription"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="text-primary">
-                      Workspace Description
-                    </FormLabel>
+                    <FormLabel className="">Workspace Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="For University"
                         {...field}
-                        className="bg-card border-primary/50"
+                        className="bg-card dark:border-primary/50"
                       />
                     </FormControl>
                     <FormMessage className="text-red-600 text-xs px-1" />
@@ -148,4 +144,4 @@ const ManageWorkspaceForm = () => {
   );
 };
 
-export default ManageWorkspaceForm;
+export default ManageWorkspaceCard;

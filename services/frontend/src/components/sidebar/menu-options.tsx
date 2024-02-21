@@ -14,14 +14,12 @@ import {
 } from "../ui/command";
 import Link from "next/link";
 import { useModal } from "@/providers/modal-provider";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import Image from "next/image";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
-import InviteAFriend from "./invite-friend";
+
 import PersonalDetails from "./personal-details";
 import { icons } from "@/lib/constants";
-import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 import {
   Card,
@@ -30,6 +28,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { ModeToggle } from "../global/mode-toggle";
 
 type Props = {
   defaultOpen?: boolean;
@@ -179,7 +178,8 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
             </Command>
 
             <div>
-              <InviteAFriend />
+              <ModeToggle />
+
               <PersonalDetails />
             </div>
           </nav>

@@ -126,3 +126,21 @@ export const assistants = [
     imgSrc: "/assets/study.png",
   },
 ];
+
+export const sidebarOpt: SidebarOption[] = [
+  {
+    heading: "",
+    items: [
+      { name: "Featured", icon: "featured", link: "/dashboard/featured" },
+
+      { name: "Assistants", icon: "agents", link: "/dashboard/agents" },
+      { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
+      { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
+      { name: "Settings", icon: "settings", link: "/dashboard/settings" },
+    ],
+  },
+  {
+    heading: "",
+    items: [],
+  },
+];
