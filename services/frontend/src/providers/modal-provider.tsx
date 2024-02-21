@@ -1,13 +1,12 @@
 "use client";
 
-import { useContext, useEffect, useState, createContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface ModalProviderProps {
   children: React.ReactNode;
 }
 
 export type ModalData = {};
-
 type ModalContextType = {
   data: ModalData;
   isOpen: boolean;
@@ -22,7 +21,7 @@ export const ModalContext = createContext<ModalContextType>({
   setClose: () => {},
 });
 
-export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
+const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<ModalData>({});
   const [showingModal, setShowingModal] = useState<React.ReactNode>(null);
@@ -50,6 +49,8 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     setData({});
   };
 
+  if (!isMounted) return null;
+
   return (
     <ModalContext.Provider value={{ data, setOpen, setClose, isOpen }}>
       {children}
@@ -61,7 +62,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 export const useModal = () => {
   const context = useContext(ModalContext);
   if (!context) {
-    throw new Error("useModal must be used within the provider");
+    throw new Error("useModal must be used within the modal provider");
   }
   return context;
 };
+
+export default ModalProvider;

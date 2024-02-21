@@ -178,7 +178,9 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
             </Command>
 
             <div>
-              <ModeToggle />
+              <div className="hidden">
+                <ModeToggle />
+              </div>
 
               <PersonalDetails />
             </div>

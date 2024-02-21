@@ -1,3 +1,5 @@
+"use client";
+import CustomModel from "@/components/global/custom-model";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,7 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Database, Edit, Edit2, PanelLeftDashed, Plus } from "lucide-react";
+
+import { useModal } from "@/providers/modal-provider";
+import { Edit2, Plus } from "lucide-react";
 
 type DatasetType = {
   name: string;
@@ -26,11 +30,20 @@ const dummyDataset: DatasetType[] = [
 ];
 
 export default function Page() {
+  const { setOpen } = useModal();
+  const datasetModal = (
+    <CustomModel
+      title="Create New Dataset"
+      subheading="Add data to your dataset here."
+    >
+      <div></div>
+    </CustomModel>
+  );
   return (
     <div className="flex flex-col gap-10">
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 w-5/6">
             <h1 className="text-secondary text-3xl font-bold">Datasets</h1>
             <p className="text-md text-muted-foreground">
               Datasets help you manage your data which you can use to configure
@@ -38,9 +51,30 @@ export default function Page() {
               now.
             </p>
           </div>
-          <Button size={"lg"} className="gap-2">
+          {/*Desktop Create Button*/}
+
+          <Button
+            size={"lg"}
+            className="gap-2 hidden lg:flex"
+            variant={"outline"}
+            onClick={() => {
+              setOpen(datasetModal);
+            }}
+          >
             <Plus className="w-5 h-5" />
             Create New Dataset
+          </Button>
+
+          {/*Mobile Create Button*/}
+          <Button
+            size={"icon"}
+            variant={"outline"}
+            className="lg:hidden"
+            onClick={() => {
+              setOpen(datasetModal);
+            }}
+          >
+            <Plus className="w-4 h-4" />
           </Button>
         </div>
         <Separator className="mt-8" />

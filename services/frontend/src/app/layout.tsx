@@ -3,10 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import clsx from "clsx";
 import { ThemeProvider } from "@/providers/theme-provider";
-import { ModalProvider } from "@/providers/modal-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Amplify } from "aws-amplify";
 import config from "../amplifyconfiguration.json";
+import ModalProvider from "@/providers/modal-provider";
 
 const font = Inter({ subsets: ["latin"] });
 
