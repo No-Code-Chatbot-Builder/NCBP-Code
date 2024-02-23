@@ -12,19 +12,17 @@ export class S3Service {
         this.s3 = new AWS.S3();
     }
     // keyPrefix can be workspaceId or userId or datasetId
-    async uploadFileToS3(bucketName: string, filePath: string, userId: string, workspaceId: string): Promise<AWS.S3.ManagedUpload.SendData>
+    async uploadFileToS3(bucketName: string, file: Express.Multer.File, userId: string, workspaceId: string, datasetId: string): Promise<AWS.S3.ManagedUpload.SendData>
     {
         try {
-            const fileData = await readFile(filePath);
-            const baseFileName = basename(filePath);
-            const s3Key = `${userId}/${workspaceId}/${baseFileName}`;
-      
-            const params = {
+          const s3Key = `${userId}/${workspaceId}/${datasetId}/${file.originalname}`;
+
+          const params = {
               Bucket: bucketName,
               Key: s3Key,
-              Body: fileData,
-              ContentType: 'application/pdf',
-            };
+              Body: file.buffer, // Assuming file is in memory; adjust if it's a stream
+              ContentType: file.mimetype, // Set content type from file metadata
+          };
       
             return await this.s3.upload(params).promise();
           } catch (error) {

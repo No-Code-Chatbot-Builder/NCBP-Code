@@ -439,7 +439,8 @@ export class PineconeService {
             ],
             metadata: {
               userId: 'u1',
-              workspaceId: 'workspace'
+              workspaceId: 'workspace',
+              string: "avc"
             }}]);
 
     }

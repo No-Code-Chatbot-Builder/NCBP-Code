@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LangchainService } from './langchain.service';
+import { LangchainService } from './langchain-docLoaders.service';
 
 describe('LangchainService', () => {
   let service: LangchainService;

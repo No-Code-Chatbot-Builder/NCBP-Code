@@ -3,10 +3,14 @@ import * as AWS from 'aws-sdk';
 import { PutItemOutput } from 'aws-sdk/clients/dynamodb';
 import { GenerateIdService } from 'src/generate-id/generate-id.service';
 import { ConfigService } from '@nestjs/config';
+import { S3Service } from 'src/s3/s3.service';
+import { LangchainService } from 'src/langchain-docLoaders/langchain-docLoaders.service';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class DynamoDbService {
     private dynamodb: AWS.DynamoDB.DocumentClient;
+    private tableName =  this.configService.get<string>('DYNAMODB_TABLE_NAME');
 
     constructor(private configService: ConfigService) {
         // Initialize the DynamoDB DocumentClient
@@ -26,8 +30,8 @@ export class DynamoDbService {
           description: description
         }
         const params = {
-            // TableName: this.configService.get<string>('DYANMODB_TABLE_NAME'),
-            TableName: "ncbp",
+            TableName: this.tableName,
+           
             Item: datasetDetails,
           };
       
@@ -39,11 +43,15 @@ export class DynamoDbService {
               message: "Dataset created successfully.",
               workspaceId: workspaceId,
               datasetDetails: {
+                  datasetId: datasetId,
                   name: name,
                   description: description,
                   workspaceId: workspaceId,
-                  datasetId: datasetId
+                  
               },
+
+              
+
           };
 
           return response; // Return the response object
@@ -54,26 +62,73 @@ export class DynamoDbService {
           }
 
     }
-    async addDatasetRecord(tableName: string, dataset: any): Promise<PutItemOutput> {
-        const datasetItem = {
-          PK: `DATASET#${GenerateIdService.generateId()}`, // Use a partition key format that aligns with your access patterns
-          SK: `METADATA#${dataset.id}`, // Sort key can be the same as the PK if there's only one entry per dataset
-          Name: dataset.name,
-          Description: dataset.description,
-          WorkspaceId: dataset.workspaceId,
-          Data: dataset.data, // Assuming 'data' is an array of objects as in your provided JSON structure
-          // ... include other dataset attributes as necessary
+
+    async addData(data: any, userId: string, workspaceId: string, datasetId: string): Promise<any> {
+
+        
+        // ...
+
+        let type: string;
+        let path: string;
+        let name: string;
+
+        if (typeof data === 'string') {
+          type = "url";
+          path = data;
+          const parsedUrl = new URL(data);
+          name = parsedUrl.hostname;
+        }
+        else if (typeof data === 'object') {
+          const bucketName = this.configService.get<string>('S3_BUCKET_NAME')
+          type = "file";
+          path = "https://" + bucketName + ".s3.us-east-1.amazonaws.com/" + userId + "/" + workspaceId + "/" + datasetId;
+          name = data.originalname;
+
+          // Upload the file to S3
+          const s3Service = new S3Service();
+          s3Service.uploadFileToS3(bucketName, data, userId, workspaceId, datasetId);
+
+
+        }
+
+        const dataId = `DATA#${GenerateIdService.generateId()}`;
+        const dataItem = {
+          PK: dataId, // Use a partition key format that aligns with your access patterns
+          SK: datasetId, // Sort key can be the same as the PK if there's only one entry per dataset
+          name: name,
+          type: type,
+          path: path,
+          userId: userId,
         };
         
         const params = {
-            TableName: tableName,
-            Item: datasetItem,
+            TableName: this.tableName,
+            Item: dataItem,
           };
       
           try {
-            const data = await this.dynamodb.put(params).promise();
-            console.log('Dataset record created successfully:', data);
-            return data; // The response from DynamoDB
+            const dynamoDbResponse = await this.dynamodb.put(params).promise();
+            
+            const response = {
+              success: true,
+              message: "Data added successfully.",
+              datasetId: datasetId,
+              dataDetails: {
+                  dataId: dataId,
+                  type: type,
+                  path: path
+                  
+              },
+              
+
+            };
+            
+            const httpService = new HttpService();
+            const ls = new LangchainService(httpService);
+            ls.dataProcessor(data);
+
+
+            return response; 
           } catch (error) {
             console.error('Error creating dataset record:', error);
             throw new Error(`Unable to create dataset record: ${error.message}`);
