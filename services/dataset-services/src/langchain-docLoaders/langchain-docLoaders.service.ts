@@ -7,6 +7,7 @@ import { DocxLoader } from "langchain/document_loaders/fs/docx";
 import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
 import { join } from 'path';
 import { HttpService } from '@nestjs/axios';
+import { Express } from 'express'; // Import Express namespace
 
 
 /*
@@ -37,7 +38,7 @@ export class LangchainService {
         }
 
     }
-    async fileProcessor(file: Express.Multer.File)
+    async fileProcessor(file: Express.Multer.File) // Fix parameter type declaration
     {
         // Define the path where you want to save the file
         this.savePath = join(__dirname, '..', 'uploads');
@@ -49,32 +50,37 @@ export class LangchainService {
             
             case 'application/pdf':
                 // Handle PDF file
-                text = this.pdfLoader(file);
+                text = await this.pdfLoader(file);
                 break;
             case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                 // Handle DOCX file
-                text = this.docxLoader(file);
+                text = await this.docxLoader(file);
                 break;
             case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
                 // Handle PPT file
-                text = this.pptLoader(file);
+                text = await this.pptLoader(file);
                 break;
             case 'text/plain':
                 // Handle text file
-                text = this.textLoader(file);
+                text = await this.textLoader(file);
                 break;
             // Add more cases as needed for other file types
         }
+        let texts: string[] = [];
+
+        for (let i = 0; i < text.length; i++) {
+            texts.push(text[i].pageContent);
+        }
 
         try {
-            const response = await this.httpService.post('http://localhost:80', {
-              text: text
+            const response = await this.httpService.post('http://localhost:80/vectorEmbeddings', {
+                texts: texts // Replace with actual texts
             }).toPromise(); // Convert Observable to Promise
-      
+
             console.log('Response from server:', response.data);
-          } catch (error) {
+        } catch (error) {
             console.error('Error sending text to server:', error);
-          }
+        }
     }
 
     async pdfLoader(file: Express.Multer.File) // one document per page
@@ -96,7 +102,8 @@ export class LangchainService {
         const loader = new DocxLoader(this.savePath);
 
         const docs = await loader.load();
-        return docs
+        
+        return docs;
     }
     async textLoader(file: Express.Multer.File) 
     {
