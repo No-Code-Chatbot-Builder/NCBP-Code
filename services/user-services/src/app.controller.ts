@@ -18,7 +18,7 @@ export class AppController {
     return await this.dynamoDbService.getAllUsers();
   }
 
-  @Post('/userById')
+  @Get('/userById')
   async getUserById(@Body() body: { sub: string }): Promise<any> {
     const { sub } = body;
     return await this.userService.getUserById(sub);

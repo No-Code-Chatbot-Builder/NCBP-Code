@@ -1,8 +1,44 @@
-# syntax=docker/dockerfile:1
+# Step 1: Set the base image. Using the official Node.js 20 image we are setting up the image for the build process.
+FROM node:20-alpine as builder
 
-FROM node:18-alpine
-WORKDIR /app
+# Step 2: Set the working directory in the container.
+WORKDIR /usr/src/app
+
+# Step 3: Copy package.json and package-lock.json (or yarn.lock if you use yarn).
+COPY package*.json ./
+
+# Step 4: Install dependencies.
+RUN npm install
+
+# Step 5: Copy the rest of your application's code.
 COPY . .
-RUN yarn install --production
-CMD ["node", "src/index.js"]
+
+# Step 6: Compile TypeScript to JavaScript.
+RUN npm run build
+
+# Step 7: Use multi-stage build to reduce the image size. 
+# This step is optional so the we can do it without doing this step too but
+# it is recommended.
+FROM node:20-alpine as production
+
+# Set the NODE_ENV environment variable to 'production'.
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+# Set the working directory in the container.
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json for production dependencies.
+COPY package*.json ./
+
+# Install only production dependencies.
+RUN npm install --only=production
+
+# Copy built assets from the 'builder' stage.
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Step 8: Expose the port your app runs on.
 EXPOSE 3000
+
+# Step 9: Define the command to run your app using Node.js.
+CMD ["node", "dist/main"]
