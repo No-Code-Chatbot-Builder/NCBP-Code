@@ -1,4 +1,4 @@
-import {  DeleteWorkspaceRequest } from '../interfaces/request.interface';
+import {  DeleteWorkspaceRequest } from '../dtos/request.dto';
 import { Workspace } from '../entities/workspace';
 import { deleteWorkspace } from '../data/deleteWorkspace';
 import { DEFAULT_WORKSPACE } from '../utils/constants';
@@ -10,9 +10,9 @@ export const deleteWorkspaceHandler = async (input: DeleteWorkspaceRequest) => {
     name: input.workspaceName,
   })
 
-  const { error, workspace } = await deleteWorkspace(queryWorkspace)
+  const { error, workspace, statusCode } = await deleteWorkspace(queryWorkspace)
 
-  const statusCode = error ? 500 : 200
+  // const statusCode = error ? 500 : 200
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ workspace })
 
   return {

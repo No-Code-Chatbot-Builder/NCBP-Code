@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { HttpStatusCode } from '../utils/constants';
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    return res.status(401).json({ error: 'Unauthorized - Bearer token is missing' });
+    return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - Bearer token is missing' });
   }
 
   try {
@@ -15,7 +16,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     next();
   } catch (error: any) {
     console.error(error);
-    res.status(401).json({ error: 'Unauthorized - ' + error.message });
+    res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - ' + error.message });
   }
 };
 

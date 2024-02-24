@@ -1,4 +1,4 @@
-import { IMembership, Role } from "../interfaces/workspace.interface"
+import { IMembership, Role } from "../dtos/workspace.dto"
 
 
 class Membership {

@@ -1,6 +1,6 @@
 import { getWorkspace } from '../data/getWorkspace';
 import { Workspace } from '../entities/workspace';
-import { GetWorkspaceRequest } from '../interfaces/request.interface';
+import { GetWorkspaceRequest } from '../dtos/request.dto';
 import { DEFAULT_WORKSPACE } from '../utils/constants';
 
 export const getWorkspaceHandler = async (input: GetWorkspaceRequest) => {
@@ -9,9 +9,9 @@ const queryWorkspace = new Workspace({
     name: input.workspaceName,
 });
 
-const { workspace, error } = await getWorkspace(queryWorkspace);
+const { workspace, error, statusCode } = await getWorkspace(queryWorkspace);
 
-const statusCode = error ? 500 : 200;
+// const statusCode = error ? 500 : 200;
 const body = error ? JSON.stringify({ error }) : JSON.stringify({ workspace });
 
   return {

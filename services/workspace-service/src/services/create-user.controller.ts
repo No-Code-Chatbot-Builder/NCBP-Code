@@ -1,4 +1,4 @@
-import { CreateUserRequest } from '../interfaces/request.interface';
+import { CreateUserRequest } from '../dtos/request.dto';
 import { createUser } from '../data/createUser';
 import { User } from '../entities/user';
 

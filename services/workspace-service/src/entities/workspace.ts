@@ -1,4 +1,4 @@
-import { IWorkspace, IWorkspaceUser } from "../interfaces/workspace.interface"
+import { IWorkspace, IWorkspaceUser } from "../dtos/workspace.dto"
 
 class Workspace implements IWorkspace {
     name: string

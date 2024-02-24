@@ -1,4 +1,5 @@
 import { Membership } from '../entities/membership';
+import { HttpStatusCode } from '../utils/constants';
 import { dynamoDB } from '../utils/db';
 
 export const inviteUser = async (membership: Membership) => {
@@ -21,20 +22,24 @@ export const inviteUser = async (membership: Membership) => {
 
     return {
       membership,
+      statusCode: HttpStatusCode.OK,
     };
   } catch (error: any) {
     console.log(error);
 
     let errorMessage = 'Could not create workspace.';
+    let statusCode = HttpStatusCode.BAD_REQUEST;
 
     if (error.code === 'TransactionCanceledException') {
       if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
+        statusCode = HttpStatusCode.CONFLICT;
       }
     }
 
     return {
       error: errorMessage,
+      statusCode,
     };
   }
 };

@@ -1,7 +1,7 @@
-import { AddUserToWorkspaceRequest } from '../interfaces/request.interface';
+import { AddUserToWorkspaceRequest } from '../dtos/request.dto';
 import { inviteUser } from '../data/inviteUser';
 import { Membership } from '../entities/membership';
-import { Role } from '../interfaces/workspace.interface';
+import { Role } from '../dtos/workspace.dto';
 import { sendEmail } from '../utils/helpers';
 
 export const inviteUserHandler = async (input: AddUserToWorkspaceRequest) => {
@@ -13,11 +13,10 @@ export const inviteUserHandler = async (input: AddUserToWorkspaceRequest) => {
     createdAt: new Date().toISOString(),
   });
 
-  const { error, membership } = await inviteUser(queryMembership);
+  const { error, membership, statusCode } = await inviteUser(queryMembership);
 
   await sendEmail(input.userEmail, input.workspaceName);
 
-  const statusCode = error ? 500 : 200;
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ membership });
 
   return {

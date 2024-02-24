@@ -15,16 +15,16 @@ import {
   RemoveUserFromWorkspaceRequest,
   RespondToWorkspaceInviteRequest,
   UpdateWorkspaceRequest,
-} from '../interfaces/request.interface';
-import { createWorkspaceHandler } from '../controller/create-workspace.controller';
-import { getWorkspaceHandler } from '../controller/get-workspace.controller';
-import { inviteUserHandler } from '../controller/invite-user.controller';
-import { updateWorkspaceHandler } from '../controller/update-workspace.controller';
-import { deleteWorkspaceHandler } from '../controller/delete-workspace.controller';
+} from '../dtos/request.dto';
+import { createWorkspaceHandler } from '../services/create-workspace.controller';
+import { getWorkspaceHandler } from '../services/get-workspace.controller';
+import { inviteUserHandler } from '../services/invite-user.controller';
+import { updateWorkspaceHandler } from '../services/update-workspace.controller';
+import { deleteWorkspaceHandler } from '../services/delete-workspace.controller';
 import { authorize } from '../middlewares/role-authorization.middleware';
-import { createUserHandler } from '../controller/create-user.controller';
-import { respondInviteHandler } from '../controller/respond-invite.controller';
-import { removeUserHandler } from '../controller/remove-user.controller';
+import { createUserHandler } from '../services/create-user.controller';
+import { respondInviteHandler } from '../services/respond-invite.controller';
+import { removeUserHandler } from '../services/remove-user.controller';
 
 const workspaceRouter = express.Router();
 
@@ -64,8 +64,8 @@ workspaceRouter.post('/respond', async (req, res) => {
   res.status(statusCode).json(JSON.parse(body));
 });
 
-// POST remove user from a workspace
-workspaceRouter.post('/remove', async (req, res) => {
+// PUT remove user from a workspace
+workspaceRouter.put('/remove', async (req, res) => {
   const input: RemoveUserFromWorkspaceRequest = req.body;
 
   const { statusCode, body } = await removeUserHandler(input);

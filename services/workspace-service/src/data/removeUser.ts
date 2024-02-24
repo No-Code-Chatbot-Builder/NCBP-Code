@@ -1,4 +1,5 @@
 import { Membership } from '../entities/membership';
+import { HttpStatusCode } from '../utils/constants';
 import { dynamoDB } from '../utils/db';
 
 export const removeUser = async (membership: Membership) => {
@@ -14,17 +15,21 @@ export const removeUser = async (membership: Membership) => {
 
     return {
       membership: Membership.fromItem(result.Attributes as Membership),
+      statusCode: HttpStatusCode.NO_CONTENT
     };
   } catch (error: any) {
     console.log('Error removing user from workspace');
     console.log(error);
     let errorMessage = 'Could not remove uer from workspace';
+    let statusCode = HttpStatusCode.BAD_REQUEST;
     // If it's a condition check violation, we'll try to indicate which condition failed.
     if (error.code === 'ConditionalCheckFailedException') {
       errorMessage = 'User doesnot exist in workspace';
+      statusCode = HttpStatusCode.NOT_FOUND;
     }
     return {
       error: errorMessage,
+      statusCode
     };
   }
 };

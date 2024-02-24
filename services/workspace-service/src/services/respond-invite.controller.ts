@@ -1,8 +1,8 @@
-import { RespondToWorkspaceInviteRequest } from '../interfaces/request.interface';
+import { RespondToWorkspaceInviteRequest } from '../dtos/request.dto';
 
 import { Membership } from '../entities/membership';
-import { Response, Role } from '../interfaces/workspace.interface';
-import { acceptInvite } from '../data/acceptInvite';
+import { Response, Role } from '../dtos/workspace.dto';
+import { respondInvite } from '../data/respondInvite';
 import { DEFAULT_MEMBERSHIP } from '../utils/constants';
 
 export const respondInviteHandler = async (input: RespondToWorkspaceInviteRequest) => {
@@ -13,9 +13,9 @@ export const respondInviteHandler = async (input: RespondToWorkspaceInviteReques
     role: input.response === Response.ACCEPTED ? Role.MEMBER : Role.REJECTED
   })
 
-  const { error, membership } = await acceptInvite(queryMembership);
+  const { error, membership, statusCode } = await respondInvite(queryMembership);
 
-  const statusCode = error ? 500 : 200;
+  // const statusCode = error ? 500 : 200;
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ membership });
 
   return {

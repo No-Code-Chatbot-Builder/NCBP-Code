@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../entities/user';
-import { DEFAULT_USER } from '../utils/constants';
+import { DEFAULT_USER, HttpStatusCode } from '../utils/constants';
 import { getUser } from '../data/getUser';
-import { Role } from '../interfaces/workspace.interface';
+import { Role } from '../dtos/workspace.dto';
 
 export const authorize = async (req: Request, res: Response, next: NextFunction) => {
     const input = req.body;
@@ -18,16 +18,16 @@ export const authorize = async (req: Request, res: Response, next: NextFunction)
     }
 
     if (!user) {
-        return res.status(401).json({ error: 'Unauthorized - User not found' });
+        return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - User not found' });
     }
 
     if (!user.workspaces.hasOwnProperty(input.workspaceName.toLowerCase())) {
-        return res.status(401).json({ error: 'Unauthorized - User not part of workspace' });
+        return res.status(HttpStatusCode.FORBIDDEN).json({ error: 'Unauthorized - User not part of workspace' });
     }
 
     const role = user.workspaces[input.workspaceName.toLowerCase()];
     if (role !== Role.ADMIN && role !== Role.OWNER) {
-        return res.status(401).json({ error: 'Unauthorized - User does not have permission' });
+        return res.status(HttpStatusCode.FORBIDDEN).json({ error: 'Unauthorized - User does not have permission' });
     }
 
     next();

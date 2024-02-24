@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { CreateWorkspaceRequest } from '../interfaces/request.interface';
+import { CreateWorkspaceRequest } from '../dtos/request.dto';
 import { Workspace } from '../entities/workspace';
 import { createWorkspace } from '../data/createWorkspace';
+import { HttpStatusCode } from '../utils/constants';
 
 
 export const createWorkspaceHandler = async (input: CreateWorkspaceRequest) => {
@@ -19,9 +20,8 @@ export const createWorkspaceHandler = async (input: CreateWorkspaceRequest) => {
     updatedAt: new Date().toISOString()
   })
 
-  const { error } = await createWorkspace(workspace)
+  const { error, statusCode } = await createWorkspace(workspace)
 
-  const statusCode = error ? 500 : 200
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ workspace })
 
   return {

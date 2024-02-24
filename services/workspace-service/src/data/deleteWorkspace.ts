@@ -1,7 +1,8 @@
 import { Membership } from '../entities/membership';
 import { Workspace } from '../entities/workspace';
-import { IWorkspace } from '../interfaces/workspace.interface';
+import { IWorkspace } from '../dtos/workspace.dto';
 import { dynamoDB } from '../utils/db';
+import { HttpStatusCode } from '../utils/constants';
 
 export const deleteWorkspace = async (workspace: Workspace) => {
   const queryParams = {
@@ -17,6 +18,7 @@ export const deleteWorkspace = async (workspace: Workspace) => {
     
     if (!results.Items) {
       return {
+        statusCode: HttpStatusCode.NOT_FOUND,
         error: 'Workspace not found.',
       };
     }
@@ -38,18 +40,22 @@ export const deleteWorkspace = async (workspace: Workspace) => {
     });
     console.log(Workspace.fromItem(workspace))
     return {
-        workspace: Workspace.fromItem(workspace)
+        workspace: Workspace.fromItem(workspace),
+        statusCode: HttpStatusCode.NO_CONTENT
     };
   } catch (error: any) {
     console.log('Error deleting workspace');
     console.log(error);
     let errorMessage = 'Could not update workspace';
+    let statusCode = HttpStatusCode.BAD_REQUEST;
     // If it's a condition check violation, we'll try to indicate which condition failed.
     if (error.code === 'ConditionalCheckFailedException') {
       errorMessage = 'Workspace does not exist';
+      statusCode = HttpStatusCode.NOT_FOUND;
     }
     return {
       error: errorMessage,
+      statusCode
     };
   }
 };

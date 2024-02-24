@@ -1,8 +1,9 @@
 import { Membership } from '../entities/membership';
-import { Role } from '../interfaces/workspace.interface';
+import { Role } from '../dtos/workspace.dto';
 import { dynamoDB } from '../utils/db';
+import { HttpStatusCode } from '../utils/constants';
 
-export const acceptInvite = async (membership: Membership) => {
+export const respondInvite = async (membership: Membership) => {
   // TODO: Append User record
 
   const paramsMembership = {
@@ -34,20 +35,24 @@ export const acceptInvite = async (membership: Membership) => {
 
     return {
       membership,
+      statusCode: HttpStatusCode.OK,
     };
   } catch (error: any) {
     console.log(error);
 
     let errorMessage = 'Could not accept invite.';
+    let statusCode = HttpStatusCode.BAD_REQUEST;  
 
     if (error.code === 'TransactionCanceledException') {
       if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
+        statusCode = HttpStatusCode.CONFLICT;
       }
     }
 
     return {
       error: errorMessage,
+      statusCode,
     };
   }
 };

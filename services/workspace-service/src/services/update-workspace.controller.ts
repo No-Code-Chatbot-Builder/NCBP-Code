@@ -1,4 +1,4 @@
-import {  UpdateWorkspaceRequest } from '../interfaces/request.interface';
+import {  UpdateWorkspaceRequest } from '../dtos/request.dto';
 import { Workspace } from '../entities/workspace';
 import { updateWorkspace } from '../data/updateWorkspace';
 
@@ -17,9 +17,9 @@ export const updateWorkspaceHandler = async (input: UpdateWorkspaceRequest) => {
     updatedAt: new Date().toISOString()
   })
 
-  const { error } = await updateWorkspace(workspace)
+  const { error, statusCode } = await updateWorkspace(workspace)
 
-  const statusCode = error ? 500 : 200
+  // const statusCode = error ? 500 : 200
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ workspace })
 
   return {

@@ -1,6 +1,6 @@
 
 import { User } from "../entities/user";
-import { IUser } from "../interfaces/user.interface";
+import { IUser } from "../dtos/user.dto";
 import { dynamoDB } from "../utils/db";
 
 export const getUser = async (user: User) => {

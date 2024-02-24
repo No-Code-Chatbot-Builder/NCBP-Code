@@ -1,4 +1,4 @@
-import {  DeleteWorkspaceRequest, RemoveUserFromWorkspaceRequest } from '../interfaces/request.interface';
+import {  DeleteWorkspaceRequest, RemoveUserFromWorkspaceRequest } from '../dtos/request.dto';
 import { Workspace } from '../entities/workspace';
 import { DEFAULT_MEMBERSHIP, DEFAULT_WORKSPACE } from '../utils/constants';
 import { Membership } from '../entities/membership';
@@ -12,9 +12,9 @@ export const removeUserHandler = async (input: RemoveUserFromWorkspaceRequest) =
     workspaceName: input.workspaceName,
   })
 
-  const { error, membership } = await removeUser(queryMembership)
+  const { error, membership, statusCode } = await removeUser(queryMembership)
 
-  const statusCode = error ? 500 : 200
+  // const statusCode = error ? 500 : 200
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ membership })
 
   return {

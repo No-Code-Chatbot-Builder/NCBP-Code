@@ -1,4 +1,4 @@
-import { Response } from "./workspace.interface";
+import { Response } from "./workspace.dto";
 
 interface CreateWorkspaceRequest {
     name: string;

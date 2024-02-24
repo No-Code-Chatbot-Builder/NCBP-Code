@@ -1,7 +1,8 @@
 import { Membership } from '../entities/membership';
 import { Workspace } from '../entities/workspace';
-import { Role } from '../interfaces/workspace.interface';
+import { Role } from '../dtos/workspace.dto';
 import { dynamoDB } from '../utils/db';
+import { HttpStatusCode } from '../utils/constants';
 
 export const createWorkspace = async (workspace: Workspace) => {
   // TODO: Append User record
@@ -42,22 +43,27 @@ export const createWorkspace = async (workspace: Workspace) => {
 
     return {
       workspace,
+      statusCode: HttpStatusCode.CREATED,
     };
   } catch (error: any) {
     console.log(error);
 
     let errorMessage = 'Could not create workspace.';
+    let statusCode = HttpStatusCode.BAD_REQUEST;
 
     if (error.code === 'TransactionCanceledException') {
       if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
         errorMessage = 'Workspace with this name already exists.';
+        statusCode = HttpStatusCode.CONFLICT;
       } else if (error.cancellationReasons[1].Code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
+        statusCode = HttpStatusCode.CONFLICT;
       }
     }
 
     return {
       error: errorMessage,
+      statusCode,
     };
   }
 };

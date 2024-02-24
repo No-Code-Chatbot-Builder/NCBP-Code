@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { body, query, validationResult } from 'express-validator';
+import { HttpStatusCode } from '../utils/constants';
 
-const VALIDATION_STATUS_CODE = 400;
 
 const validateCreateWorkspace = (req: Request, res: Response, next: NextFunction) => {
   body('name').notEmpty().isString();
@@ -13,7 +13,7 @@ const validateCreateWorkspace = (req: Request, res: Response, next: NextFunction
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: errors.array() });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };
@@ -25,7 +25,7 @@ const validateGetWorkspace = (req: Request, res: Response, next: NextFunction) =
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: errors.array() });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };
@@ -38,7 +38,7 @@ const validateAddUserToWorkspace = (req: Request, res: Response, next: NextFunct
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: errors.array() });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };
@@ -51,7 +51,7 @@ const validateRemoveUserFromWorkspace = (req: Request, res: Response, next: Next
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: errors.array() });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };
@@ -66,13 +66,13 @@ const validateUpdateWorkspace = (req: Request, res: Response, next: NextFunction
   body('description').optional().isString();
 
   if (!req.body.website && !req.body.description) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: 'Either website or description should be present' });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: 'Either website or description should be present' });
   }
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: errors.array() });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };
@@ -84,7 +84,7 @@ const validateDeleteWorkspace = (req: Request, res: Response, next: NextFunction
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(VALIDATION_STATUS_CODE).json({ errors: errors.array() });
+    return res.status(HttpStatusCode.BAD_REQUEST).json({ errors: errors.array() });
   }
   next();
 };
