@@ -52,7 +52,7 @@ export class AppController {
     {
       data = url;
     }
-    const userId = "USER#123"; // Replace with req[user] after creating middleware
+    const userId = "123"; // Replace with req[user] after creating middleware
 
     const response = await this.dynamoDbService.addData(data, userId, workspaceId, datasetId)
     return response;
@@ -71,10 +71,5 @@ export class AppController {
     return response;
   }
   
-  @Post("embedVectors")
-  async embedVectors(): Promise<any> {
-    const indexName = "test-index";
 
-    await this.pineconeService.upsertRecords(indexName);
-  }
 }

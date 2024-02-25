@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LangchainService } from './langchain-docLoaders.service';
+import { LangchainDocLoaderService } from './langchain-docLoaders.service';
 
-describe('LangchainService', () => {
-  let service: LangchainService;
+describe('LangchainDocLoaderService', () => {
+  let service: LangchainDocLoaderService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LangchainService],
+      providers: [LangchainDocLoaderService],
     }).compile();
 
-    service = module.get<LangchainService>(LangchainService);
+    service = module.get<LangchainDocLoaderService>(LangchainDocLoaderService);
   });
 
   it('should be defined', () => {

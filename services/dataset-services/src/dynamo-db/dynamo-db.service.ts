@@ -4,7 +4,7 @@ import { PutItemOutput } from 'aws-sdk/clients/dynamodb';
 import { GenerateIdService } from 'src/generate-id/generate-id.service';
 import { ConfigService } from '@nestjs/config';
 import { S3Service } from 'src/s3/s3.service';
-import { LangchainService } from 'src/langchain-docLoaders/langchain-docLoaders.service';
+import { LangchainDocLoaderService } from 'src/langchain-docLoaders/langchain-docLoaders.service';
 import { HttpService } from '@nestjs/axios';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class DynamoDbService {
     private dynamodb: AWS.DynamoDB.DocumentClient;
     private tableName =  this.configService.get<string>('DYNAMODB_TABLE_NAME');
 
-    constructor(private configService: ConfigService) {
+    constructor(private configService: ConfigService, private LangchainDocLoaderService: LangchainDocLoaderService) {
         // Initialize the DynamoDB DocumentClient
         this.dynamodb = new AWS.DynamoDB.DocumentClient({
             region: 'us-east-1' 
@@ -86,7 +86,7 @@ export class DynamoDbService {
 
           // Upload the file to S3
           const s3Service = new S3Service();
-          s3Service.uploadFileToS3(bucketName, data, userId, workspaceId, datasetId);
+          s3Service.uploadFileToS3(bucketName, data, `USER#${userId}`, `WORKSPACE#${workspaceId}`, `DATASET#${datasetId}`);
 
 
         }
@@ -94,11 +94,11 @@ export class DynamoDbService {
         const dataId = `DATA#${GenerateIdService.generateId()}`;
         const dataItem = {
           PK: dataId, // Use a partition key format that aligns with your access patterns
-          SK: datasetId, // Sort key can be the same as the PK if there's only one entry per dataset
+          SK: `DATASET#${datasetId}`, // Sort key can be the same as the PK if there's only one entry per dataset
           name: name,
           type: type,
           path: path,
-          userId: userId,
+          userId: `USER#${userId}`,
         };
         
         const params = {
@@ -124,8 +124,8 @@ export class DynamoDbService {
             };
             
             const httpService = new HttpService();
-            const ls = new LangchainService(httpService);
-            ls.dataProcessor(data);
+            this.LangchainDocLoaderService.dataProcessor(data, userId, workspaceId, datasetId);
+            
 
 
             return response; 

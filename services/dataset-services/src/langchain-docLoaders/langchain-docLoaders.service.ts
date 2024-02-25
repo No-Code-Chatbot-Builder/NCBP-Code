@@ -7,6 +7,7 @@ import { DocxLoader } from "langchain/document_loaders/fs/docx";
 import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
 import { join } from 'path';
 import { HttpService } from '@nestjs/axios';
+import { PineconeService } from 'src/pinecone/pinecone.service';
 import { Express } from 'express'; // Import Express namespace
 
 
@@ -14,31 +15,31 @@ import { Express } from 'express'; // Import Express namespace
     Please note that the following class will be adjusted to incorporate Strategy/Factory Pattern to address various loaders
 */
 @Injectable()
-export class LangchainService {
+export class LangchainDocLoaderService {
     
     private data: any;
     private savePath: string;
 
     
     
-    constructor(private httpService: HttpService) {
+    constructor(private httpService: HttpService, private pineconeService: PineconeService) {
         
 
 
 
     }
 
-    async dataProcessor(data: File | string)
+    async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string)
     {
         this.data = data;
         if (typeof(this.data) === "object") {
-            this.fileProcessor(this.data);
+            this.fileProcessor(this.data, userId, workspaceId, datasetId);
         }else if (typeof(this.data) === "string") {
             this.webLoader(this.data);
         }
 
     }
-    async fileProcessor(file: Express.Multer.File) // Fix parameter type declaration
+    async fileProcessor(file: Express.Multer.File, userId: string, workspaceId: string, datasetId: string) // Fix parameter type declaration
     {
         // Define the path where you want to save the file
         this.savePath = join(__dirname, '..', 'uploads');
@@ -77,7 +78,8 @@ export class LangchainService {
                 texts: texts // Replace with actual texts
             }).toPromise(); // Convert Observable to Promise
 
-            console.log('Response from server:', response.data);
+            
+            this.pineconeService.upsertRecords(response.data, userId, workspaceId, datasetId)
         } catch (error) {
             console.error('Error sending text to server:', error);
         }
