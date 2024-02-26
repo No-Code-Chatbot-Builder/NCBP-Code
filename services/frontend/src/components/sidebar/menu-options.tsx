@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { ChevronsUpDown, Menu, PlusCircle, Settings } from "lucide-react";
+import { ChevronsUpDown, Menu, Plus, PlusCircle, Settings } from "lucide-react";
 import clsx from "clsx";
 import {
   Command,
@@ -29,6 +29,9 @@ import {
   CardTitle,
 } from "../ui/card";
 import { ModeToggle } from "../global/mode-toggle";
+import { ModeDashboardToggle } from "../global/mode-dashboard";
+import CustomModel from "../global/custom-model";
+import CreateWorkspaceForm from "../forms/create-workspace";
 
 type Props = {
   defaultOpen?: boolean;
@@ -109,7 +112,7 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="mt-2 w-64 h-fit z-50">
-                <Card>
+                <Card className="border-2 border-text-muted">
                   <CardHeader>
                     <CardTitle className="text-xl">Change Workspace</CardTitle>
                     <CardDescription className="text-xs">
@@ -121,8 +124,20 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
                       <div className="text-muted-foreground">
                         No new workspaces
                       </div>
-                      <Button className="w-full gap-2">
-                        <PlusCircle className="w-4 h-4" />
+                      <Button
+                        className="w-full gap-2"
+                        onClick={() => {
+                          setOpen(
+                            <CustomModel
+                              title="Create New Workspace"
+                              description="Enter the details below to create a new workspace"
+                            >
+                              <CreateWorkspaceForm />
+                            </CustomModel>
+                          );
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
                         Create Workspace
                       </Button>
                     </div>
@@ -176,14 +191,18 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
                 ))}
               </CommandList>
             </Command>
-
-            <div>
-              <div className="hidden">
-                <ModeToggle />
+            <section>
+              <div>
+                <ModeDashboardToggle />
               </div>
 
-              <PersonalDetails />
-            </div>
+              <Popover>
+                <PopoverTrigger className="hover:bg-card rounded-lg p-1">
+                  <PersonalDetails />
+                </PopoverTrigger>
+                <PopoverContent></PopoverContent>
+              </Popover>
+            </section>
           </nav>
         </div>
       </SheetContent>

@@ -30,9 +30,7 @@ export default function Page() {
         {assistants.map((assistant) => (
           <Card key={assistant.id}>
             <CardHeader>
-              <CardTitle className="text-secondary">
-                {assistant.title}
-              </CardTitle>
+              <CardTitle>{assistant.title}</CardTitle>
               <CardDescription>
                 <div className="flex gap-4">
                   <div>{assistant.description}</div>

@@ -20,8 +20,8 @@ export const icons = [
     path: Zap,
   },
   {
-    value: "agents",
-    label: "Agents",
+    value: "assistants",
+    label: "Assistants",
     path: Code,
   },
   {
@@ -133,7 +133,7 @@ export const sidebarOpt: SidebarOption[] = [
     items: [
       { name: "Featured", icon: "featured", link: "/dashboard/featured" },
 
-      { name: "Assistants", icon: "agents", link: "/dashboard/agents" },
+      { name: "Assistants", icon: "assistants", link: "/dashboard/assistants" },
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
       { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
@@ -142,5 +142,55 @@ export const sidebarOpt: SidebarOption[] = [
   {
     heading: "",
     items: [],
+  },
+];
+
+export type AssistantType = {
+  id: string;
+  name: string;
+  description: string;
+  owner: string;
+};
+
+export const dummyAssistant: AssistantType[] = [
+  {
+    id: "1",
+    name: "NextJS Assistant",
+    description:
+      "Expert on Next.js and returns answers with high accuracy. Learn next.js from my Assistant",
+    owner: "ibrahimtariqsheikh",
+  },
+  {
+    id: "2",
+    name: "Math Assistant",
+    description:
+      "Trained specifically on Mathematics books for more reliable answers so you can study in peace.",
+    owner: "ibrahimtariqsheikh",
+  },
+  {
+    id: "3",
+    name: "IBA Entry Assistant",
+    description:
+      "Prepare for IBA Entry tests, ask for similar questions and get in with ease.",
+    owner: "hussainmurtaza",
+  },
+];
+
+export type DatasetType = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+export const dummyDataset: DatasetType[] = [
+  {
+    id: "1",
+    name: "Ibrahim's Dataset",
+    description: "Contains Ibrahim's Essential Data",
+  },
+  {
+    id: "2",
+    name: "Hussain's Dataset",
+    description: "Contains Hussain's Essential Data",
   },
 ];

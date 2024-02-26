@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -78,18 +79,18 @@ export const TypewriterEffect = ({
       {renderWords()}
       <motion.span
         initial={{
-          opacity: 0,
+          opacity: 0.3,
         }}
         animate={{
           opacity: 1,
         }}
         transition={{
-          duration: 0.8,
+          duration: 0.2,
           repeat: Infinity,
           repeatType: "reverse",
         }}
         className={cn(
-          "inline-block rounded-sm w-[4px] h-4 md:h-6 lg:h-10 bg-blue-500",
+          "inline-block rounded-sm w-[4px] h-4 md:h-8 lg:h-10 bg-secondary/50 translate-y-1",
           cursorClassName
         )}
       ></motion.span>

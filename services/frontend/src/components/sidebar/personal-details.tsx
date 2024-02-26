@@ -11,7 +11,7 @@ const PersonalDetails = () => {
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>IB</AvatarFallback>
         </Avatar>
-        <div className="flex flex-col">
+        <div className="flex flex-col items-start">
           <h3 className="font-semibold">Ibrahim Sheikh</h3>
           <p className="text-xs text-muted-foreground">
             ibrahimsheikht@gmail.com

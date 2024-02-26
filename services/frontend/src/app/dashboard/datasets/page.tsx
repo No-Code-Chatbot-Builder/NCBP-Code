@@ -1,5 +1,9 @@
 "use client";
+import CreateDatasetForm from "@/components/forms/create-dataset";
 import CustomModel from "@/components/global/custom-model";
+import CustomSheet from "@/components/global/custom-sheet";
+import JsonIcon from "@/components/icons/json-icon";
+import PdfIcon from "@/components/icons/pdf-icon";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,43 +13,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { dummyDataset } from "@/lib/constants";
 
 import { useModal } from "@/providers/modal-provider";
-import { Edit2, Plus } from "lucide-react";
-
-type DatasetType = {
-  name: string;
-  description: string;
-};
-
-const dummyDataset: DatasetType[] = [
-  {
-    name: "Ibrahim's Dataset",
-    description: "Contains Ibrahim's Essential Data",
-  },
-  {
-    name: "Hussain's Dataset",
-    description: "Contains Hussain's Essential Data",
-  },
-];
+import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { setOpen } = useModal();
-  const datasetModal = (
-    <CustomModel
+  const router = useRouter();
+  const datasetSheet = (
+    <CustomSheet
       title="Create New Dataset"
-      subheading="Add data to your dataset here."
+      description="Add data to your dataset here."
     >
-      <div></div>
-    </CustomModel>
+      <CreateDatasetForm />
+    </CustomSheet>
   );
   return (
     <div className="flex flex-col gap-10">
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
-          <div className="flex flex-col gap-4 w-5/6">
+          <div className="flex flex-col gap-4 w-5/6 mr-10">
             <h1 className="text-secondary text-3xl font-bold">Datasets</h1>
-            <p className="text-md text-muted-foreground">
+            <p className="text-md text-muted-foreground hidden md:block">
               Datasets help you manage your data which you can use to configure
               your workspace. Create your personal dataset and start using it
               now.
@@ -55,26 +46,15 @@ export default function Page() {
 
           <Button
             size={"lg"}
-            className="gap-2 hidden lg:flex"
-            variant={"outline"}
+            className="gap-2"
             onClick={() => {
-              setOpen(datasetModal);
+              setOpen(datasetSheet);
             }}
           >
             <Plus className="w-5 h-5" />
-            Create New Dataset
-          </Button>
-
-          {/*Mobile Create Button*/}
-          <Button
-            size={"icon"}
-            variant={"outline"}
-            className="lg:hidden"
-            onClick={() => {
-              setOpen(datasetModal);
-            }}
-          >
-            <Plus className="w-4 h-4" />
+            <p className="flex">
+              Create <span className="hidden lg:block">&nbsp;Dataset</span>
+            </p>
           </Button>
         </div>
         <Separator className="mt-8" />
@@ -87,10 +67,18 @@ export default function Page() {
                 <CardTitle>{dataset.name}</CardTitle>
                 <CardDescription>{dataset.description}</CardDescription>
               </CardHeader>
+              <div className="flex gap-4 px-4">
+                <PdfIcon className="w-12" />
+                <JsonIcon className="w-12" />
+              </div>
               <CardContent>
-                <Button className="w-full gap-2">
-                  <Edit2 className="w-5 h-5" />
-                  Edit
+                <Button
+                  className="w-full gap-2"
+                  onClick={() => {
+                    router.push(`/dashboard/datasets/${dataset.id}`);
+                  }}
+                >
+                  Manage Files
                 </Button>
               </CardContent>
             </Card>

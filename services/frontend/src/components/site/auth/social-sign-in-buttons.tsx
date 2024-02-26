@@ -10,21 +10,21 @@ const SocialSignInButtons = () => {
       <Button
         variant={"outline"}
         size={"icon"}
-        className="bg-secondary hover:bg-secondary/50"
+        className="dark:bg-secondary hover:bg-secondary/50"
       >
         <GoogleIcon className="w-5 h-5" />
       </Button>
       <Button
         variant={"outline"}
         size={"icon"}
-        className="bg-secondary hover:bg-secondary/50"
+        className="dark:bg-secondary hover:bg-secondary/50"
       >
         <FacebookIcon className="w-5 h-5" />
       </Button>
       <Button
         variant={"outline"}
         size={"icon"}
-        className="bg-secondary hover:bg-secondary/50"
+        className="dark:bg-secondary hover:bg-secondary/50"
       >
         <XTwitterIcon className="w-5 h-5" />
       </Button>
