@@ -12,7 +12,23 @@ const font = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "NoCodeBot.ai",
-  description: "Make Custom Chatbots for your everyday tasks",
+  description: "Make Custom Assistants without writing a single line of code.",
+  authors: [
+    { name: "NCBPTeam", url: "https://github.com/No-Code-Chatbot-Builder" },
+  ],
+  openGraph: {
+    type: "website",
+    url: "https://nocodebotai.vercel.app/",
+    title: "NoCodeBot.ai",
+    description:
+      "Create Custom Chat Assistants without writing a single line of code. NoCodeBot.ai personalizes your assistant so you can retrieve custom information with ease. Made by students in IBA from Karachi, Pakistan",
+    siteName: "NoCodeBot.ai",
+    images: [
+      {
+        url: "https://i.ibb.co/L06VyVW/Github-Prreview.png",
+      },
+    ],
+  },
 };
 
 Amplify.configure(config);

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { frontPageCards } from "@/lib/constants";
 import Link from "next/link";
 import Steps from "@/components/site/steps/steps";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   return (
@@ -100,7 +101,7 @@ export default function Home() {
       </section>
 
       <section className="z-10 flex-col gap-4 mt-20 justify-center px-0 xl:px-48">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-secondary my-10 leading-tight">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-secondary my-10 lg:my-32 leading-tight">
           Learn How To Make Your <br />
           Custom AI Assistant.
         </h2>
@@ -123,7 +124,7 @@ export default function Home() {
               description="  After signing up, create a dataset that will contain your
             essential data, needed to create your custom chatbot."
               imageLink="/assets/createdataset.png"
-              className="lg:order-last"
+              className="md:order-last"
             />
             <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-l-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
           </div>
@@ -138,7 +139,7 @@ export default function Home() {
             />
             <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
           </div>
-          {/*Step 1 */}
+          {/*Step 4 */}
           <div className="relative">
             <Steps
               title="All Done! Use your Assistant now."
@@ -146,11 +147,22 @@ export default function Home() {
             NoCodeBot.ai makes this process incredibily easy, all without
             writing any line of code."
               imageLink="/assets/chatbotpage.png"
-              className="lg:order-last"
+              className="md:order-last"
             />
           </div>
         </div>
-        <div></div>
+        <div className="grid gap-12 w-9/12 lg:w-6/12 mx-auto my-32">
+          <h1 className="text-4xl font-bold text-center">
+            Get Early Access and Notified on the day of the Launch.
+          </h1>
+          <div className="flex gap-4">
+            <Input
+              placeholder="Enter your email address"
+              className="rounded-lg bg-card p-6 border-primary"
+            />
+            <Button className="rounded-lg p-6">Subscribe</Button>
+          </div>
+        </div>
       </section>
     </>
   );

@@ -6,8 +6,49 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Code2, MoveDownIcon, Video } from "lucide-react";
+import { MoveDownIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SparklesCore } from "@/components/ui/sparkles";
+
+const people = [
+  {
+    name: "Ibrahim Sheikh",
+    role: "UI/UX/Frontend",
+  },
+  {
+    name: "Hussain Murtaza",
+    role: "AI",
+  },
+  {
+    name: "Zohaib Azam",
+    role: "Cloud/Backend",
+  },
+  {
+    name: "Labib Asif",
+    role: "Cloud/Backend",
+  },
+  {
+    name: "Shariq Anwar",
+    role: "Cloud/Backend",
+  },
+];
+
+const PeopleComponent = () => {
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 mt-10 gap-10 place-items-center">
+      {people.map((person, index) => (
+        <div
+          key={index}
+          className="flex flex-col gap-2 items-center justify-center"
+        >
+          <div className="w-40 h-40 bg-card mb-6 rounded-t-full "></div>
+          <h2 className="text-lg font-semibold">{person.name}</h2>
+          <p className="text-muted-foreground text-sm">{person.role}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const SectionCard = ({
   title,
@@ -31,22 +72,36 @@ const SectionCard = ({
 const AboutPage = () => {
   return (
     <div className="">
-      <div className="flex flex-col justify-center items-center mt-10">
-        <div className="text-center mb-12 grid gap-4">
-          <p className="text-xs font-semibold text-muted-foreground">
+      <div className="flex flex-col justify-center items-center mt-10 ">
+        <div className="w-full absolute inset-0 ">
+          <SparklesCore
+            id="tsparticlesfullpage"
+            background="transparent"
+            minSize={1.0}
+            maxSize={2.0}
+            particleDensity={100}
+            className="w-full h-96"
+            particleColor="#1C65EE"
+          />
+        </div>
+
+        <div className="text-center mb-12 grid gap-8  w-9/12 z-10">
+          <p className="text-sm font-semibold text-muted-foreground">
             About NoCodeBot.ai
           </p>
           <div className="flex justify-center">
-            <h1 className="text-3xl font-bold w-2/3 text-center">
-              Revolutionizing GPT Development, create Assistants without writing
-              any
-              <br />
-              Code.
-            </h1>
+            <h2 className="text-4xl lg:text-5xl font-bold text-center leading-tight w-11/12">
+              Revolutionizing GPT Development. <br />
+            </h2>
           </div>
-          <p className="text-sm font-medium text-muted-foreground">
-            About NoCodeBot.ai
+          <p className="text-md font-medium text-muted-foreground leading-normal">
+            NoCodeBot.ai, a pioneering platform in AI development, empowers
+            users across industries to create AI Assistants effortlessly. With a
+            focus on user control, extensive customization, and comprehensive
+            documentation, it stands apart in a market filled with limited
+            options.
           </p>
+
           <div className="flex gap-3 justify-center">
             <Button className="gap-2">
               <Video className="w-4 h-4" />
@@ -58,37 +113,52 @@ const AboutPage = () => {
             </Button>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-10 mx-10">
-          <SectionCard
-            title="Our Mission"
-            content="At NoCodeBot.ai, our mission is to democratize AI development. We strive to make advanced GPT technology accessible and user-friendly, enabling businesses and individuals to innovate and solve problems without needing extensive coding knowledge."
-          />
-          <SectionCard
-            title="Our Vision"
-            content="We envision a future where the power of AI and GPT models fuels creativity and problem-solving in every industry. By providing intuitive, no-code solutions, we aim to be at the forefront of AI democratization, contributing to a world where technology enhances human potential."
-          />
-          <SectionCard
-            title="Our Values"
-            content="Innovation, accessibility, and empowerment are at the core of everything we do. We believe in building tools that open up new possibilities for our users, ensuring that our products are not only powerful but also ethical and easy to use."
-          />
-          <SectionCard
-            title="Meet the Team"
-            content={
-              <div>
-                <p>
-                  Our team is a blend of AI enthusiasts, software engineers, and
-                  creative thinkers. Leading our team is Jane Doe, our CEO, with
-                  a passion for AI and its potential to change the world. Our
-                  CTO, John Smith, is a veteran in AI research, constantly
-                  pushing the boundaries of what our tools can do. Our design
-                  and development teams work tirelessly to make our vision a
-                  reality, ensuring NoCodeBot.ai is not only technologically
-                  advanced but also user-friendly and engaging.
+        <Card className="w-11/12 mt-10">
+          <CardContent>
+            <div className="flex justify-center">
+              <div className="text-center mb-12 grid gap-4  w-11/12 my-20">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Our Vision
                 </p>
-                {/* Additional team details or profiles can be added here */}
+                <div className="flex justify-center">
+                  <h2 className="text-3xl lg:text-4xl font-bold text-center leading-tight w-10/12">
+                    Making Responsible AI Models that will make you more
+                    productive.
+                  </h2>
+                </div>
+
+                <div className="flex justify-center">
+                  <p className="text-md font-medium text-muted-foreground leading-normal w-10/12 lg:w-1/2 text-center">
+                    Our vision at NoCodeBot.ai is to create a user-friendly,
+                    no-code pipeline that opens the doors of advanced AI
+                    technology to a diverse range of users, especially those
+                    without extensive technical backgrounds. We believe in
+                    democratizing access to AI, ensuring that our cutting-edge
+                    technology serves a broader audience and fosters an
+                    environment where innovation is not limited by technical
+                    expertise. Our commitment lies in making AI accessible,
+                    versatile, and beneficial for all, regardless of their
+                    technical prowess
+                  </p>
+                </div>
               </div>
-            }
-          />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-center">
+          <div className="text-center mb-12 grid gap-4 mt-20">
+            <p className="text-sm font-semibold text-muted-foreground">
+              The Team
+            </p>
+            <div className="flex justify-center">
+              <h2 className="text-3xl lg:text-4xl font-bold text-center leading-tight w-11/12">
+                Meet Everyone who makes this possible.
+              </h2>
+            </div>
+
+            <PeopleComponent />
+          </div>
         </div>
       </div>
     </div>
