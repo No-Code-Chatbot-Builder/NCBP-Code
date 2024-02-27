@@ -102,7 +102,8 @@ export default function Home() {
       <section className="z-10 flex-col gap-4 mt-20 justify-center px-0 xl:px-48 hidden lg:flex">
         <h2 className="text-5xl font-bold text-center text-secondary my-10 leading-tight">
           Learn How To Make Your <br />
-          Custom AI Assistant.
+          Custom AI <br />
+          Assistant.
         </h2>
 
         <div className="">
