@@ -34,7 +34,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
-            <h1 className="text-7xl font-bold text-center md-text-[300px]">
+            <h1 className="text-5xl lg:text-7xl font-bold text-center">
               Make Custom AI Assistants
             </h1>
           </div>
@@ -72,7 +72,7 @@ export default function Home() {
         </div>
       </section>
       <section className="relative z-10 flex justify-center items-center flex-col gap-4 mt-20 md:mt-20">
-        <h2 className="text-5xl font-bold text-center text-secondary my-10 leading-tight">
+        <h2 className="text-4xl lg:text-5xl font-bold text-center text-secondary my-10 leading-tight">
           Make Custom Assistant&apos;s <br />
           For Your Everyday <br />
           Tasks
@@ -99,11 +99,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="z-10 flex-col gap-4 mt-20 justify-center px-0 xl:px-48 hidden lg:flex">
-        <h2 className="text-5xl font-bold text-center text-secondary my-10 leading-tight">
+      <section className="z-10 flex-col gap-4 mt-20 justify-center px-0 xl:px-48">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-secondary my-10 leading-tight">
           Learn How To Make Your <br />
-          Custom AI <br />
-          Assistant.
+          Custom AI Assistant.
         </h2>
 
         <div className="">
@@ -115,7 +114,7 @@ export default function Home() {
           address, password, date of birth and address."
               imageLink="/assets/signup.png"
             />
-            <div className="absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
+            <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
           </div>
           {/*Step 2 */}
           <div className="relative">
@@ -124,9 +123,9 @@ export default function Home() {
               description="  After signing up, create a dataset that will contain your
             essential data, needed to create your custom chatbot."
               imageLink="/assets/createdataset.png"
-              className="order-last"
+              className="lg:order-last"
             />
-            <div className="absolute w-96 h-96 bg-transparent border-t-4 border-l-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
+            <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-l-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
           </div>
           {/*Step 3 */}
           <div className="relative">
@@ -137,7 +136,7 @@ export default function Home() {
             writing any line of code."
               imageLink="/assets/createassistant.png"
             />
-            <div className="absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
+            <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 border-primary right-[500px] -bottom-[250px] rounded-2xl border-dashed -z-10" />
           </div>
           {/*Step 1 */}
           <div className="relative">
@@ -147,7 +146,7 @@ export default function Home() {
             NoCodeBot.ai makes this process incredibily easy, all without
             writing any line of code."
               imageLink="/assets/chatbotpage.png"
-              className="order-last"
+              className="lg:order-last"
             />
           </div>
         </div>

@@ -24,10 +24,10 @@ const Steps = ({ imageLink, title, description, className }: Props) => {
       >
         {/* Shading Effect: Behind the Image */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-10 -left-10 w-96 h-96 bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-5 animate-blob" />
-          <div className="absolute top-10 -right-10 w-96 h-96  bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opactity-5 animate-blob animation-delay-2000" />
-          <div className="absolute -bottom-10 -right-10 w-96 h-96  bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opactity-5 animate-blob animation-delay-4000" />
-          <div className="absolute -bottom-10 -left-10 w-96 h-96  bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opactity-5 animate-blob animation-delay-6000" />
+          <div className="absolute top-10 -left-10  w-52 h-52 lg:w-96 lg:h-96 bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opacity-5 animate-blob" />
+          <div className="absolute top-10 -right-10  w-52 h-52 lg:w-96 lg:h-96  bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opactity-5 animate-blob animation-delay-2000" />
+          <div className="absolute -bottom-10 -right-10 w-52 h-52 lg:w-96 lg:h-96  bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opactity-5 animate-blob animation-delay-4000" />
+          <div className="absolute -bottom-10 -left-10 w-52 h-52 lg:w-96 lg:h-96  bg-primary/60 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-3xl opactity-5 animate-blob animation-delay-6000" />
         </div>
         {/* Image: In the Foreground */}
         <div className="flex justify-center items-center h-full z-10">
