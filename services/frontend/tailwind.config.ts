@@ -76,10 +76,25 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        blob: {
+          "0%": {
+            transform: "scale(1) translate(0px,0px)",
+          },
+          "33%": {
+            transform: "scale(1.1) translate(30px,-50px)",
+          },
+          "66%": {
+            transform: "scale(0.9) translate(-20px,20px)",
+          },
+          "100%": {
+            transform: "scale(1) translate(0px,0px)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        blob: "blob 7s infinite",
       },
     },
   },

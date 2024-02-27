@@ -104,7 +104,11 @@ const SignUpForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
+                  <Input
+                    placeholder="Enter your email"
+                    {...field}
+                    className="border-border"
+                  />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
@@ -122,6 +126,7 @@ const SignUpForm = () => {
                     type="password"
                     placeholder="Create a password"
                     {...field}
+                    className="border-border"
                   />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
@@ -182,7 +187,11 @@ const SignUpForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Address</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your address" {...field} />
+                  <Input
+                    placeholder="Enter your address"
+                    {...field}
+                    className="border-border"
+                  />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>

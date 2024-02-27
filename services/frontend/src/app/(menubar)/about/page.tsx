@@ -6,6 +6,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Code2, MoveDownIcon, Video } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SectionCard = ({
   title,
@@ -29,14 +31,32 @@ const SectionCard = ({
 const AboutPage = () => {
   return (
     <div className="">
-      <div className="flex flex-col justify-center items-center h-screen -translate-y-9">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-secondary">
+      <div className="flex flex-col justify-center items-center mt-10">
+        <div className="text-center mb-12 grid gap-4">
+          <p className="text-xs font-semibold text-muted-foreground">
             About NoCodeBot.ai
-          </h1>
-          <p className="text-lg text-muted-foreground mt-4">
-            Revolutionizing GPT Development
           </p>
+          <div className="flex justify-center">
+            <h1 className="text-3xl font-bold w-2/3 text-center">
+              Revolutionizing GPT Development, create Assistants without writing
+              any
+              <br />
+              Code.
+            </h1>
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">
+            About NoCodeBot.ai
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button className="gap-2">
+              <Video className="w-4 h-4" />
+              Watch Video
+            </Button>
+            <Button className="gap-2" variant={"outline"}>
+              Learn More
+              <MoveDownIcon className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-10 mx-10">
           <SectionCard

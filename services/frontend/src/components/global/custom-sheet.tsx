@@ -25,7 +25,7 @@ const CustomSheet = ({ title, description, children, defaultOpen }: Props) => {
     <Sheet open={isOpen || defaultOpen}>
       <SheetContent
         side={"right"}
-        className="bg-card w-[400px] sm:w-[540px]"
+        className="bg-background w-[400px] sm:w-[540px]"
         showX={true}
       >
         <SheetHeader className="pt-10">

@@ -10,7 +10,7 @@ type Props = {
 
 const Navigation = (props: Props) => {
   return (
-    <div className="py-6 px-10 flex items-center justify-between sticky top-0 z-30 bg-background backdrop-blur-xl bg-opacity-90">
+    <div className="py-6 px-10 flex items-center justify-between sticky top-0 z-50 bg-transparent backdrop-blur-xl">
       <aside className="flex items-center gap-2">
         <Link href="/">
           <div className="flex items-center space-x-2">
