@@ -6,8 +6,8 @@ import SocialSignInButtons from "../auth/social-sign-in-buttons";
 
 const Footer = () => {
   return (
-    <div className="w-full h-[400px] bg-sidebar mt-20 overflow-hidden">
-      <div className="grid grid-cols-2 gap-10 place-items-center p-10 xl:px-32 xl:pt-32">
+    <div className="w-full h-fit bg-sidebar mt-20 overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 place-items-center p-10 xl:px-32 xl:pt-32">
         <div className="flex flex-col gap-8">
           <h1 className="text-3xl font-bold">NoCodeBot.ai</h1>
           <p className="text-muted-foreground">
