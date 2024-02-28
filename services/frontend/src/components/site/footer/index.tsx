@@ -16,7 +16,7 @@ const Footer = () => {
           </p>
           <SocialSignInButtons className="flex justify-start items-start" />
         </div>
-        <div className="grid grid-cols-2 gap-4 xl:gap-10">
+        <div className="flex justify-between w-full  px-2 xl:px-32">
           <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-bold">Our Products</h1>
             <div className="text-muted-foreground grid gap-2">

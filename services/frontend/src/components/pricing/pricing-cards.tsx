@@ -18,7 +18,12 @@ interface Props {
 
 const PricingCards = ({ className }: Props) => {
   return (
-    <div className={clsx("flex gap-4 lg:gap-10 flex-wrap mt-6 p-4", className)}>
+    <div
+      className={clsx(
+        "grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-10 mt-6 p-4",
+        className
+      )}
+    >
       {pricingCards.map((card) => (
         <Card
           key={card.title}
