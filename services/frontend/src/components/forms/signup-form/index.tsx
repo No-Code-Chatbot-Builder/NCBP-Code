@@ -30,6 +30,7 @@ import { signUp } from "aws-amplify/auth";
 import { confirmSignUp, type ConfirmSignUpInput } from "aws-amplify/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Error from "next/error";
 
 const SignUpForm = () => {
   const [isVerificationStep, setIsVerificationStep] = useState(false);
@@ -81,8 +82,14 @@ const VerificationStuff = ({ email }: { email: string }) => {
         router.push("/dashboard");
         verificationform.reset();
       }
-    } catch (error) {
-      console.log("error confirming sign up", error);
+    } catch (error: any) {
+      console.error("Error signing up:", error);
+      toast(
+        <div className="grid gap-2">
+          <h3 className="font-bold text-lg">Error Signing Up</h3>
+          <p className="text-muted-foreground text-sm">{error.toString()}</p>
+        </div>
+      );
     }
   }
   return (
@@ -191,12 +198,12 @@ const SignUpStuff = ({ onSignUp }: SignUpStuffProps) => {
 
       onSignUp(values.email);
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing up:", error);
       toast(
         <div className="grid gap-2">
           <h3 className="font-bold text-lg">Error Signing Up</h3>
-          <p className="text-muted-foreground text-sm">fix error.</p>
+          <p className="text-muted-foreground text-sm">{error.toString()}</p>
         </div>
       );
     }
