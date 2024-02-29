@@ -125,7 +125,7 @@ const FeaturesPage = () => {
             </Button>
           </div>
         </div>
-        <BentoGrid className="max-w-7xl mx-auto mx-10">
+        <BentoGrid className="max-w-7xl mx-auto">
           {items.map((item, i) => (
             <BentoGridItem
               key={i}

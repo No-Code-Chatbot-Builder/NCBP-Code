@@ -28,9 +28,9 @@ export default function Home() {
       </section>
       <section className="relative z-10">
         <div className="flex flex-col gap-y-5 mt-10 py-10 text-center items-center">
-          <div className="p-3 border border-[#1C65EE] rounded-full text-sm bg-info text-info-foreground ">
-            Want to learn how?{" "}
-            <Link className="underline" href={"#"}>
+          <div className="hidden lg:block p-3 border border-[#1C65EE] rounded-full text-sm bg-info text-info-foreground ">
+            NoCodeBot.ai is currently in Devlopment Mode.{" "}
+            <Link className="underline" href={"/features"}>
               Learn More
             </Link>
           </div>

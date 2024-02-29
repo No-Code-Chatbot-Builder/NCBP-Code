@@ -1,1 +1,77 @@
-{}
+{
+  "auth": {
+    "nocodebotai2820a293": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_nocodebotai2820a293_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai2820a293"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai2820a293_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai2820a293"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai2820a293_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai2820a293"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai2820a293_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai2820a293"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai7a8660d5_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai7a8660d5"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai7a8660d5_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai7a8660d5"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai7a8660d5_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai7a8660d5"
+        }
+      ]
+    },
+    "AMPLIFY_auth_nocodebotai7a8660d5_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "nocodebotai7a8660d5"
+        }
+      ]
+    }
+  }
+}

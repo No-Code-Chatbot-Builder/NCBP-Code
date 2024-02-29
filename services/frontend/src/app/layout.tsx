@@ -4,9 +4,8 @@ import "./globals.css";
 import clsx from "clsx";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { Amplify } from "aws-amplify";
-import config from "../amplifyconfiguration.json";
 import ModalProvider from "@/providers/modal-provider";
+import ConfigureAmplifyClientSide from "@/components/ConfigureAmplify";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -16,22 +15,20 @@ export const metadata: Metadata = {
   authors: [
     { name: "NCBPTeam", url: "https://github.com/No-Code-Chatbot-Builder" },
   ],
-  openGraph: {
-    type: "website",
-    url: "https://nocodebotai.vercel.app/",
-    title: "NoCodeBot.ai",
-    description:
-      "Create Custom Chat Assistants without writing a single line of code. NoCodeBot.ai personalizes your assistant so you can retrieve custom information with ease. Made by students in IBA from Karachi, Pakistan",
-    siteName: "NoCodeBot.ai",
-    images: [
-      {
-        url: "https://i.ibb.co/L06VyVW/Github-Prreview.png",
-      },
-    ],
-  },
+  // openGraph: {
+  //   type: "website",
+  //   url: "https://nocodebotai.vercel.app/",
+  //   title: "NoCodeBot.ai",
+  //   description:
+  //     "Create Custom Chat Assistants without writing a single line of code. NoCodeBot.ai personalizes your assistant so you can retrieve custom information with ease. Made by students in IBA from Karachi, Pakistan",
+  //   siteName: "NoCodeBot.ai",
+  //   images: [
+  //     {
+  //       url: "https://i.ibb.co/L06VyVW/Github-Prreview.png",
+  //     },
+  //   ],
+  // },
 };
-
-Amplify.configure(config);
 
 export default function RootLayout({
   children,
@@ -43,6 +40,7 @@ export default function RootLayout({
       <body
         className={clsx(font.className, "min-h-screen font-sans antialiased ")}
       >
+        <ConfigureAmplifyClientSide />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

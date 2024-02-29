@@ -20,22 +20,18 @@ import Link from "next/link";
 import SocialSignInButtons from "@/components/site/auth/social-sign-in-buttons";
 import { useRouter } from "next/navigation";
 import { signIn } from "aws-amplify/auth";
+import { toast } from "sonner";
 
 const SignInForm = () => {
-  const { toast } = useToast();
   const FormSchema = z.object({
     email: z
       .string()
       .min(5, {
         message: "Email must be at least 5 characters long",
       })
-      .email("Enter a valid Email Address"),
+      .email(),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters long" })
-      .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter",
-      })
       .regex(/[A-Z]/, {
         message: "Password must contain at least one uppercase letter",
       })
@@ -59,13 +55,23 @@ const SignInForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      const { isSignedIn } = await signIn({
+      const user = await signIn({
         username: values.email,
         password: values.password,
       });
-      if (isSignedIn) router.push("/dashboard");
+      if (user.isSignedIn) {
+        toast(
+          <div className="grid gap-2">
+            <h3 className="font-bold text-lg">User Signed In</h3>
+            <p className="text-muted-foreground text-sm">
+              Welcome to your Dashboard Page.
+            </p>
+          </div>
+        );
+        router.push("/dashboard");
+      }
     } catch (error) {
-      console.log(`Error signing in user: ${error}`);
+      console.error(`Error signing in user: ${error}`);
     }
   };
 
