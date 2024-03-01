@@ -18,27 +18,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import SocialSignInButtons from "@/components/site/auth/social-sign-in-buttons";
-import { useRouter } from "next/navigation";
-import { signIn } from "aws-amplify/auth";
-import { toast } from "sonner";
+import { useCustomAuth } from "@/providers/auth-provider";
+import VerificationInput from "../signup-form/verification-input";
 
-const SignInForm = () => {
+const SignUpInput = () => {
+  const { login } = useCustomAuth();
   const FormSchema = z.object({
     email: z
       .string()
       .min(5, {
         message: "Email must be at least 5 characters long",
       })
-      .email(),
-    password: z
-      .string()
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" })
-      .regex(/[\W_]/, {
-        message: "Password must contain at least one special character",
-      }),
+      .email({ message: "The email you entered is invalid" }),
+    password: z.string(),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -51,32 +43,13 @@ const SignInForm = () => {
   });
 
   const isLoading = form.formState.isSubmitting;
-  const router = useRouter();
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-    try {
-      const user = await signIn({
-        username: values.email,
-        password: values.password,
-      });
-      if (user.isSignedIn) {
-        toast(
-          <div className="grid gap-2">
-            <h3 className="font-bold text-lg">User Signed In</h3>
-            <p className="text-muted-foreground text-sm">
-              Welcome to your Dashboard Page.
-            </p>
-          </div>
-        );
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.error(`Error signing in user: ${error}`);
-    }
+    await login({ username: values.email, password: values.password });
   };
-
   return (
-    <div className="flex flex-col h-[100vh] justify-center px-10">
+    <div>
+      {" "}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Sign In to NoCodeBot.ai</h1>
         <p className="text-sm text-secondary">
@@ -94,7 +67,11 @@ const SignInForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
+                  <Input
+                    placeholder="Enter your email"
+                    {...field}
+                    className="border-border"
+                  />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
@@ -112,6 +89,7 @@ const SignInForm = () => {
                     type="password"
                     placeholder="Enter your password"
                     {...field}
+                    className="border-border"
                   />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
@@ -146,6 +124,16 @@ const SignInForm = () => {
           </Link>
         </div>
       </div>
+    </div>
+  );
+};
+
+const SignInForm = () => {
+  const { isVerificationStep } = useCustomAuth();
+
+  return (
+    <div className="flex flex-col h-[100vh] justify-center px-10">
+      {isVerificationStep ? <VerificationInput /> : <SignUpInput />}
     </div>
   );
 };

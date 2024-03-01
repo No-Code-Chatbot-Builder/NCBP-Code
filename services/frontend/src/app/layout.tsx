@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import ModalProvider from "@/providers/modal-provider";
 import ConfigureAmplifyClientSide from "@/components/ConfigureAmplify";
+import AuthProvider from "@/providers/auth-provider";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -15,19 +16,6 @@ export const metadata: Metadata = {
   authors: [
     { name: "NCBPTeam", url: "https://github.com/No-Code-Chatbot-Builder" },
   ],
-  // openGraph: {
-  //   type: "website",
-  //   url: "https://nocodebotai.vercel.app/",
-  //   title: "NoCodeBot.ai",
-  //   description:
-  //     "Create Custom Chat Assistants without writing a single line of code. NoCodeBot.ai personalizes your assistant so you can retrieve custom information with ease. Made by students in IBA from Karachi, Pakistan",
-  //   siteName: "NoCodeBot.ai",
-  //   images: [
-  //     {
-  //       url: "https://i.ibb.co/L06VyVW/Github-Prreview.png",
-  //     },
-  //   ],
-  // },
 };
 
 export default function RootLayout({
@@ -47,7 +35,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ModalProvider>{children}</ModalProvider>
+          <AuthProvider>
+            <ModalProvider>{children}</ModalProvider>
+          </AuthProvider>
           <Toaster />
         </ThemeProvider>
       </body>

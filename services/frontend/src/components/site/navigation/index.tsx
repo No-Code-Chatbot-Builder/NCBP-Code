@@ -4,47 +4,12 @@ import Link from "next/link";
 import React from "react";
 import { ModeToggle } from "../../global/mode-toggle";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { signOut } from "aws-amplify/auth";
-import { getCurrentUser } from "aws-amplify/auth";
-import { toast } from "sonner";
+import { SignInToggle } from "@/components/global/signin-toggle";
+import { useCustomAuth } from "@/providers/auth-provider";
 
-type Props = {
-  user?: null;
-};
+const Navigation = () => {
+  const { isLoggedIn, logout } = useCustomAuth();
 
-const Navigation = (props: Props) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    checkUserSession();
-  }, []);
-
-  const checkUserSession = async () => {
-    try {
-      const { username, userId, signInDetails } = await getCurrentUser();
-      if (username && userId && signInDetails) setIsLoggedIn(true);
-    } catch (error) {
-      setIsLoggedIn(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      setIsLoggedIn(false);
-      toast(
-        <div className="grid gap-2">
-          <h3 className="text-lg font-bold">User Signed Out</h3>
-          <p className="text-muted-foreground font-sm">
-            Thank you for using NoCodeBot.ai
-          </p>
-        </div>
-      );
-    } catch (error) {
-      console.error("Error signing out: ", error);
-    }
-  };
   return (
     <div className="py-6 px-10 flex items-center justify-between sticky top-0 z-50 bg-transparent backdrop-blur-xl">
       <aside className="flex items-center gap-2">
@@ -78,14 +43,18 @@ const Navigation = (props: Props) => {
         </ul>
       </nav>
       <aside className="flex gap-2 items-center">
-        {isLoggedIn ? (
-          <Button onClick={handleSignOut}>Sign Out</Button>
-        ) : (
-          <Link href="/sign-in">
-            <Button>Sign In</Button>
-          </Link>
-        )}
-
+        <div className="hidden lg:block">
+          {isLoggedIn ? (
+            <Button onClick={logout}>Sign Out</Button>
+          ) : (
+            <Link href="/sign-in">
+              <Button>Sign In</Button>
+            </Link>
+          )}
+        </div>
+        <div className="lg:hidden block">
+          <SignInToggle />
+        </div>
         <ModeToggle />
       </aside>
     </div>

@@ -26,124 +26,23 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import SocialSignInButtons from "@/components/site/auth/social-sign-in-buttons";
-import { signUp } from "aws-amplify/auth";
-import { confirmSignUp, type ConfirmSignUpInput } from "aws-amplify/auth";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import Error from "next/error";
+
+import { useCustomAuth } from "@/providers/auth-provider";
+import VerificationInput from "./verification-input";
 
 const SignUpForm = () => {
-  const [isVerificationStep, setIsVerificationStep] = useState(false);
-  const [emailForV, setEmailForV] = useState("");
-
+  const { isVerificationStep } = useCustomAuth();
   return (
     <div className="flex flex-col h-[100vh] justify-center px-10">
-      {isVerificationStep ? (
-        <VerificationStuff email={emailForV} />
-      ) : (
-        <SignUpStuff
-          onSignUp={(email) => {
-            setIsVerificationStep(true);
-            setEmailForV(email);
-          }}
-        />
-      )}
+      {isVerificationStep ? <VerificationInput /> : <SignUpInput />}
     </div>
   );
 };
 
 export default SignUpForm;
 
-const VerificationStuff = ({ email }: { email: string }) => {
-  const router = useRouter();
-  const VerificationSchema = z.object({
-    verificationCode: z.string().min(1, "Verification code is required"),
-  });
-
-  const verificationform = useForm<z.infer<typeof VerificationSchema>>({
-    mode: "onChange",
-    resolver: zodResolver(VerificationSchema),
-    defaultValues: {
-      verificationCode: "",
-    },
-  });
-
-  const isLoadingValidation = verificationform.formState.isSubmitting;
-  async function handleSignUpConfirmation(
-    values: z.infer<typeof VerificationSchema>
-  ) {
-    try {
-      const { isSignUpComplete } = await confirmSignUp({
-        username: email,
-        confirmationCode: values.verificationCode,
-      });
-      if (isSignUpComplete) {
-        toast("email verified");
-        router.push("/dashboard");
-        verificationform.reset();
-      }
-    } catch (error: any) {
-      console.error("Error signing up:", error);
-      toast(
-        <div className="grid gap-2">
-          <h3 className="font-bold text-lg">Error Signing Up</h3>
-          <p className="text-muted-foreground text-sm">{error.toString()}</p>
-        </div>
-      );
-    }
-  }
-  return (
-    <div>
-      <div className="flex flex-col h-[100vh] justify-center px-10">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Enter The Verification Code</h1>
-          <p className="text-sm text-secondary">Check your email.</p>
-        </div>
-        <div className="mb-4" />
-        <Form {...verificationform}>
-          <form
-            onSubmit={verificationform.handleSubmit(handleSignUpConfirmation)}
-            className="space-y-4"
-          >
-            <FormField
-              disabled={isLoadingValidation}
-              control={verificationform.control}
-              name="verificationCode"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel className="text-primary">
-                    Verification Code
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter the code" />
-                  </FormControl>
-                  <FormMessage className="text-red-600 text-xs px-1" />
-                </FormItem>
-              )}
-            />
-            <Button
-              className="w-full p-6"
-              type="submit"
-              disabled={isLoadingValidation}
-            >
-              {isLoadingValidation ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Verify Code"
-              )}
-            </Button>
-          </form>
-        </Form>
-      </div>
-    </div>
-  );
-};
-
-interface SignUpStuffProps {
-  onSignUp: (email: string) => void;
-}
-
-const SignUpStuff = ({ onSignUp }: SignUpStuffProps) => {
+const SignUpInput = () => {
+  const { signup } = useCustomAuth();
   const FormSchema = z.object({
     email: z
       .string()
@@ -177,36 +76,12 @@ const SignUpStuff = ({ onSignUp }: SignUpStuffProps) => {
   });
   const isLoading = form.formState.isSubmitting;
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-    try {
-      const formattedBirthdate = format(values.birthdate, "yyyy-MM-dd");
-
-      const { isSignUpComplete } = await signUp({
-        username: values.email,
-        password: values.password,
-        options: {
-          userAttributes: {
-            email: values.email,
-
-            birthdate: formattedBirthdate,
-            address: values.address,
-
-            preferred_username: values.email.split("@")[0],
-            given_name: "YourGivenName",
-          },
-        },
-      });
-
-      onSignUp(values.email);
-      form.reset();
-    } catch (error: any) {
-      console.error("Error signing up:", error);
-      toast(
-        <div className="grid gap-2">
-          <h3 className="font-bold text-lg">Error Signing Up</h3>
-          <p className="text-muted-foreground text-sm">{error.toString()}</p>
-        </div>
-      );
-    }
+    await signup({
+      email: values.email,
+      password: values.password,
+      birthdate: values.birthdate,
+      address: values.address,
+    });
   };
   return (
     <div>

@@ -28,14 +28,15 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ModeToggle } from "../global/mode-toggle";
 import { ModeDashboardToggle } from "../global/mode-dashboard";
 import CustomModel from "../global/custom-model";
 import CreateWorkspaceForm from "../forms/create-workspace";
 import {
   FetchUserAttributesOutput,
+  fetchAuthSession,
   fetchUserAttributes,
 } from "aws-amplify/auth";
+import { useCustomAuth } from "@/providers/auth-provider";
 
 type Props = {
   defaultOpen?: boolean;
@@ -43,19 +44,10 @@ type Props = {
   id: string;
 };
 
-type UserAttributes = {
-  email: string;
-  email_verified: boolean;
-  preferred_username: string;
-  given_name: string;
-  sub: string;
-};
-
 const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
   const { setOpen } = useModal();
   const [isMounted, setIsMounted] = useState(false);
-  const [userAttributes, setUserAttributes] =
-    useState<FetchUserAttributesOutput>({});
+  const { logout } = useCustomAuth();
 
   const openState = useMemo(
     () => (defaultOpen ? { open: true } : {}),
@@ -64,16 +56,6 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
 
   useEffect(() => {
     setIsMounted(true);
-
-    async function currentAuthenticatedUser() {
-      try {
-        const user = await fetchUserAttributes();
-        setUserAttributes(user);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    currentAuthenticatedUser();
   }, []);
   const pathname = usePathname();
 
@@ -222,9 +204,11 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
 
               <Popover>
                 <PopoverTrigger className="hover:bg-card rounded-lg p-1">
-                  <PersonalDetails userAttributes={userAttributes} />
+                  <PersonalDetails />
                 </PopoverTrigger>
-                <PopoverContent></PopoverContent>
+                <PopoverContent>
+                  <Button onClick={logout}>Sign Out</Button>
+                </PopoverContent>
               </Popover>
             </section>
           </nav>

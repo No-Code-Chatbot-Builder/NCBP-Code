@@ -37,15 +37,15 @@ export default function Page() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 h-full">
-      <div className="md:col-span-7 bg-accent hidden md:flex flex-col">
+    <div className="grid grid-cols-1 lg:grid-cols-12 h-full">
+      <div className="lg:col-span-7 bg-accent hidden lg:flex flex-col">
         <AuthNavigation />
         <div className="flex items-center justify-center flex-grow px-20 lg:px-40 xl:px-72">
           <TypewriterEffect words={words} />
         </div>
       </div>
-      <div className="col-span-1 md:col-span-5">
-        <AuthNavigation className="md:hidden" />
+      <div className="col-span-1 lg:col-span-5">
+        <AuthNavigation className="lg:hidden" />
         <SignInForm />
       </div>
     </div>

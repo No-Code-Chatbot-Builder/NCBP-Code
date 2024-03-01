@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { LogIn } from "lucide-react";
@@ -6,8 +7,10 @@ import { frontPageCards } from "@/lib/constants";
 import Link from "next/link";
 import Steps from "@/components/site/steps/steps";
 import { Input } from "@/components/ui/input";
+import { useCustomAuth } from "@/providers/auth-provider";
 
 export default function Home() {
+  const { logout, isLoggedIn } = useCustomAuth();
   return (
     <>
       <section className="hidden dark:block absolute inset-0 z-0">
@@ -161,6 +164,12 @@ export default function Home() {
               className="rounded-lg bg-card p-6 border-primary"
             />
             <Button className="rounded-lg p-6">Subscribe</Button>
+          </div>
+        </div>
+        <div className="">
+          <Button onClick={logout}>Sign Out</Button>
+          <div>
+            {isLoggedIn ? <div>I Logged IN</div> : <div>Sorry Im Not</div>}
           </div>
         </div>
       </section>

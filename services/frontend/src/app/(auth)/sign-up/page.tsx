@@ -3,8 +3,8 @@ import AuthNavigation from "@/components/site/navigation/auth-nav";
 
 export default function Page() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 h-full">
-      <div className="hidden md:block md:col-span-7 bg-accent">
+    <div className="grid grid-cols-1 lg:grid-cols-12 h-full">
+      <div className="hidden lg:block lg:col-span-7 bg-accent">
         <AuthNavigation />
         <div className="flex items-center justify-center h-[100vh] px-20 lg:px-40 xl:px-60">
           <div className="space-y-2">
@@ -17,8 +17,8 @@ export default function Page() {
           </div>
         </div>
       </div>
-      <div className="col-span-1 md:col-span-5">
-        <AuthNavigation className="block md:hidden" />
+      <div className="col-span-1 lg:col-span-5">
+        <AuthNavigation className="block lg:hidden" />
         <SignUpForm />
       </div>
     </div>
