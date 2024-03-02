@@ -6,7 +6,13 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Code2, Database, MoveDownIcon, Video } from "lucide-react";
+import {
+  Code2,
+  Database,
+  MoveDownIcon,
+  PersonStandingIcon,
+  Video,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
@@ -25,11 +31,11 @@ const Skeleton = () => (
 );
 const items = [
   {
-    title: "Drag and Drop Interface",
+    title: "No Code Magic",
     description:
-      "Design complex systems with simplicity using an intuitive drag and drop interface.",
+      "No need to learn code to power chatbots for your company or university with personalized data.",
     header: <Skeleton />,
-    icon: <IconClipboardCopy className="h-5 w-5 dark:text-white text-black" />,
+    icon: <Code2 className="h-5 w-5 dark:text-white text-black" />,
   },
   {
     title: "Custom Assistant Creation",
@@ -58,11 +64,11 @@ const items = [
     ),
   },
   {
-    title: "Connect Models Without Learning Code",
+    title: "Connect Models With Ease",
     description:
-      "Link diverse models effortlessly without the need for coding expertise.",
+      "Never been easier to connect different model stages to each other",
     header: <Skeleton />,
-    icon: <Code2 className="h-5 w-5 dark:text-white" />,
+    icon: <PersonStandingIcon className="h-5 w-5 dark:text-white" />,
   },
   {
     title: "Personalized Datasets",
@@ -85,7 +91,7 @@ const items = [
 const FeaturesPage = () => {
   return (
     <div className="">
-      <div className="flex flex-col justify-center items-center mt-10 ">
+      <div className="flex flex-col justify-center items-center mt-1 p-10 lg-p-0 ">
         <div className="w-full absolute inset-0 ">
           <SparklesCore
             id="tsparticlesfullpage"

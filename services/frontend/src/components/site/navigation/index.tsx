@@ -11,7 +11,7 @@ const Navigation = () => {
   const { isLoggedIn, logout } = useCustomAuth();
 
   return (
-    <div className="py-6 px-10 flex items-center justify-between sticky top-0 z-50 bg-transparent backdrop-blur-xl">
+    <div className="py-6 px-10 flex items-center justify-between sticky top-0 z-50 bg-transparent backdrop-blur-3xl">
       <aside className="flex items-center gap-2">
         <Link href="/">
           <div className="flex items-center space-x-2">
@@ -36,9 +36,6 @@ const Navigation = () => {
           </Link>
           <Link href={"/features"} className="hover:underline">
             Features
-          </Link>
-          <Link href={"/dashboard/featured"} className="hover:underline">
-            Dashboard
           </Link>
         </ul>
       </nav>

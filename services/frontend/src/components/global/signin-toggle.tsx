@@ -26,7 +26,7 @@ export function SignInToggle() {
         <DropdownMenuItem onClick={() => router.push("/features")}>
           Features
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/pricing")}>
+        <DropdownMenuItem onClick={() => router.push("/about")}>
           About
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/pricing")}>

@@ -15,26 +15,16 @@ export default function Home() {
 
   return (
     <>
-      <section className="hidden dark:block absolute inset-0 z-0">
-        <Image
-          src={"/assets/lineargradient.svg"}
-          layout="fill"
-          alt="linear gradient backdrop"
-          className="object-cover"
-        />
+      <section className="absolute inset-0 z-0">
+        <div className="h-[50rem] w-full dark:bg-grid-white/[0.1] bg-grid-black/[0.1] relative flex items-center justify-center">
+          <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-gradient-to-b from-[#1C65EE]/60 to-bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]" />
+        </div>
       </section>
-      <section className="dark:hidden absolute inset-0 z-0">
-        <Image
-          src={"/assets/lineargradientlight.svg"}
-          layout="fill"
-          alt="linear gradient backdrop"
-          className="object-cover"
-        />
-      </section>
+
       <section className="relative z-10">
-        <div className="flex flex-col gap-y-5 mt-10 py-10 text-center items-center">
+        <div className="flex flex-col gap-y-5 mt-10 py-10 text-center items-center z-20 bg-clip-text">
           <div className="hidden lg:block p-3 border border-[#1C65EE] rounded-full text-sm bg-info text-info-foreground ">
-            NoCodeBot.ai is currently in Devlopment Mode.{" "}
+            NoCodeBot.ai is currently in Development Mode.{" "}
             <Link className="underline" href={"/features"}>
               Learn More
             </Link>
