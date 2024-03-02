@@ -13,9 +13,6 @@ const font = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "NoCodeBot.ai",
   description: "Make Custom Assistants without writing a single line of code.",
-  authors: [
-    { name: "NCBPTeam", url: "https://github.com/No-Code-Chatbot-Builder" },
-  ],
 };
 
 export default function RootLayout({

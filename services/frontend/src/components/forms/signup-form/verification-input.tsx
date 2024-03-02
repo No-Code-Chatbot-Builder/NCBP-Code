@@ -16,7 +16,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const VerificationInput = () => {
-  const router = useRouter();
   const VerificationSchema = z.object({
     verificationCode: z.string().min(1, "Verification code is required"),
   });

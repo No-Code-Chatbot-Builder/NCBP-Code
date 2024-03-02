@@ -169,7 +169,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             description="Navigating to dashboard"
           />
         );
-
+        setIsVerificationStep(false);
         router.push("/dashboard");
       } else setIsVerificationStep(true);
     } catch (error: any) {
@@ -194,6 +194,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
       if (user?.isSignedIn) {
+        setIsVerificationStep(false);
         toast(
           <CustomToast
             title="User Signed In"

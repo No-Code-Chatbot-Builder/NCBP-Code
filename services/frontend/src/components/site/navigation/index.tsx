@@ -26,7 +26,7 @@ const Navigation = () => {
         </Link>
       </aside>
 
-      <nav className="hidden md:block absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%]">
+      <nav className="hidden lg:block absolute left-[50%] top-[50%] transform translate-x-[-50%] translate-y-[-50%]">
         <ul className="flex items-center justify-center gap-8">
           <Link href={"/pricing"} className="hover:underline">
             Pricing
