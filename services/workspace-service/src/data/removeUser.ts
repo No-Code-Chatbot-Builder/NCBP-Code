@@ -1,9 +1,26 @@
 import { Membership } from '../entities/membership';
-import { HttpStatusCode } from '../utils/constants';
+import { User } from '../entities/user';
+import { DEFAULT_USER, HttpStatusCode } from '../utils/constants';
 import { dynamoDB } from '../utils/db';
 
 export const removeUser = async (membership: Membership) => {
-    // TODO: remove from user record
+  const user = new User({
+    ...DEFAULT_USER,
+    userId: membership.userId,
+    email: membership.userEmail,
+  });
+
+  const paramsUser = {
+    TableName: process.env.TABLE_NAME as string,
+    Key: user.key(),
+    UpdateExpression: 'remove #workspaces.#workspaceName',
+    ExpressionAttributeNames: {
+      '#workspaces': 'workspaces',
+      '#workspaceName': membership.workspaceName.toLowerCase(),
+    },
+    ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)',
+  };
+
   const paramsMembership = {
     TableName: process.env.TABLE_NAME as string,
     Key: membership.key(),
@@ -11,11 +28,22 @@ export const removeUser = async (membership: Membership) => {
   };
 
   try {
-    const result = await dynamoDB.delete(paramsMembership).promise();
+    await dynamoDB
+      .transactWrite({
+        TransactItems: [
+          {
+            Update: paramsUser,
+          },
+          {
+            Delete: paramsMembership,
+          },
+        ],
+      })
+      .promise();
 
     return {
-      membership: Membership.fromItem(result.Attributes as Membership),
-      statusCode: HttpStatusCode.NO_CONTENT
+      membership,
+      statusCode: HttpStatusCode.NO_CONTENT,
     };
   } catch (error: any) {
     console.log('Error removing user from workspace');
@@ -29,7 +57,7 @@ export const removeUser = async (membership: Membership) => {
     }
     return {
       error: errorMessage,
-      statusCode
+      statusCode,
     };
   }
 };

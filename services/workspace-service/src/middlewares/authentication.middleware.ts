@@ -31,7 +31,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       throw new Error('User not found');
     }
 
-    req.user = user;
     next();
   } catch (error: any) {
     console.error(error);
@@ -40,7 +39,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 };
 
 const verifyToken: (token: string) => Promise<jwt.JwtPayload> = async (token: string) => {
-  // TODO: verify token using cognito
   let decoded = jwt.decode(token);
   if (!decoded) {
     throw new Error('Invalid token');

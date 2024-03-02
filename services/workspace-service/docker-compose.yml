@@ -1,0 +1,13 @@
+version: '1.0'
+
+services:
+  app:
+    image: workspace-service
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env # this contains TABLE NAME for dynamodb
+    ports:
+      - "5000:5000"

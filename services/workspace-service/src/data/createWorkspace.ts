@@ -2,10 +2,16 @@ import { Membership } from '../entities/membership';
 import { Workspace } from '../entities/workspace';
 import { Role } from '../dtos/workspace.dto';
 import { dynamoDB } from '../utils/db';
-import { HttpStatusCode } from '../utils/constants';
+import { DEFAULT_USER, HttpStatusCode } from '../utils/constants';
+import { User } from '../entities/user';
 
 export const createWorkspace = async (workspace: Workspace) => {
-  // TODO: Append User record
+  
+  const user = new User({
+    ...DEFAULT_USER,
+    userId: workspace.owner.id,
+    email: workspace.owner.email,
+  });
 
   const membership = new Membership({
     workspaceName: workspace.name,
@@ -27,6 +33,20 @@ export const createWorkspace = async (workspace: Workspace) => {
     ConditionExpression: 'attribute_not_exists(PK) AND attribute_not_exists(SK)',
   };
 
+  const paramsUser = {
+    TableName: process.env.TABLE_NAME as string,
+    Key: user.key(),
+    UpdateExpression: 'set #workspaces.#workspaceName = :role',
+    ExpressionAttributeNames: {
+      '#workspaces': 'workspaces',
+      '#workspaceName': workspace.name.toLowerCase(),
+    },
+    ExpressionAttributeValues: {
+      ':role': Role.OWNER,
+    },
+    ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)',
+  };
+
   try {
     await dynamoDB
       .transactWrite({
@@ -36,6 +56,9 @@ export const createWorkspace = async (workspace: Workspace) => {
           },
           {
             Put: paramsMembership,
+          },
+          {
+            Update: paramsUser,
           },
         ],
       })

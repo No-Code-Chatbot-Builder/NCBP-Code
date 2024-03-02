@@ -1,16 +1,20 @@
 import { Membership } from '../entities/membership';
 import { Role } from '../dtos/workspace.dto';
 import { dynamoDB } from '../utils/db';
-import { HttpStatusCode } from '../utils/constants';
+import { DEFAULT_USER, HttpStatusCode } from '../utils/constants';
+import { User } from '../entities/user';
 
 export const respondInvite = async (membership: Membership) => {
-  // TODO: Append User record
+
+  const user = new User({
+    ...DEFAULT_USER,
+    userId: membership.userId,
+    email: membership.userEmail,
+  });
 
   const paramsMembership = {
     TableName: process.env.TABLE_NAME as string,
-    Key: {
-      ...membership.key(),
-    },
+    Key: membership.key(),
     UpdateExpression: 'set #role = :role',
     ExpressionAttributeNames: {
       '#role': 'role',
@@ -22,6 +26,20 @@ export const respondInvite = async (membership: Membership) => {
     ReturnValues: 'ALL_NEW',
   };
 
+  const paramsUser = {
+    TableName: process.env.TABLE_NAME as string,
+    Key: user.key(),
+    UpdateExpression: 'set #workspaces.#workspaceName = :role',
+    ExpressionAttributeNames: {
+      '#workspaces': 'workspaces',
+      '#workspaceName': membership.workspaceName.toLowerCase(),
+    },
+    ExpressionAttributeValues: {
+      ':role': membership.role,
+    },
+    ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)',
+  };
+
   try {
     dynamoDB
       .transactWrite({
@@ -29,6 +47,9 @@ export const respondInvite = async (membership: Membership) => {
           {
             Update: paramsMembership,
           },
+          {
+            Update: paramsUser,
+          }
         ],
       })
       .promise();
