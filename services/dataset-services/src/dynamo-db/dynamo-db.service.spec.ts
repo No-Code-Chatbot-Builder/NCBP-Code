@@ -6,7 +6,7 @@ describe('DynamoDbService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DynamoDbService],
+      providers: [DynamoDbService]
     }).compile();
 
     service = module.get<DynamoDbService>(DynamoDbService);

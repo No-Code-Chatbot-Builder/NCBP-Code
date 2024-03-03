@@ -1,138 +1,289 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import { PutItemOutput } from 'aws-sdk/clients/dynamodb';
 import { GenerateIdService } from 'src/generate-id/generate-id.service';
 import { ConfigService } from '@nestjs/config';
 import { S3Service } from 'src/s3/s3.service';
 import { LangchainDocLoaderService } from 'src/langchain-docLoaders/langchain-docLoaders.service';
-import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class DynamoDbService {
-    private dynamodb: AWS.DynamoDB.DocumentClient;
-    private tableName =  this.configService.get<string>('DYNAMODB_TABLE_NAME');
+  private dynamodb: AWS.DynamoDB.DocumentClient;
+  private tableName = this.configService.get<string>('DYNAMODB_TABLE_NAME');
 
-    constructor(private configService: ConfigService, private LangchainDocLoaderService: LangchainDocLoaderService) {
-        // Initialize the DynamoDB DocumentClient
-        this.dynamodb = new AWS.DynamoDB.DocumentClient({
-            region: 'us-east-1' 
-        });
-    }
+  constructor(
+    private configService: ConfigService,
+    private LangchainDocLoaderService: LangchainDocLoaderService,
+    private readonly s3Service: S3Service
+  ) {
+    // Inject S3Service) {
+    // Initialize the DynamoDB DocumentClient
+    this.dynamodb = new AWS.DynamoDB.DocumentClient({
+      region: 'us-east-1'
+    });
+  }
 
-    async createDataset(workspaceId: string, userId: string, name: string, description: string): Promise<any>
-    {
-        const datasetId = `DATASET#${GenerateIdService.generateId()}`;
-        const datasetDetails = {
-          PK: datasetId, 
-          SK: `WORKSPACEID#${workspaceId}`,
-          userId: userId,
+  async createDataset(workspaceId: string, userId: string, name: string, description: string): Promise<any> {
+    const datasetId = GenerateIdService.generateId();
+    const datasetDetails = {
+      PK: `WORKSPACE#${workspaceId}`,
+      SK: `DATASET#${datasetId}`,
+      id: datasetId,
+      userId: userId,
+      name: name,
+      description: description,
+      createdAt: new Date().toISOString()
+    };
+    const params = {
+      TableName: this.tableName,
+
+      Item: datasetDetails
+    };
+
+    try {
+      const data = await this.dynamodb.put(params).promise();
+
+      const response = {
+        success: true,
+        message: 'Dataset created successfully.',
+        workspaceId: workspaceId,
+        datasetDetails: {
+          datasetId: datasetId,
           name: name,
-          description: description
+          description: description,
+          workspaceId: workspaceId
         }
-        const params = {
-            TableName: this.tableName,
-           
-            Item: datasetDetails,
-          };
-      
-          try {
-            const data = await this.dynamodb.put(params).promise();
+      };
 
-            const response = {
-              success: true,
-              message: "Dataset created successfully.",
-              workspaceId: workspaceId,
-              datasetDetails: {
-                  datasetId: datasetId,
-                  name: name,
-                  description: description,
-                  workspaceId: workspaceId,
-                  
-              },
-
-              
-
-          };
-
-          return response; // Return the response object
-            
-          } catch (error) {
-            
-            throw new Error(`Unable to create dataset: ${error.message}`);
-          }
-
+      return response; // Return the response object
+    } catch (error) {
+      throw new Error(`Unable to create dataset: ${error.message}`);
     }
+  }
 
-    async addData(data: any, userId: string, workspaceId: string, datasetId: string): Promise<any> {
+  async addData(data: any, userId: string, workspaceId: string, datasetId: string): Promise<any> {
+    let type: string;
+    let path: string;
+    let name: string;
 
-        
-        // ...
+    let responseForAddingFileNameUUID: {
+      success: boolean;
+      message: string;
+      fileName: string;
+      fileId: string;
+    };
 
-        let type: string;
-        let path: string;
-        let name: string;
-
-        if (typeof data === 'string') {
-          type = "url";
-          path = data;
-          const parsedUrl = new URL(data);
-          name = parsedUrl.hostname;
-        }
-        else if (typeof data === 'object') {
-          const bucketName = this.configService.get<string>('S3_BUCKET_NAME')
-          type = "file";
-          path = "https://" + bucketName + ".s3.us-east-1.amazonaws.com/" + userId + "/" + workspaceId + "/" + datasetId;
-          name = data.originalname;
-
-          // Upload the file to S3
-          const s3Service = new S3Service();
-          s3Service.uploadFileToS3(bucketName, data, `USER#${userId}`, `WORKSPACE#${workspaceId}`, `DATASET#${datasetId}`);
-
-
-        }
-
-        const dataId = `DATA#${GenerateIdService.generateId()}`;
-        const dataItem = {
-          PK: dataId, // Use a partition key format that aligns with your access patterns
-          SK: `DATASET#${datasetId}`, // Sort key can be the same as the PK if there's only one entry per dataset
-          name: name,
-          type: type,
-          path: path,
-          userId: `USER#${userId}`,
+    let response: {
+      responseForAddingData: {
+        success: boolean;
+        message: string;
+        datasetId: string;
+        dataDetails: {
+          dataId: string;
+          type: string;
+          path: string;
         };
-        
-        const params = {
-            TableName: this.tableName,
-            Item: dataItem,
-          };
-      
-          try {
-            const dynamoDbResponse = await this.dynamodb.put(params).promise();
-            
-            const response = {
-              success: true,
-              message: "Data added successfully.",
-              datasetId: datasetId,
-              dataDetails: {
-                  dataId: dataId,
-                  type: type,
-                  path: path
-                  
-              },
-              
-
-            };
-            
-            const httpService = new HttpService();
-            this.LangchainDocLoaderService.dataProcessor(data, userId, workspaceId, datasetId);
-            
-
-
-            return response; 
-          } catch (error) {
-            console.error('Error creating dataset record:', error);
-            throw new Error(`Unable to create dataset record: ${error.message}`);
-          }
+      };
+      responseForAddingFileNameUUID?: { // Marked as optional with `?`
+        success: boolean;
+        message: string;
+        fileName: string;
+        fileId: string;
+      };
     }
 
+    if (typeof data === 'string') {
+      type = 'url';
+      path = data;
+      const parsedUrl = new URL(data);
+      name = parsedUrl.hostname;
+    } else if (typeof data === 'object') {
+      let fileHandlerResponse: {
+        type: string;
+        name: string;
+        path: string;
+        responseForAddingFileNameUUID: {
+          success: boolean;
+          message: string;
+          fileName: string;
+          fileId: string;
+        };
+      };
+      try {
+        fileHandlerResponse = await this.fileHandler(data, userId, workspaceId, datasetId);
+      } catch (error) {
+        console.error('Error handling file:', error);
+        throw new Error(`Unable to handle file: ${error.message}`);
+      }
+      type = fileHandlerResponse.type;
+      name = fileHandlerResponse.name;
+      path = fileHandlerResponse.path;
+      responseForAddingFileNameUUID = fileHandlerResponse.responseForAddingFileNameUUID;
+    }
+
+    const dataId = GenerateIdService.generateId();
+    const dataItem = {
+      PK: `DATASET#${datasetId}`, // Sort key can be the same as the PK if there's only one entry per dataset
+      SK: `DATA#${dataId}`, // Use a partition key format that aligns with your access patterns
+      id: dataId,
+      name: name,
+      type: type,
+      path: path,
+      userId: userId,
+      createdAt: new Date().toISOString()
+    };
+
+    const params = {
+      TableName: this.tableName,
+      Item: dataItem
+    };
+
+    try {
+      const dynamoDbResponse = await this.dynamodb.put(params).promise();
+      
+      response = {
+        responseForAddingData: {
+          success: true,
+          message: 'Data added successfully.',
+          datasetId: datasetId,
+          dataDetails: {
+            dataId: dataId,
+            type: type,
+            path: path,
+          },
+        },
+      };
+      
+      if (responseForAddingFileNameUUID) {
+        response.responseForAddingFileNameUUID = responseForAddingFileNameUUID;
+      }
+      
+
+      try {
+        this.LangchainDocLoaderService.dataProcessor(data, userId, workspaceId, datasetId);
+      } catch (error) {
+        console.error('Error from Langchain Loaders:', error);
+        throw new Error(`Error from Langchain Loaders:: ${error.message}`);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error creating dataset record:', error);
+      throw new Error(`Unable to create dataset record: ${error.message}`);
+    }
+  }
+
+  async fileHandler(file: Express.Multer.File, userId: string, workspaceId: string, datasetId: string) {
+    const bucketName = this.configService.get<string>('S3_BUCKET_NAME');
+    const type = 'file';
+    const fileId = GenerateIdService.generateId();
+    const path = 'https://' + bucketName + '.s3.us-east-1.amazonaws.com/' + `USER#${userId}/` + `WORKSPACE#${workspaceId}/` + `DATASET#${datasetId}/` + fileId;
+    const name = file.originalname;
+
+    const dataItem = {
+      PK: `DATANAME#${name}`, // Sort key can be the same as the PK if there's only one entry per dataset
+      SK: `FILE#${fileId}`, // Use a partition key format that aligns with your access patterns
+      id: fileId,
+      createdAt: new Date().toISOString()
+    };
+
+    const params = {
+      TableName: this.tableName,
+      Item: dataItem
+    };
+
+    let responseForAddingFileNameUUID: {
+      success: boolean;
+      message: string;
+      fileName: string;
+      fileId: string;
+    };
+    try {
+      const dynamoDbResponseForAddingFileNameUUID = await this.dynamodb.put(params).promise();
+
+      responseForAddingFileNameUUID = {
+        success: true,
+        message: 'File Name against UUID added successfully to DynamoDb.',
+        fileName: name,
+        fileId: fileId
+      };
+      //return response;
+    } catch (error) {
+      console.error('Error adding File Name against UUID in DynamoDb:', error);
+      throw new Error(`Unable to add File Name against UUID in DynamoDb: ${error.message}`);
+    }
+
+    // Upload the file to S3
+    try {
+      this.s3Service.uploadFileToS3(bucketName, file, fileId, userId, workspaceId, datasetId);
+    } catch (error) {
+      console.error('Error uploading file to S3:', error);
+      throw new Error(`Unable to upload file to S3: ${error.message}`);
+    }
+
+    return { type, name, path, responseForAddingFileNameUUID };
+  }
+  async getDatasets(workspaceId: string) {
+    const params = {
+      TableName: this.tableName,
+      KeyConditionExpression: 'PK = :pk',
+      ExpressionAttributeValues: {
+        ':pk': `WORKSPACE#${workspaceId}`
+      }
+    };
+
+    try {
+      const data = await this.dynamodb.query(params).promise();
+      return data.Items;
+    } catch (error) {
+      console.error('Error getting datasets:', error);
+      throw new Error(`Unable to get datasets: ${error.message}`);
+    }
+  }
+
+  async getDatasetById(workspaceId: string, datasetId: string) {
+    // Query parameters to fetch the dataset by workspaceId and datasetId
+    const paramsForDataset = {
+      TableName: this.tableName,
+      KeyConditionExpression: 'PK = :pk and SK = :sk',
+      ExpressionAttributeValues: {
+        ':pk': `WORKSPACE#${workspaceId}`,
+        ':sk': `DATASET#${datasetId}`
+      }
+    };
+
+    try {
+      const datasetResult = await this.dynamodb.query(paramsForDataset).promise();
+
+      // Assuming there's only one dataset with this specific datasetId
+      if (datasetResult.Items.length > 0) {
+        const datasetItem = datasetResult.Items[0]; // Assuming only one item matches
+
+        // Query parameters to fetch related data using the datasetId
+        const paramsForData = {
+          TableName: this.tableName,
+          KeyConditionExpression: 'PK = :pk',
+          ExpressionAttributeValues: {
+            ':pk': `DATASET#${datasetId}`
+          }
+        };
+
+        try {
+          const dataResult = await this.dynamodb.query(paramsForData).promise();
+
+          // Assuming you want to nest the related data within the dataset item
+          datasetItem.data = dataResult.Items;
+
+          return datasetItem; // Return the combined dataset with its related data
+        } catch (error) {
+          console.error('Error getting related data:', error);
+          throw new Error(`Unable to get related data: ${error.message}`);
+        }
+      } else {
+        return null; // No dataset found with the given IDs
+      }
+    } catch (error) {
+      console.error('Error getting dataset:', error);
+      throw new Error(`Unable to get dataset: ${error.message}`);
+    }
+  }
 }

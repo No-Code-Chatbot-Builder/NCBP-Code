@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PineconeService } from './pinecone/pinecone.service';
@@ -8,10 +8,15 @@ import { HttpModule } from '@nestjs/axios';
 import { DynamoDbService } from './dynamo-db/dynamo-db.service';
 import { S3Service } from './s3/s3.service';
 import { GenerateIdService } from './generate-id/generate-id.service';
+import { AuthMiddleware } from './auth/auth.middleware';
 
 @Module({
   imports: [ConfigModule.forRoot(), HttpModule],
   controllers: [AppController],
-  providers: [AppService, PineconeService, LangchainDocLoaderService, DynamoDbService, S3Service, GenerateIdService],
+  providers: [AppService, PineconeService, LangchainDocLoaderService, DynamoDbService, S3Service, GenerateIdService]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*'); // or specify more specific routes or controllers
+  }
+}

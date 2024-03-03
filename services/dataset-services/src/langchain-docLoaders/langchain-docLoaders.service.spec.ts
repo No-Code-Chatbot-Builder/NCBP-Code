@@ -6,7 +6,7 @@ describe('LangchainDocLoaderService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LangchainDocLoaderService],
+      providers: [LangchainDocLoaderService]
     }).compile();
 
     service = module.get<LangchainDocLoaderService>(LangchainDocLoaderService);

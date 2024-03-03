@@ -1,124 +1,111 @@
-import { Injectable} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { writeFileSync } from 'fs';
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
-import { PPTXLoader } from "langchain/document_loaders/fs/pptx";
-import { TextLoader } from "langchain/document_loaders/fs/text";
-import { DocxLoader } from "langchain/document_loaders/fs/docx";
-import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
+import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { PPTXLoader } from 'langchain/document_loaders/fs/pptx';
+import { TextLoader } from 'langchain/document_loaders/fs/text';
+import { DocxLoader } from 'langchain/document_loaders/fs/docx';
+import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { join } from 'path';
 import { HttpService } from '@nestjs/axios';
 import { PineconeService } from 'src/pinecone/pinecone.service';
 import { Express } from 'express'; // Import Express namespace
-
 
 /*
     Please note that the following class will be adjusted to incorporate Strategy/Factory Pattern to address various loaders
 */
 @Injectable()
 export class LangchainDocLoaderService {
-    
-    private data: any;
-    private savePath: string;
+  private data: any;
+  private savePath: string;
 
-    
-    
-    constructor(private httpService: HttpService, private pineconeService: PineconeService) {
-        
+  constructor(
+    private httpService: HttpService,
+    private pineconeService: PineconeService
+  ) {}
 
+  async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string) {
+    this.data = data;
+    if (typeof this.data === 'object') {
+      this.fileProcessor(this.data, userId, workspaceId, datasetId);
+    } else if (typeof this.data === 'string') {
+      this.webLoader(this.data);
+    }
+  }
+  async fileProcessor(file: Express.Multer.File, userId: string, workspaceId: string, datasetId: string) {
+    // Fix parameter type declaration
+    // Define the path where you want to save the file
+    this.savePath = join(__dirname, '..', 'uploads');
 
+    // Write the file to the server
+    writeFileSync(this.savePath, file.buffer);
+    let text;
+    switch (file.mimetype) {
+      case 'application/pdf':
+        // Handle PDF file
+        text = await this.pdfLoader(file);
+        break;
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        // Handle DOCX file
+        text = await this.docxLoader(file);
+        break;
+      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+        // Handle PPT file
+        text = await this.pptLoader(file);
+        break;
+      case 'text/plain':
+        // Handle text file
+        text = await this.textLoader(file);
+        break;
+      // Add more cases as needed for other file types
+    }
+    let texts: string[] = [];
 
+    for (let i = 0; i < text.length; i++) {
+      texts.push(text[i].pageContent);
     }
 
-    async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string)
-    {
-        this.data = data;
-        if (typeof(this.data) === "object") {
-            this.fileProcessor(this.data, userId, workspaceId, datasetId);
-        }else if (typeof(this.data) === "string") {
-            this.webLoader(this.data);
-        }
+    try {
+      const response = await this.httpService
+        .post('http://localhost:80/vectorEmbeddings', {
+          texts: texts // Replace with actual texts
+        })
+        .toPromise(); // Convert Observable to Promise
 
+      this.pineconeService.upsertRecords(response.data, userId, workspaceId, datasetId);
+    } catch (error) {
+      console.error('Error sending text to server:', error);
     }
-    async fileProcessor(file: Express.Multer.File, userId: string, workspaceId: string, datasetId: string) // Fix parameter type declaration
-    {
-        // Define the path where you want to save the file
-        this.savePath = join(__dirname, '..', 'uploads');
+  }
 
-        // Write the file to the server
-        writeFileSync(this.savePath, file.buffer);
-        let text;
-        switch (file.mimetype) {
-            
-            case 'application/pdf':
-                // Handle PDF file
-                text = await this.pdfLoader(file);
-                break;
-            case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                // Handle DOCX file
-                text = await this.docxLoader(file);
-                break;
-            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-                // Handle PPT file
-                text = await this.pptLoader(file);
-                break;
-            case 'text/plain':
-                // Handle text file
-                text = await this.textLoader(file);
-                break;
-            // Add more cases as needed for other file types
-        }
-        let texts: string[] = [];
+  async pdfLoader(file: Express.Multer.File) {
+    // one document per page
+    const loader = new PDFLoader(this.savePath);
+    const docs = await loader.load();
+    return docs;
+  }
+  async pptLoader(file: Express.Multer.File) {
+    const loader = new PPTXLoader(this.savePath);
 
-        for (let i = 0; i < text.length; i++) {
-            texts.push(text[i].pageContent);
-        }
+    const docs = await loader.load();
+    return docs;
+  }
+  async docxLoader(file: Express.Multer.File) {
+    const loader = new DocxLoader(this.savePath);
 
-        try {
-            const response = await this.httpService.post('http://localhost:80/vectorEmbeddings', {
-                texts: texts // Replace with actual texts
-            }).toPromise(); // Convert Observable to Promise
+    const docs = await loader.load();
 
-            
-            this.pineconeService.upsertRecords(response.data, userId, workspaceId, datasetId)
-        } catch (error) {
-            console.error('Error sending text to server:', error);
-        }
-    }
+    return docs;
+  }
+  async textLoader(file: Express.Multer.File) {
+    const loader = new TextLoader(this.savePath);
 
-    async pdfLoader(file: Express.Multer.File) // one document per page
-    {        
-        const loader = new PDFLoader(this.savePath);
-        const docs = await loader.load(); 
-        return docs
-    }
-    async pptLoader(file: Express.Multer.File) 
-    {
-        
-        const loader = new PPTXLoader(this.savePath);
+    const docs = await loader.load();
+    return docs;
+  }
+  async webLoader(url: string) {
+    const loader = new CheerioWebBaseLoader(url);
 
-        const docs = await loader.load();
-        return docs
-    }
-    async docxLoader(file: Express.Multer.File)
-    {
-        const loader = new DocxLoader(this.savePath);
-
-        const docs = await loader.load();
-        
-        return docs;
-    }
-    async textLoader(file: Express.Multer.File) 
-    {
-        const loader = new TextLoader(this.savePath);
-
-        const docs = await loader.load();
-        return docs
-    }
-    async webLoader(url: string)
-    {
-        const loader = new CheerioWebBaseLoader(url);
-          
-          const docs = await loader.load();
-          return docs
-    }
+    const docs = await loader.load();
+    return docs;
+  }
 }
