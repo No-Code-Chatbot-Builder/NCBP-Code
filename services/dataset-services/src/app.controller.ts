@@ -37,7 +37,7 @@ export class AppController {
     return response;
   }
 
-  @Post('dataset/:workspaceId')
+  @Post(':workspaceId/dataset')
   async createDataset(@Body() body: { name: string; description?: string }, @Param('workspaceId') workspaceId: string): Promise<any> {
     const { name, description } = body;
 
@@ -46,19 +46,19 @@ export class AppController {
     return response;
   }
 
-  @Get('dataset/:workspaceId')
+  @Get(':workspaceId/dataset/')
   async getDatasets(@Param('workspaceId') workspaceId: string): Promise<any> {
     const response = await this.dynamoDbService.getDatasets(workspaceId);
     return response;
   }
 
-  @Get('dataset/:workspaceId/:datasetId')
+  @Get(':workspaceId/dataset/:datasetId')
   async getDatasetById(@Param('workspaceId') workspaceId: string, @Param('datasetId') datasetId: string): Promise<any> {
     const dataset = await this.dynamoDbService.getDatasetById(workspaceId, datasetId);
     return dataset;
   }
 
-  @Post('data/:workspaceId/:datasetId')
+  @Post(':workspaceId/:datasetId/data/')
   @UseInterceptors(FileInterceptor('file'))
   async addData(@UploadedFile() file: Express.Multer.File, @Body() body: { url: string }, @Param('workspaceId') workspaceId: string, @Param('datasetId') datasetId: string): Promise<any> {
     let data: Express.Multer.File | string;
