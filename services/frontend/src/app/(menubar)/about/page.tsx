@@ -128,7 +128,7 @@ const AboutPage = () => {
                 </div>
 
                 <div className="flex justify-center">
-                  <p className="text-md font-medium text-muted-foreground leading-normal w-10/12 lg:w-1/2 text-center">
+                  <p className="text-md font-medium text-muted-foreground leading-normal w-10/12 text-center">
                     Our vision at NoCodeBot.ai is to create a user-friendly,
                     no-code pipeline that opens the doors of advanced AI
                     technology to a diverse range of users, especially those

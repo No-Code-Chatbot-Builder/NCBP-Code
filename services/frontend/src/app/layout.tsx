@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import ModalProvider from "@/providers/modal-provider";
 import ConfigureAmplifyClientSide from "@/components/ConfigureAmplify";
 import AuthProvider from "@/providers/auth-provider";
+import StoreProvider from "@/providers/redux/provider/store-provider";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={clsx(font.className, "min-h-screen font-sans antialiased ")}
+        className={clsx(
+          font.className,
+          "min-h-screen font-sans antialiased overflow-x-hidden "
+        )}
       >
         <ConfigureAmplifyClientSide />
         <ThemeProvider
@@ -33,7 +37,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <ModalProvider>{children}</ModalProvider>
+            <ModalProvider>
+              <StoreProvider>{children}</StoreProvider>
+            </ModalProvider>
           </AuthProvider>
           <Toaster />
         </ThemeProvider>
