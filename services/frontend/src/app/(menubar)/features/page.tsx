@@ -104,7 +104,7 @@ const FeaturesPage = () => {
           />
         </div>
 
-        <div className="text-center mb-12 grid gap-8  w-9/12 z-10">
+        <div className="text-center mb-12 grid gap-8  z-10">
           <p className="text-sm font-semibold text-muted-foreground">
             Features
           </p>

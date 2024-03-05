@@ -26,7 +26,7 @@ export default function RootLayout({
       <body
         className={clsx(
           font.className,
-          "min-h-screen font-sans antialiased overflow-x-hidden "
+          "font-sans antialiased overflow-x-hidden w-full"
         )}
       >
         <ConfigureAmplifyClientSide />

@@ -8,6 +8,15 @@ import {
   Zap,
 } from "lucide-react";
 
+export type StepCard = {
+  title: string;
+  description: String;
+  header: React.ReactNode;
+  className: string;
+  icon: React.ReactNode;
+  key: string;
+};
+
 export const icons = [
   {
     value: "featured",
