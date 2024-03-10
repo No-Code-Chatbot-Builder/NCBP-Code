@@ -68,7 +68,6 @@ export class DynamoDbService {
     let responseForAddingFileNameUUID: {
       success: boolean;
       message: string;
-      fileName: string;
       fileId: string;
     };
 
@@ -76,19 +75,13 @@ export class DynamoDbService {
       responseForAddingData: {
         success: boolean;
         message: string;
-        datasetId: string;
         dataDetails: {
           dataId: string;
           type: string;
           path: string;
         };
       };
-      responseForAddingFileNameUUID?: { // Marked as optional with `?`
-        success: boolean;
-        message: string;
-        fileName: string;
-        fileId: string;
-      };
+      responseForAddingFileNameUUID?: typeof responseForAddingFileNameUUID;
     }
 
     if (typeof data === 'string') {
@@ -101,12 +94,7 @@ export class DynamoDbService {
         type: string;
         name: string;
         path: string;
-        responseForAddingFileNameUUID: {
-          success: boolean;
-          message: string;
-          fileName: string;
-          fileId: string;
-        };
+        responseForAddingFileNameUUID: typeof responseForAddingFileNameUUID;
       };
       try {
         fileHandlerResponse = await this.fileHandler(data, userId, workspaceId, datasetId);
@@ -144,7 +132,6 @@ export class DynamoDbService {
         responseForAddingData: {
           success: true,
           message: 'Data added successfully.',
-          datasetId: datasetId,
           dataDetails: {
             dataId: dataId,
             type: type,
@@ -194,7 +181,6 @@ export class DynamoDbService {
     let responseForAddingFileNameUUID: {
       success: boolean;
       message: string;
-      fileName: string;
       fileId: string;
     };
     try {
@@ -203,7 +189,6 @@ export class DynamoDbService {
       responseForAddingFileNameUUID = {
         success: true,
         message: 'File Name against UUID added successfully to DynamoDb.',
-        fileName: name,
         fileId: fileId
       };
       //return response;
@@ -240,7 +225,7 @@ export class DynamoDbService {
     }
   }
 
-  async getDatasetById(workspaceId: string, datasetId: string) {
+  async getDatasetById(workspaceId: string, datasetId: string) : Promise<any> {
     // Query parameters to fetch the dataset by workspaceId and datasetId
     const paramsForDataset = {
       TableName: this.tableName,
@@ -284,6 +269,34 @@ export class DynamoDbService {
     } catch (error) {
       console.error('Error getting dataset:', error);
       throw new Error(`Unable to get dataset: ${error.message}`);
+    }
+  }
+
+  async getDataById(datsetId: string, dataId: string) : Promise<any>{
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        PK: `DATASET#${datsetId}`,
+        SK: `DATA#${dataId}`
+      }
+    };
+
+    try {
+      const data = await this.dynamodb.get(params).promise();
+      const response = {
+        success: true,
+        message: 'Data fetched successfully.',
+        dataDetails: {
+          dataId: data.Item.id,
+          type: data.Item.type,
+          path: data.Item.path 
+        }
+      };
+      
+      return response;
+    } catch (error) {
+      console.error('Error getting data:', error);
+      throw new Error(`Unable to get data: ${error.message}`);
     }
   }
 }

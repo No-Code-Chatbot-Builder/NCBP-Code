@@ -14,15 +14,20 @@ export class AuthMiddleware implements NestMiddleware {
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log('Inside middleware');
-    // //const headers = req.headers as { authorization?: string }; // Update the type of req.headers
-
-    // const token = headers.authorization?.split(' ')[1]; // Extract token from Authorization
-
-    // if (!token) {
-    //   throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
+    //let headers = new Headers();
+    // const headers = req.headers as { authorization?: string }
+    // if (headers.authorization && headers.authorization.startsWith('Bearer'))
+    // {
+    //   const token = headers.authorization.split(' ')[1];
+    //   if (!token) {
+    //     throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
+    //   }
+    //   const secret = process.env.JWT_SECRET;
+    //   // Verify token
+    //   const decoded = jwt.verify(token, secret)
+      next(); // Call next route handler
     // }
-
+    
     // try {
     //   const decoded: any = jwt.verify(token, process.env.JWT_SECRET);
     //   if (!decoded.sub) {
@@ -44,7 +49,6 @@ export class AuthMiddleware implements NestMiddleware {
     //     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     //   }
 
-    next(); // Call next route handler
     // } catch (error) {
     //   console.error(error);
     //   throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);

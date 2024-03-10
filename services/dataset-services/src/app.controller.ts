@@ -80,13 +80,9 @@ export class AppController {
     return response;
   }
 
-  @Get('s3')
-  async getS3(): Promise<any> {
-    const bucketName = 'ncbp-bucket';
-    const filePath = 'bitcoin.pdf';
-    const userId = 'userId';
-    const workspaceId = 'workspaceId';
-    const response = await this.s3Service.getFileFromS3(bucketName, filePath, userId, workspaceId);
+  @Get(':workspaceId/:datasetId/data/:dataId')
+  async getDataById(@Param('datasetId') datasetId: string, @Param('dataId') dataId: string): Promise<any> {
+    const response = await this.dynamoDbService.getDataById(datasetId, dataId);
     return response;
   }
 }

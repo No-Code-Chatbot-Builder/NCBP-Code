@@ -10,58 +10,30 @@ import { HttpService } from '@nestjs/axios';
 import { PineconeService } from 'src/pinecone/pinecone.service';
 import { Express } from 'express'; // Import Express namespace
 
-/*
-    Please note that the following class will be adjusted to incorporate Strategy/Factory Pattern to address various loaders
-*/
 @Injectable()
 export class LangchainDocLoaderService {
   private data: any;
   private savePath: string;
 
-  constructor(
-    private httpService: HttpService,
-    private pineconeService: PineconeService
-  ) {}
+  constructor(private httpService: HttpService, private pineconeService: PineconeService) {
+
+  }
 
   async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string) {
+
     this.data = data;
+
+    let document: any;
+
     if (typeof this.data === 'object') {
-      this.fileProcessor(this.data, userId, workspaceId, datasetId);
+      document = this.fileProcessor(this.data);
     } else if (typeof this.data === 'string') {
-      this.webLoader(this.data);
+      document = this.webLoader(this.data);
     }
-  }
-  async fileProcessor(file: Express.Multer.File, userId: string, workspaceId: string, datasetId: string) {
-    // Fix parameter type declaration
-    // Define the path where you want to save the file
-    this.savePath = join(__dirname, '..', 'uploads');
 
-    // Write the file to the server
-    writeFileSync(this.savePath, file.buffer);
-    let text;
-    switch (file.mimetype) {
-      case 'application/pdf':
-        // Handle PDF file
-        text = await this.pdfLoader(file);
-        break;
-      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-        // Handle DOCX file
-        text = await this.docxLoader(file);
-        break;
-      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-        // Handle PPT file
-        text = await this.pptLoader(file);
-        break;
-      case 'text/plain':
-        // Handle text file
-        text = await this.textLoader(file);
-        break;
-      // Add more cases as needed for other file types
-    }
     let texts: string[] = [];
-
-    for (let i = 0; i < text.length; i++) {
-      texts.push(text[i].pageContent);
+    for (let i = 0; i < document.length; i++) {
+      texts.push(document[i].pageContent);
     }
 
     try {
@@ -76,29 +48,39 @@ export class LangchainDocLoaderService {
       console.error('Error sending text to server:', error);
     }
   }
+  async fileProcessor(file: Express.Multer.File) {
+    // Fix parameter type declaration
+    // Define the path where you want to save the file
+    this.savePath = join(__dirname, '..', 'uploads');
 
-  async pdfLoader(file: Express.Multer.File) {
-    // one document per page
-    const loader = new PDFLoader(this.savePath);
-    const docs = await loader.load();
-    return docs;
+    // Write the file to the server
+    writeFileSync(this.savePath, file.buffer);
+    let text: string | string[];
+    switch (file.mimetype) {
+      case 'application/pdf':
+        // Handle PDF file
+        text = await this.docLoader(new PDFLoader(this.savePath));
+        break;
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        // Handle DOCX file
+        text = await this.docLoader(new DocxLoader(this.savePath));
+        break;
+      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+        // Handle PPT file
+        text = await this.docLoader(new PPTXLoader(this.savePath));
+        break;
+      case 'text/plain':
+        // Handle text file
+        text = await this.docLoader(new TextLoader(this.savePath));
+        break;
+      // Add more cases as needed for other file types
+    }
+    
+
+    
   }
-  async pptLoader(file: Express.Multer.File) {
-    const loader = new PPTXLoader(this.savePath);
-
-    const docs = await loader.load();
-    return docs;
-  }
-  async docxLoader(file: Express.Multer.File) {
-    const loader = new DocxLoader(this.savePath);
-
-    const docs = await loader.load();
-
-    return docs;
-  }
-  async textLoader(file: Express.Multer.File) {
-    const loader = new TextLoader(this.savePath);
-
+  async docLoader(loader: TextLoader | PDFLoader | PPTXLoader | TextLoader) : Promise<any>
+  {
     const docs = await loader.load();
     return docs;
   }
