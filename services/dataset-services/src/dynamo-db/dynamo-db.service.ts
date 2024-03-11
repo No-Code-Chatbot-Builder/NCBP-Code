@@ -255,11 +255,23 @@ export class DynamoDbService {
 
     try {
       const datasetResult = await this.dynamodb.query(paramsForDataset).promise();
-
+      let response;
       // Assuming there's only one dataset with this specific datasetId
-      if (datasetResult.Items.length > 0) {
-        const datasetItem = datasetResult.Items[0]; // Assuming only one item matches
-
+      if (datasetResult.Items.length > 0) { 
+        response = {
+          success: true,
+          message: 'Dataset fetched successfully.',
+          datasetDetails: {
+            datasetId: datasetResult.Items[0].id,
+            name: datasetResult.Items[0].name,
+            description: datasetResult.Items[0].description,
+            createdAt: datasetResult.Items[0].createdAt,
+            createdBy: datasetResult.Items[0].createdBy,
+            
+          }
+        };
+      
+         
         // Query parameters to fetch related data using the datasetId
         const paramsForData = {
           TableName: this.tableName,
@@ -273,9 +285,19 @@ export class DynamoDbService {
           const dataResult = await this.dynamodb.query(paramsForData).promise();
 
           // Assuming you want to nest the related data within the dataset item
-          datasetItem.data = dataResult.Items;
+          response.data = dataResult.Items?.map(item => ({
+          
+            dataId: item.id,
+            name: item.name,
+            type: item.type,
+            path: item.path,
+            createdAt: item.createdAt,
+            createdBy: item.createdBy,
+            
+            
+          }))
 
-          return datasetItem; // Return the combined dataset with its related data
+          return response; // Return the combined dataset with its related data
         } catch (error) {
           console.error('Error getting related data:', error);
           throw new Error(`Unable to get related data: ${error.message}`);
