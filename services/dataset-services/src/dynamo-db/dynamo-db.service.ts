@@ -28,7 +28,7 @@ export class DynamoDbService {
       PK: `WORKSPACE#${workspaceId}`,
       SK: `DATASET#${datasetId}`,
       id: datasetId,
-      userId: userId,
+      createdBy: userId,
       name: name,
       description: description,
       createdAt: new Date().toISOString()
@@ -45,12 +45,11 @@ export class DynamoDbService {
       const response = {
         success: true,
         message: 'Dataset created successfully.',
-        workspaceId: workspaceId,
         datasetDetails: {
           datasetId: datasetId,
           name: name,
           description: description,
-          workspaceId: workspaceId
+        
         }
       };
 
@@ -218,11 +217,29 @@ export class DynamoDbService {
 
     try {
       const data = await this.dynamodb.query(params).promise();
-      return data.Items;
-    } catch (error) {
+
+      const response = {
+        success: true,
+        message: 'Datasets fetched successfully.',
+        datasets: data.Items?.map(item => ({
+          
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          createdAt: item.createdAt,
+          createdBy: item.createdBy,
+          
+          
+        }))
+      };
+      return response;
+    }
+      
+     catch (error) {
       console.error('Error getting datasets:', error);
       throw new Error(`Unable to get datasets: ${error.message}`);
     }
+  
   }
 
   async getDatasetById(workspaceId: string, datasetId: string) : Promise<any> {
