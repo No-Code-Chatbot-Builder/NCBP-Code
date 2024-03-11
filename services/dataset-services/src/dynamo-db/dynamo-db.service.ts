@@ -115,7 +115,7 @@ export class DynamoDbService {
       name: name,
       type: type,
       path: path,
-      userId: userId,
+      createdBy: userId,
       createdAt: new Date().toISOString()
     };
 
