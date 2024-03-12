@@ -37,6 +37,13 @@ const Navigation = () => {
           <Link href={"/features"} className="hover:underline">
             Features
           </Link>
+          {isLoggedIn ? (
+            <Link href={"/dashboard"} className="hover:underline">
+              Dashboard
+            </Link>
+          ) : (
+            ""
+          )}
         </ul>
       </nav>
       <aside className="flex gap-2 items-center">

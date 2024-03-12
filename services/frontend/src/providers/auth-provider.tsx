@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import {
   confirmSignUp,
+  fetchAuthSession,
   fetchUserAttributes,
   FetchUserAttributesOutput,
   resendSignUpCode,
@@ -13,6 +14,8 @@ import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import Cookies from "js-cookie";
+import { decodeJWT } from "@aws-amplify/core";
 
 interface LoginInput {
   username: string;
@@ -83,21 +86,27 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const fetchAttributes = async () => {
       try {
-        const userAttributes = await fetchUserAttributes();
-        setUser(userAttributes);
+        const session = await fetchAuthSession();
+        console.log(session.tokens?.idToken?.toString());
+        console.log(session.tokens?.idToken?.payload);
+
+        if (session && Cookies.get("userLoggedIn")) {
+          setIsLoggedIn(true);
+          const userAttributes = await fetchUserAttributes();
+          setUser(userAttributes);
+        } else {
+          setIsLoggedIn(false);
+          Cookies.remove("userLoggedIn");
+        }
       } catch (err) {
-        console.error(err);
+        setIsLoggedIn(false);
+        Cookies.remove("userLoggedIn");
         setUser(null);
       }
     };
 
     fetchAttributes();
   }, []);
-
-  const getUser = async () => {
-    const userAttributes = await fetchUserAttributes();
-    setUser(userAttributes);
-  };
 
   const verifyCode = async ({ username, code }: VerificationInput) => {
     try {
@@ -161,7 +170,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           },
         },
       });
-      setUser({ ...user, email: email });
+      setUser({
+        ...user,
+        email: email,
+        preferred_username: email.split("@")[0],
+      });
       if (isSignUpComplete) {
         toast(
           <CustomToast
@@ -169,6 +182,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             description="Navigating to dashboard"
           />
         );
+        setUser({ ...user, email: email });
         setIsVerificationStep(false);
         router.push("/dashboard");
       } else setIsVerificationStep(true);
@@ -202,7 +216,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           />
         );
       }
+      setUser({
+        ...user,
+        email: username,
+        preferred_username: username.split("@")[0],
+      });
       setIsLoggedIn(true);
+      Cookies.set("userLoggedIn", "true", { expires: 1 });
       router.push("/dashboard");
     } catch (error: any) {
       toast(
@@ -214,6 +234,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await signOut();
+      Cookies.remove("userLoggedIn");
       toast(
         <CustomToast
           title="User Signed Out"

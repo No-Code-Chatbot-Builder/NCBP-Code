@@ -13,6 +13,7 @@ import { useCustomAuth } from "@/providers/auth-provider";
 export function SignInToggle() {
   const router = useRouter();
   const { isLoggedIn, logout } = useCustomAuth();
+  console.log(isLoggedIn);
 
   return (
     <DropdownMenu>
