@@ -1,5 +1,5 @@
 // app.controller.ts
-import { Controller, Get, Post, Body, Req, Res, HttpStatus} from '@nestjs/common';
+import { Controller, Get, Put, Body, Req, Res, HttpStatus} from '@nestjs/common';
 import { AppService } from './app.service';
 import { UserService } from './user/user.service';
 import { Middleware } from './middleware/auth.middleware'; // Import your middleware
@@ -24,7 +24,7 @@ export class AppController {
     return await this.userService.getUserById(PK, SK);
   }
 
-  @Post('/UpdateSpecificUser')
+  @Put('/UpdateSpecificUser')
   async updateUserField(@Body() body: { PK: string, SK: string, [key: string]: any }): Promise<any> {
     const { PK, SK, ...fieldsToUpdate } = body;
     return await this.userService.updateUserFields(PK, SK, fieldsToUpdate);
