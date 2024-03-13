@@ -1,18 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BotService } from './bot.service';
+import { Gpt3Service } from './botDemo.service';
 
-describe('BotServiceService', () => {
-  let service: BotService;
+describe('UserService', () => {
+  let service: Gpt3Service;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BotService],
+      providers: [Gpt3Service],
     }).compile();
 
-    service = module.get<BotService>(BotService);
+    service = module.get<Gpt3Service>(Gpt3Service);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });
+
+

@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BotServiceService } from './bot_service.service';
+import { DynamoDbService } from './dynamo-db.service';
 
-describe('BotServiceService', () => {
-  let service: BotServiceService;
+describe('DynamoDbService', () => {
+  let service: DynamoDbService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [BotServiceService],
+      providers: [DynamoDbService],
     }).compile();
 
-    service = module.get<BotServiceService>(BotServiceService);
+    service = module.get<DynamoDbService>(DynamoDbService);
   });
 
   it('should be defined', () => {

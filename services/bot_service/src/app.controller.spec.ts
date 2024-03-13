@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Gpt3Service } from './bot/bot.service';
+import { Gpt3Service } from './botDemo/botDemo.service';
 
 describe('AppController', () => {
   let appController: AppController;
