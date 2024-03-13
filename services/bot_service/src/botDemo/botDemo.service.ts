@@ -6,7 +6,7 @@ export class BotDemo {}
 
 export class Gpt3Service {
     async generateResponse(query: string): Promise<string> {
-      const apiKey = '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';
+      const apiKey = '';
       const endpoint = 'https://api.openai.com/v1/completions';
   
       const response = await axios.post(
