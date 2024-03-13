@@ -26,6 +26,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@pinecone-database/pinecone": "^2.0.1",
+    "aws-jwt-verify": "^4.0.1",
     "aws-sdk": "^2.1555.0",
     "axios": "^1.6.7",
     "cheerio": "^1.0.0-rc.12",
