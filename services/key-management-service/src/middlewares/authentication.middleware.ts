@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { DEFAULT_USER, HttpStatusCode } from '../utils/constants';
 import { User } from '../entities/user';
@@ -37,9 +36,9 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     (req).user = user;
     next();
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
-    res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - ' + error.message });
+    res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - ' + error});
   }
 };
 
@@ -70,7 +69,7 @@ const verifyToken: (token: string) => Promise<CognitoIdTokenPayload> = async (to
 
     console.log(payload)
     return payload;
-  } catch(error: any) {
+  } catch(error) {
     console.log('Error:', error)
     console.log('Token not valid!');
     throw new Error('Invalid token');

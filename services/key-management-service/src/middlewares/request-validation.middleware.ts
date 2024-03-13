@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { body, query, validationResult } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { HttpStatusCode } from '../utils/constants';
 
 const validateCreateKey = (req: Request, res: Response, next: NextFunction) => {

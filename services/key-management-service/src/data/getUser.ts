@@ -1,4 +1,3 @@
-
 import { User } from "../entities/user";
 import { IUser } from "../dtos/user.dto";
 import { dynamoDB } from "../utils/db";
@@ -22,7 +21,7 @@ export const getUser = async (user: User) => {
     return {
       user: new User(result.Items[0] as IUser),
     };
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     return {
       error: 'Could not get user.',
