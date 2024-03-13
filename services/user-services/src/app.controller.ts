@@ -19,15 +19,15 @@ export class AppController {
   }
 
   @Get('/userById')
-  async getUserById(@Body() body: { sub: string }): Promise<any> {
-    const { sub } = body;
-    return await this.userService.getUserById(sub);
+  async getUserById(@Body() body: { PK: string, SK: string }): Promise<any> {
+    const { PK, SK } = body;
+    return await this.userService.getUserById(PK, SK);
   }
 
-  @Post('/specificUser')
-  async updateUserField(@Body() body: { sub: string, [key: string]: any }): Promise<any> {
-    const { sub, ...fieldsToUpdate } = body;
-    return await this.userService.updateUserFields(sub, fieldsToUpdate);
+  @Post('/UpdateSpecificUser')
+  async updateUserField(@Body() body: { PK: string, SK: string, [key: string]: any }): Promise<any> {
+    const { PK, SK, ...fieldsToUpdate } = body;
+    return await this.userService.updateUserFields(PK, SK, fieldsToUpdate);
   }
 }
 

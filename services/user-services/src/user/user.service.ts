@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
     private readonly dynamoDb: AWS.DynamoDB.DocumentClient;
+    private tableName = this.configService.get<string>('DYNAMODB_TABLE_NAME');
     
 
-    constructor() {
+    constructor(private configService: ConfigService,) {
+      
       this.dynamoDb = new AWS.DynamoDB.DocumentClient(
         {
             region: 'us-east-1'
@@ -16,7 +19,7 @@ export class UserService {
   
     async getAllUsers(): Promise<any[]> {
       const params = {
-        TableName: 'demoTable'
+        TableName: this.tableName
       };
   
       try {
@@ -28,11 +31,12 @@ export class UserService {
       }
     }
     
-    async getUserById(sub: string): Promise<any> {
+    async getUserById(id: string, email: string): Promise<any> {
         const params = {
-          TableName: 'demoTable',
+          TableName: this.tableName,
           Key: {
-            'sub': sub
+            'PK': `USER#${id}`,
+            'SK': `USEREMAIL#${email}`
           }
         };
   
@@ -45,7 +49,7 @@ export class UserService {
         }
       }
 
-      async updateUserFields(sub: string, fieldsToUpdate: { [key: string]: any }): Promise<any> {
+      async updateUserFields(id: string, email: string, fieldsToUpdate: { [key: string]: any }): Promise<any> {
         //keys are strings and values can be of any type in fieldstoUpdate
       const updateExpressionArray = [];
       for (const key of Object.keys(fieldsToUpdate)) { 
@@ -68,37 +72,37 @@ export class UserService {
 
 
 const keys = Object.keys(fieldsToUpdate);
-for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const value = fieldsToUpdate[key];
+for (const key of keys) {
+  const value = fieldsToUpdate[key];
 
-    let sanitizedValue = value;
+  let sanitizedValue = value;
 
-    // Check if the value is not null or undefined
-    if (sanitizedValue === null || sanitizedValue === undefined) {
-        // Handle null or undefined values
-        throw new Error(`Value for field '${key}' cannot be null or undefined.`);
-    }
+  // Check if the value is not null or undefined
+  if (sanitizedValue === null || sanitizedValue === undefined) {
+    // Handle null or undefined values
+    throw new Error(`Value for field '${key}' cannot be null or undefined.`);
+  }
 
-    // Convert empty strings to null
-    if (typeof sanitizedValue === 'string' && sanitizedValue.trim() === '') {
-        sanitizedValue = null;
-    }
+  // Convert empty strings to null
+  if (typeof sanitizedValue === 'string' && sanitizedValue.trim() === '') {
+    sanitizedValue = null;
+  }
 
-    // Assign the sanitized value to the expression attribute values
-    expressionAttributeValues[`:${key}`] = sanitizedValue;
+  // Assign the sanitized value to the expression attribute values
+  expressionAttributeValues[`:${key}`] = sanitizedValue;
 }
 
-        const params = {
-            TableName: 'demoTable',
-            Key: {
-                'sub': sub
-            },
-            UpdateExpression: `SET ${updateExpression}`,
-            ExpressionAttributeNames: expressionAttributeNames,
-            ExpressionAttributeValues: expressionAttributeValues,
-            ReturnValues: 'ALL_NEW' // Return the updated item
-        };
+const params = {
+  TableName: this.tableName,
+  Key: {
+    'PK': `USER#${id}`,
+    'SK': `USEREMAIL#${email}`
+  },
+  UpdateExpression: `SET ${updateExpression}`,
+  ExpressionAttributeNames: expressionAttributeNames,
+  ExpressionAttributeValues: expressionAttributeValues,
+  ReturnValues: 'ALL_NEW' // Return the updated item
+};
 
         try {
             const data = await this.dynamoDb.update(params).promise();

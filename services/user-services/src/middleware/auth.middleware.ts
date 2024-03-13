@@ -1,50 +1,55 @@
-import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';// NestMiddleware, HttpException, HttpStatus } 
 import { Request, Response, NextFunction } from 'express';
-import * as jwt from 'jsonwebtoken';
-import { DynamoDB } from 'aws-sdk';
+// import * as jwt from 'jsonwebtoken';
+// import { DynamoDB } from 'aws-sdk';
 
 @Injectable()
-export class Middleware implements NestMiddleware {
-  private readonly dynamoDb: DynamoDB.DocumentClient;
-
-  constructor() {
-    this.dynamoDb = new DynamoDB.DocumentClient();
-  }
-
+export class Middleware{ //implements NestMiddleware {
+  
   async use(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization 
+    next(); // Call next route handler
+  }
+  // private readonly dynamoDb: DynamoDB.DocumentClient;
 
-    if (!token) {
-      throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
-    }
+  // constructor() {
+  //   this.dynamoDb = new DynamoDB.DocumentClient();
+  // }
 
-    try {
-      const decoded: any = jwt.verify(token, process.env.JWT_SECRET); 
-      if (!decoded.sub) {
-        throw new HttpException('Invalid token: sub not found', HttpStatus.UNAUTHORIZED);
-      }
+  // async use(req: Request, res: Response, next: NextFunction) {
+  //   const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization 
 
-      // Define DynamoDB parameters
-      const params: DynamoDB.DocumentClient.GetItemInput = {
-        TableName: 'demoTable', 
-        Key: {
-          'sub': decoded.sub,
-        },
-      };
+  //   if (!token) {
+  //     throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
+  //   }
 
-      // Fetch user details from DynamoDB table
-      const data = await this.dynamoDb.get(params).promise();
+  //   try {
+  //     const decoded: any = jwt.verify(token, process.env.JWT_SECRET); 
+  //     if (!decoded.sub) {
+  //       throw new HttpException('Invalid token: sub not found', HttpStatus.UNAUTHORIZED);
+  //     }
 
-      if (!data) {
-        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      }
+  //     // Define DynamoDB parameters
+  //     const params: DynamoDB.DocumentClient.GetItemInput = {
+  //       TableName: 'ncbp', 
+  //       Key: {
+  //         'sub': decoded.sub,
+  //       },
+  //     };
+
+  //     // Fetch user details from DynamoDB table
+  //     const data = await this.dynamoDb.get(params).promise();
+
+  //     if (!data) {
+  //       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  //     }
 
 
       
-      next(); // Call next route handler
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
-    }
-  }
+  //     next(); // Call next route handler
+  //   } catch (error) {
+  //     console.error(error);
+  //     throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+  //   }
+  // }
+
 }
