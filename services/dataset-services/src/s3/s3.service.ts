@@ -11,9 +11,9 @@ export class S3Service {
     this.s3 = new AWS.S3();
   }
   // keyPrefix can be workspaceId or userId or datasetId
-  async uploadFileToS3(bucketName: string, file: Express.Multer.File, fileName:string, userId: string, workspaceId: string, datasetId: string): Promise<AWS.S3.ManagedUpload.SendData> {
+  async uploadFileToS3(bucketName: string, file: Express.Multer.File, fileName: string, userId: string, workspaceId: string, datasetId: string): Promise<AWS.S3.ManagedUpload.SendData> {
     try {
-      const s3Key =  `USER#${userId}/WORKSPACE#${workspaceId}/DATASET#${datasetId}/${fileName}`;
+      const s3Key = `USER#${userId}/WORKSPACE#${workspaceId}/DATASET#${datasetId}/${fileName}`;
 
       const params = {
         Bucket: bucketName,

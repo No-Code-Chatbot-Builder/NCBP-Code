@@ -15,12 +15,12 @@ export class LangchainDocLoaderService {
   private data: any;
   private savePath: string;
 
-  constructor(private httpService: HttpService, private pineconeService: PineconeService) {
-
-  }
+  constructor(
+    private httpService: HttpService,
+    private pineconeService: PineconeService
+  ) {}
 
   async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string) {
-
     this.data = data;
 
     let document: any;
@@ -75,12 +75,8 @@ export class LangchainDocLoaderService {
         break;
       // Add more cases as needed for other file types
     }
-    
-
-    
   }
-  async docLoader(loader: TextLoader | PDFLoader | PPTXLoader | TextLoader) : Promise<any>
-  {
+  async docLoader(loader: TextLoader | PDFLoader | PPTXLoader | TextLoader): Promise<any> {
     const docs = await loader.load();
     return docs;
   }

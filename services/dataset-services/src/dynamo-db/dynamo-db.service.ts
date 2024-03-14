@@ -48,8 +48,7 @@ export class DynamoDbService {
         datasetDetails: {
           datasetId: datasetId,
           name: name,
-          description: description,
-        
+          description: description
         }
       };
 
@@ -81,7 +80,7 @@ export class DynamoDbService {
         };
       };
       responseForAddingFileNameUUID?: typeof responseForAddingFileNameUUID;
-    }
+    };
 
     if (typeof data === 'string') {
       type = 'url';
@@ -126,7 +125,7 @@ export class DynamoDbService {
 
     try {
       const dynamoDbResponse = await this.dynamodb.put(params).promise();
-      
+
       response = {
         responseForAddingData: {
           success: true,
@@ -134,15 +133,14 @@ export class DynamoDbService {
           dataDetails: {
             dataId: dataId,
             type: type,
-            path: path,
-          },
-        },
+            path: path
+          }
+        }
       };
-      
+
       if (responseForAddingFileNameUUID) {
         response.responseForAddingFileNameUUID = responseForAddingFileNameUUID;
       }
-      
 
       try {
         this.LangchainDocLoaderService.dataProcessor(data, userId, workspaceId, datasetId);
@@ -222,27 +220,21 @@ export class DynamoDbService {
         success: true,
         message: 'Datasets fetched successfully.',
         datasets: data.Items?.map(item => ({
-          
           id: item.id,
           name: item.name,
           description: item.description,
           createdAt: item.createdAt,
-          createdBy: item.createdBy,
-          
-          
+          createdBy: item.createdBy
         }))
       };
       return response;
-    }
-      
-     catch (error) {
+    } catch (error) {
       console.error('Error getting datasets:', error);
       throw new Error(`Unable to get datasets: ${error.message}`);
     }
-  
   }
 
-  async getDatasetById(workspaceId: string, datasetId: string) : Promise<any> {
+  async getDatasetById(workspaceId: string, datasetId: string): Promise<any> {
     // Query parameters to fetch the dataset by workspaceId and datasetId
     const paramsForDataset = {
       TableName: this.tableName,
@@ -257,7 +249,7 @@ export class DynamoDbService {
       const datasetResult = await this.dynamodb.query(paramsForDataset).promise();
       let response;
       // Assuming there's only one dataset with this specific datasetId
-      if (datasetResult.Items.length > 0) { 
+      if (datasetResult.Items.length > 0) {
         response = {
           success: true,
           message: 'Dataset fetched successfully.',
@@ -266,12 +258,10 @@ export class DynamoDbService {
             name: datasetResult.Items[0].name,
             description: datasetResult.Items[0].description,
             createdAt: datasetResult.Items[0].createdAt,
-            createdBy: datasetResult.Items[0].createdBy,
-            
+            createdBy: datasetResult.Items[0].createdBy
           }
         };
-      
-         
+
         // Query parameters to fetch related data using the datasetId
         const paramsForData = {
           TableName: this.tableName,
@@ -286,16 +276,13 @@ export class DynamoDbService {
 
           // Assuming you want to nest the related data within the dataset item
           response.data = dataResult.Items?.map(item => ({
-          
             dataId: item.id,
             name: item.name,
             type: item.type,
             path: item.path,
             createdAt: item.createdAt,
-            createdBy: item.createdBy,
-            
-            
-          }))
+            createdBy: item.createdBy
+          }));
 
           return response; // Return the combined dataset with its related data
         } catch (error) {
@@ -311,7 +298,7 @@ export class DynamoDbService {
     }
   }
 
-  async getDataById(datsetId: string, dataId: string) : Promise<any>{
+  async getDataById(datsetId: string, dataId: string): Promise<any> {
     const params = {
       TableName: this.tableName,
       Key: {
@@ -328,10 +315,10 @@ export class DynamoDbService {
         dataDetails: {
           dataId: data.Item.id,
           type: data.Item.type,
-          path: data.Item.path 
+          path: data.Item.path
         }
       };
-      
+
       return response;
     } catch (error) {
       console.error('Error getting data:', error);
