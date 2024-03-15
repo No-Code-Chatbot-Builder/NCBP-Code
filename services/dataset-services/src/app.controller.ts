@@ -35,7 +35,7 @@ export class AppController {
     return response;
   }
 
-  @Post(':workspaceId/dataset')
+  @Post('datasets/:workspaceId/dataset')
   async createDataset(@Req() req: Request, @Body() body: { name: string; description?: string }, @Param('workspaceId') workspaceId: string): Promise<any> {
     const { name, description } = body;
 
@@ -44,19 +44,19 @@ export class AppController {
     return response;
   }
 
-  @Get(':workspaceId/dataset/')
+  @Get('datasets/:workspaceId/')
   async getDatasets(@Param('workspaceId') workspaceId: string): Promise<any> {
     const response = await this.dynamoDbService.getDatasets(workspaceId);
     return response;
   }
 
-  @Get(':workspaceId/dataset/:datasetId')
+  @Get('datasets/:workspaceId/:datasetId')
   async getDatasetById(@Param('workspaceId') workspaceId: string, @Param('datasetId') datasetId: string): Promise<any> {
     const dataset = await this.dynamoDbService.getDatasetById(workspaceId, datasetId);
     return dataset;
   }
 
-  @Post(':workspaceId/:datasetId/data/')
+  @Post('datasets/:workspaceId/:datasetId/data/')
   @UseInterceptors(FileInterceptor('file'))
   async addData(
     @Req() req: Request,
@@ -84,10 +84,16 @@ export class AppController {
     return response;
   }
 
-  @Get(':workspaceId/:datasetId/data/:dataId')
+  @Get('datasets/:workspaceId/:datasetId/data/:dataId')
   async getDataById(@Param('datasetId') datasetId: string, @Param('dataId') dataId: string): Promise<any> {
     const response = await this.dynamoDbService.getDataById(datasetId, dataId);
 
     return response;
+  }
+
+  @Get('datasets/health')
+  async healthCheck(): Promise<any> {
+    return { statuscode: 200,
+      message: 'ok' };
   }
 }

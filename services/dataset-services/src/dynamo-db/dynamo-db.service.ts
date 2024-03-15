@@ -31,6 +31,7 @@ export class DynamoDbService {
       createdBy: userId,
       name: name,
       description: description,
+      jsonlId: "",
       createdAt: new Date().toISOString()
     };
     const params = {
