@@ -9,9 +9,12 @@ app = FastAPI()
 class Texts(BaseModel):
     texts: List[str]
 
+class TextModel(BaseModel):  # Define a Pydantic model that matches the expected JSON structure
+    text: str
+
 @app.post("/vectorEmbeddings")
 def create_vector_embeddings(texts: Texts):
-    
+   
     
     splitter = CharacterTextSplitter(separator='\n', chunk_size=1000, chunk_overlap=200)
     
@@ -20,7 +23,7 @@ def create_vector_embeddings(texts: Texts):
         splitted_documents.extend(splitter.split_text(text))
 
     
-    # Split each document and flatten the list
+    # lit each document and flatten the list
     """    splitted_documents = []
         for text in texts.texts:
             # For each text, use the splitter to split it into chunks
@@ -43,6 +46,18 @@ def create_vector_embeddings(texts: Texts):
 
   
 
+@app.post("/queryVectorEmbeddings")
+def createQueryVectorEmbeddings(text: TextModel):
+    
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+
+    # Encoding the splitted documents
+    embeddings = model.encode([text.text])
+
+    embeddings_as_lists = [embedding.tolist() for embedding in embeddings]
+    
+    return embeddings_as_lists[0]
+    
 
     
 
