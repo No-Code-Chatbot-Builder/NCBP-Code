@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import OpenAI from "openai";
 import { DynamoDbService } from 'src/dynamo-db/dynamo-db.service';
 
 @Injectable()
 export class BotService {
 
-    constructor(private dynamoDbService: DynamoDbService) 
+    constructor(private dynamoDbService: DynamoDbService, private configService: ConfigService) 
     {
 
     }  
@@ -18,10 +19,11 @@ export class BotService {
             model: "gpt-3.5-turbo",
           });
         
-          console.log(completion.choices[0]);
+          return (completion.choices[0]);
+          //console.log(completion.choices[0]);
     }
 
-    async createAssistant (){
+    async createAssistantOnly (){
       const openai = new OpenAI();
       const myAssistant = await openai.beta.assistants.create({
         instructions:
@@ -56,7 +58,7 @@ export class BotService {
       const myThread = await openai.beta.threads.create({});
     
       console.log(myThread);
-      this.createMessage(myThread.id, "what is compiler construction", assistantId);
+      this.createMessage(myThread.id,  assistantId, "what is compiler construction");
     }
 
     async retrieveThread (threadId: string) {
@@ -73,7 +75,7 @@ export class BotService {
       console.log(myThread);
     }
 
-    async createMessage (threadId: string, assistantId: string, query: string, ) {
+    async createMessage (threadId: string, assistantId: string, query: string) {
       const openai = new OpenAI();
       const myMessage = await openai.beta.threads.messages.create(threadId, {
         role: "user",
@@ -81,7 +83,7 @@ export class BotService {
       });
     
       console.log(myMessage);
-      this.createRun(threadId, assistantId, query);
+      return(this.createRun(threadId, assistantId, query));
     }
 
 
@@ -91,12 +93,13 @@ export class BotService {
         assistant_id: assistantId,
         instructions: query,
       });
-    
-      this.createResponse(myRun.id, threadId, query, assistantId)
+
       console.log(myRun);
+    
+      return(this.createResponse(myRun.id, threadId));
     }
 
-    async createResponse(runId, threadId, query, assistantId) {
+    async createResponse(runId, threadId) {
       const openai = new OpenAI();
       const interval = 1000; // Set the interval to 1 second (adjust as needed)
   
@@ -105,17 +108,23 @@ export class BotService {
   
           if (run.status === 'completed') {
               const messagesFromThread = await openai.beta.threads.messages.list(threadId);
-              console.log(messagesFromThread);
-         
-              return { runResult: run, messages: messagesFromThread }; // Resolve with result
+              return(messagesFromThread.data[0].content[0]["text"]["value"]);
           }  
           await new Promise(resolve => setTimeout(resolve, interval));
       }
   }
 
+  async fetchingInfo (workspaceId: string, query: string) {
+    const data = await this.dynamoDbService.fetchingData(workspaceId);
+    //console.log(data.datasets[0].assistantId);
+    //console.log(data.datasets[0].threadId);
+    //console.log(query);
+    return(this.createMessage(data.datasets[0].threadId, data.datasets[0].assistantId, query));
+  }
+
 
   //Only Assistant with Thread
-  async createAssistantAndThread (instruction: string, workspace: string) {
+  async createAssistant (instruction: string, workspace: string, userId: string) {
     const openai = new OpenAI();
     const myAssistant = await openai.beta.assistants.create({
       instructions:
@@ -126,15 +135,15 @@ export class BotService {
     });
   
     console.log(myAssistant);
-    this.createThreadForAssistant(myAssistant.id, workspace);
+    this.createThreadForAssistant(myAssistant.id, workspace, userId);
   }
 
   //Only Thread with Assistant
-  async createThreadForAssistant (assistantId: string, workspace: string) {
+  async createThreadForAssistant (assistantId: string, workspace: string, userId: string) {
     const createdAt = new Date().toISOString();
     const openai = new OpenAI();
     const myThread = await openai.beta.threads.create({});
-    this.dynamoDbService.addData(workspace, assistantId, myThread.id, "userID", createdAt);
+    this.dynamoDbService.addData(workspace, assistantId, myThread.id, userId, createdAt);
   
     console.log(myThread);
   }

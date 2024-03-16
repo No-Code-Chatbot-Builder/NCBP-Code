@@ -1,21 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-//import { GenerateIdService } from 'src/generate-id/generate-id.service';
 import { ConfigService } from '@nestjs/config';
-//import { S3Service } from 'src/s3/s3.service';
-//import { LangchainDocLoaderService } from 'src/langchain-docLoaders/langchain-docLoaders.service';
-import { BotService } from 'src/bot/bot.service';
 
 @Injectable()
 export class DynamoDbService {
     private dynamodb: AWS.DynamoDB.DocumentClient;
     private tableName = this.configService.get<string>('DYNAMODB_TABLE_NAME');
-    private botServie: BotService;
+    //private botService: BotService;
   
     constructor(
       private configService: ConfigService,
-      //private LangchainDocLoaderService: LangchainDocLoaderService,
-      //private readonly s3Service: S3Service
+      
     ) {
       // Inject S3Service) {
       // Initialize the DynamoDB DocumentClient
@@ -59,7 +54,7 @@ export class DynamoDbService {
     }
 
 
-    async sendWorkspaceId (workspaceId: string, query: string): Promise<any> {
+    async fetchingData (workspaceId: string): Promise<any> {
         const params = {
             TableName: this.tableName,
             KeyConditionExpression: 'PK = :pk',
@@ -73,7 +68,7 @@ export class DynamoDbService {
       
             const response = {
               success: true,
-              message: 'Datasets fetched successfully.',
+              message: 'Data fetched successfully.',
               datasets: data.Items?.map(item => ({
                 
                 id: item.id,
@@ -87,17 +82,12 @@ export class DynamoDbService {
                 
               }))
             };
-            console.log(response)
-            //idher araha hai vo msg pe nahi ja raha
-            //response sahi print kar raha hai
-            this.botServie.createMessage(data.Items[0].threadId, data.Items[0].assistantId, query);
             return response;
           }
             
            catch (error) {
             console.error('Error getting datasets:', error);
             throw new Error(`Unable to get datasets: ${error.message}`);
-          }
-    
+          }   
 }
 }

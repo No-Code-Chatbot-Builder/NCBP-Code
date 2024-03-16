@@ -1,97 +1,100 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
-import { Gpt3Service } from './botDemo/botDemo.service';
+import { Controller, Get, Post, Body, Param, Delete, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BotService } from './bot/bot.service';
-import { DynamoDbService } from './dynamo-db/dynamo-db.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly gpt3Service: Gpt3Service, // Inject Gpt3Service
     private readonly botService: BotService, // Inject BotServiceService
-    private readonly dynamoDbService: DynamoDbService // Inject DynamoDbService
   ) {}
 
+  //Connection check
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
 
-  @Post()
-  async handleQuery(@Body() body: { query: string }) {
-    const { query } = body;
-    const response = await this.gpt3Service.generateResponse(query);
-    return { response };
-  }
-
-
+  //Demo
   @Post('/gpt')
   async handleQuery2() {
     const response = await this.botService.demo();
     return { response };
   }
 
-  @Post('/api.openai.com/v1/assistants')
+  //Create Assistant - complete cycle in one go 
+  //This API will create assistant, thread, message, and run, all in one go
+  @Post('/createAssistant')
   async handleQuery4 (){
-    const response = await this.botService.createAssistant();
+    const response = await this.botService.createAssistantOnly();
     return { response };
   }
 
-  @Get('/api.openai.com/v1/assistants')
+//List all Assistants
+  @Get('/listAllAssistants')
   async handleQuery5 (){
     const response = await this.botService.ListAssistants();
     return { response };
   }
 
-  @Get('/v1/assistants/:assistantId')
-  async handleQuery6(@Param('assistantId') assistantId: string) {
+  //Retrieve a specific Assistant
+  @Get('/retrieveAssistant')
+  async handleQuery6(@Body() body: { assistantId: string }) {
+    const { assistantId } = body;
     const response = await this.botService.retrieveAssistant(assistantId);
     return { response };
   }
 
-  @Post('/v1/threads/:assistantId')
-  async handleQuery7(@Param('assistantId') assistantId: string) {
+//Create Thread. This will create thread, message, and run because its calling the same API 
+//which is used to create assistant, thread, message, and run in one go
+  @Post('/createThread')
+  async handleQuery7(@Body() body: { assistantId: string }) {
+    const { assistantId } = body;
     const response = await this.botService.createThread(assistantId);
     return { response };
   }
 
-
-  @Get ('/v1/threads/:threadId')
-  async handleQuery8(@Param('threadId') threadId: string) {
+//Retrieve a specific Thread with its details
+  @Get ('/retrieveThread')
+  async handleQuery8(@Body() body: { threadId: string }) {
+    const { threadId } = body;
     const response = await this.botService.retrieveThread(threadId);
     return { response };
   }
 
-
-  @Delete ('/v1/threads/:threadId')
-  async handleQuery9(@Param('threadId') threadId: string) {
+//Deletes a specific Thread
+  @Delete ('/deleteThread')
+  async handleQuery9(@Body() body: { threadId: string }) {
+    const { threadId } = body;
     const response = await this.botService.deleteThread(threadId);
     return { response };
   }
 
-  @Post ('/v1/threads/:threadId/messages')
-  async handleQuery10(@Param('threadId') threadId: string, @Body() body: { content: string, assistantId: string}) {
-    const response = await this.botService.createMessage(threadId, body.content, body.assistantId);
+  //Create message with run 
+  @Post ('/createMessage')
+  async handleQuery10(@Body() body: { threadId, assistantId: string, query: string}) {
+    const response = await this.botService.createMessage(body.threadId, body.assistantId, body.query);
     return { response };
   }
 
-  @Post ('/v1/threads/:threadId/runs')
-  async handleQuery11(@Param('threadId') threadId: string, @Body() body: { assistantId: string, instructions: string }) {
-    const response = await this.botService.createRun(threadId, body.assistantId, body.instructions);
+  //Create Run
+  @Post ('/createRun')
+  async handleQuery11(@Body() body: { threadId: string, assistantId: string, query: string}) {
+    const response = await this.botService.createRun(body.threadId, body.assistantId, body.query);
     return { response };
   }
 
-  //Creating Assistant and Thread only
-  @Post('/api.openai.com/v1/assistantsAndThreadOnly')
-  async handleQuery12 (@Body() requestBody: { purpose: string, workspace: string }) {
+  //Creating Assistant and Thread only. It also adds into dynamoDB
+  @Post('/createAssistant')
+  async handleQuery12 (@Req() req: Request, @Body() requestBody: { purpose: string, workspace: string }) {
     const {purpose, workspace } = requestBody;
-    const response = await this.botService.createAssistantAndThread(purpose, workspace);
+    const userId = req['user'].id;
+    const response = await this.botService.createAssistant(purpose, workspace, userId);
     return { response };
   }
   
    //Creating message and run only
-   @Post('/api.openai.com/v1/runAndMessageOnly')
+   @Post('/runAndMessageOnly')
    async handleQuery13(@Body() requestBody: { threadId: string, assistantId: string, query: string }) {
      const { threadId, assistantId, query } = requestBody;
      const response = await this.botService.createMessage(threadId, assistantId, query);
@@ -99,10 +102,11 @@ export class AppController {
    }
 
    //Sending workspace id to dynamoDb so that it fetches AssitantId and ThreadId to create msg and run
-    @Post('/api.openai.com/v1/sendWorkspaceId') 
-    async handleQuery14(@Body() requestBody: { workspaceId: string, query: string }) {
-      const { workspaceId, query } = requestBody;
-      const response = await this.dynamoDbService.sendWorkspaceId(workspaceId, query);
-      return { response };
-    }
+   @Post('/runAssistant/:workspaceId')
+   async handleQuery14(@Param('workspaceId') workspaceId: string, @Body() requestBody: { query: string }) {
+     const { query } = requestBody;
+     const response = await this.botService.fetchingInfo(workspaceId, query);
+     return { response };
+   }
+   
 }
