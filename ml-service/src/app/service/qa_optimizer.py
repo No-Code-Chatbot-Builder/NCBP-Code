@@ -27,7 +27,6 @@ def remove_irrelevant_pairs(qa_pairs):
     return filtered_qa_pairs
 
 
-
 def remove_redundant_pairs(qa_pairs, similarity_threshold=0.9):
     vectorizer = TfidfVectorizer().fit([qa['Question'] + " " + qa['Answer'] for qa in qa_pairs])
     qa_vectors = vectorizer.transform([qa['Question'] + " " + qa['Answer'] for qa in qa_pairs])

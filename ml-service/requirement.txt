@@ -12,3 +12,10 @@ tensorflow_hub
 pytest
 gunicorn
 uvicorn[standard]
+pymupdf
+python-docx
+python-pptx
+spaCy
+requests 
+beautifulsoup4
+uuid

@@ -19,5 +19,4 @@ def initialize_db() -> ServiceResource:
                          aws_access_key_id=Config.DB_ACCESS_KEY_ID,
                          aws_secret_access_key=Config.DB_SECRET_ACCESS_KEY)
     print("dynamo db connected")
-
     return ddb

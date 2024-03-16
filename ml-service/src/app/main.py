@@ -2,8 +2,8 @@ from fastapi import FastAPI,HTTPException,WebSocket
 import openai
 from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
-from app.middlewares.data import *
-# from web_socket import html
+from app.middlewares.data import configure_data
+from app.config.pinecone_config import *
 from fastapi.middleware.cors import CORSMiddleware
 import pathlib
 from dotenv import load_dotenv
@@ -42,13 +42,11 @@ async def fine_tune_model(request: FineTuneRequest):
     user_id = request.user_id
     dataset_id = request.dataset_id
     workspace_id = request.workspace_id
-
-    items = await fetch_dataset_info(dataset_id)
-
-    s3_keys = construct_s3_keys(items,user_id,workspace_id, dataset_id)
-
-    await process_documents(s3_keys)
-
+    
+    # chunks  = await get_data_from_pinecone(user_id,dataset_id,workspace_id)
+    jsonl_data = configure_data( user_id, workspace_id, dataset_id)
+    
+    
 
     return {"message": "Fine-tuning process started"}
 
