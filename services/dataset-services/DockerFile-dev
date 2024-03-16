@@ -20,6 +20,8 @@ RUN npm install -g npm@9.4.1
 # This includes all files and directories in the current directory on the host.
 COPY . .
 
+# ENV VARIABLES
+
 # Compiling the TypeScript application to JavaScript.
 # This step transforms the TypeScript code into executable JavaScript code.
 RUN npm run build
@@ -42,6 +44,7 @@ WORKDIR /usr/src/app
 # This is necessary to install only the production dependencies in the next step.
 COPY package*.json ./
 
+COPY .env /usr/src/app/.env
 # Installing only the production dependencies.
 # The --only=production flag tells npm to omit 'devDependencies',
 # which are not needed in the production environment.
@@ -51,9 +54,9 @@ RUN npm install --only=production
 # The /usr/src/app/dist directory contains the output from the TypeScript compilation.
 COPY --from=builder /usr/src/app/dist ./dist
 
-# Exposing port 3000, which is the port our application will listen on.
+# Exposing port 80, which is the port our application will listen on.
 # This is a convention in Node.js applications and allows the app to be accessed from outside the container.
-EXPOSE 3000
+EXPOSE 80
 
 # Defining the command to start the application using Node.js.
 # This command will run the compiled JavaScript starting script located in the /dist directory.
