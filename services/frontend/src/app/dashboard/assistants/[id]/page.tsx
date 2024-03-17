@@ -1,6 +1,7 @@
 "use client";
 
-import { AssistantType, dummyAssistant } from "@/lib/constants";
+import { useAppSelector } from "@/lib/hooks";
+import { getAssistantById } from "@/providers/redux/slice/assistantSlice";
 import React, { useEffect, useState } from "react";
 
 type Props = {
@@ -9,26 +10,17 @@ type Props = {
   };
 };
 
-const DatasetByIdPage = ({ params }: Props) => {
-  const [assistant, setAssistant] = useState<AssistantType | null>(null);
-
-  useEffect(() => {
-    const fetchedAssistant = dummyAssistant.find((d) => d.id === params.id);
-    if (fetchedAssistant) {
-      setAssistant(fetchedAssistant);
-    }
-  }, [params.id]);
-
-  if (!assistant) {
-    return <p>Assistant not found</p>;
-  }
+const AssistantIdByPage = ({ params }: Props) => {
+  const assistant = useAppSelector((state) =>
+    getAssistantById(state, params.id)
+  );
 
   return (
     <div>
-      <h2>{assistant.name}</h2>
-      <p>{assistant.description}</p>
+      <h2>{assistant && assistant.name}</h2>
+      <p>{assistant && assistant.description}</p>
     </div>
   );
 };
 
-export default DatasetByIdPage;
+export default AssistantIdByPage;

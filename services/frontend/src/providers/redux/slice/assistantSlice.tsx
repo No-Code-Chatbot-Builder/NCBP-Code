@@ -60,8 +60,10 @@ export const { addAssistant, removeAssistant, updateAssistant } =
 export const getAssistantById = createSelector(
   [
     (state: { assistants: AssistantState }) => state.assistants.assistants,
+
     (state, assistantId: string) => assistantId,
   ],
+
   (assistants, assistantId) =>
     assistants.find((assistant) => assistant.id === assistantId)
 );
