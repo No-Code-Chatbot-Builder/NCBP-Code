@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PineconeService } from './pinecone/pinecone.service';
@@ -17,6 +17,7 @@ import { AuthMiddleware } from './auth/auth.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('*'); // or specify more specific routes or controllers
+    consumer.apply(AuthMiddleware).exclude({ path: 'datasets/health', method: RequestMethod.ALL },
+    ).forRoutes('*'); // or specify more specific routes or controllers
   }
 }

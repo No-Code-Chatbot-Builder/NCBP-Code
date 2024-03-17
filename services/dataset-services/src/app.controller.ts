@@ -17,6 +17,11 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+  @Get('datasets/health')
+  async healthCheck(): Promise<any> {
+    return { statuscode: 200,
+      message: 'ok' };
+  }
 
   @Post('index')
   async createIndex(
@@ -91,9 +96,5 @@ export class AppController {
     return response;
   }
 
-  @Get('datasets/health')
-  async healthCheck(): Promise<any> {
-    return { statuscode: 200,
-      message: 'ok' };
-  }
+
 }
