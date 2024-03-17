@@ -112,29 +112,12 @@ export const pricingCards = [
   },
 ];
 
-export const assistants = [
-  {
-    id: 1,
-    title: "Study Buddy",
-    description:
-      "Try NoCodeBot.ai’s personalised study assistant, simplifies your learning journey. It customises study sessions.",
-    imgSrc: "/assets/study.png",
-  },
-  {
-    id: 2,
-    title: "Research Helper",
-    description:
-      "Enhance your research with our dedicated assistant, designed to streamline and support your projects.",
-    imgSrc: "/assets/study.png",
-  },
-  {
-    id: 3,
-    title: "Exam Prep",
-    description:
-      "Get ready for exams with tailored revision strategies and support, making sure you're fully prepared.",
-    imgSrc: "/assets/study.png",
-  },
-];
+export type FeaturedAssistant = {
+  id: number;
+  title: string;
+  description: string;
+  imgSrc: string;
+};
 
 export const sidebarOpt: SidebarOption[] = [
   {
@@ -161,45 +144,8 @@ export type AssistantType = {
   owner: string;
 };
 
-export const dummyAssistant: AssistantType[] = [
-  {
-    id: "1",
-    name: "NextJS Assistant",
-    description:
-      "Expert on Next.js and returns answers with high accuracy. Learn next.js from my Assistant",
-    owner: "ibrahimtariqsheikh",
-  },
-  {
-    id: "2",
-    name: "Math Assistant",
-    description:
-      "Trained specifically on Mathematics books for more reliable answers so you can study in peace.",
-    owner: "ibrahimtariqsheikh",
-  },
-  {
-    id: "3",
-    name: "IBA Entry Assistant",
-    description:
-      "Prepare for IBA Entry tests, ask for similar questions and get in with ease.",
-    owner: "hussainmurtaza",
-  },
-];
-
 export type DatasetType = {
   id: string;
   name: string;
   description: string;
 };
-
-export const dummyDataset: DatasetType[] = [
-  {
-    id: "1",
-    name: "Ibrahim's Dataset",
-    description: "Contains Ibrahim's Essential Data",
-  },
-  {
-    id: "2",
-    name: "Hussain's Dataset",
-    description: "Contains Hussain's Essential Data",
-  },
-];

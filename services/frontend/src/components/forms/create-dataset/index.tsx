@@ -11,16 +11,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useModal } from "@/providers/modal-provider";
+import { useAppDispatch } from "@/lib/hooks";
+import { addDataset } from "@/providers/redux/slice/datasetSlice";
+import { uuid } from "uuidv4";
+import CustomToast from "@/components/global/custom-toast";
+import { toast } from "sonner";
 
 const CreateDatasetForm = () => {
-  const { toast } = useToast();
+  const dispatch = useAppDispatch();
+  const { setClose } = useModal();
 
   const FormSchema = z.object({
     name: z
@@ -42,10 +48,32 @@ const CreateDatasetForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-    } catch (error) {}
+      //updating state, showing toast, closing model
+      dispatch(
+        addDataset({
+          id: uuid(),
+          name: values.name,
+          description: values.description,
+        })
+      );
+      setClose();
+      toast(
+        CustomToast({
+          title: "Dataset Added",
+          description: "Your Dataset has been created.",
+        })
+      );
+    } catch (error: any) {
+      //throwing error if any
+      toast(
+        CustomToast({
+          title: "Error Creating Dataset",
+          description: error.toString(),
+        })
+      );
+    }
   };
   const isLoading = form.formState.isSubmitting;
-  const router = useRouter();
 
   return (
     <main className="mt-4">
@@ -74,7 +102,6 @@ const CreateDatasetForm = () => {
                 <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
                   <Input
-                    type="password"
                     placeholder="Enter the workspace description"
                     {...field}
                   />
@@ -83,12 +110,19 @@ const CreateDatasetForm = () => {
               </FormItem>
             )}
           />
-          <div className="flex flex-row-reverse">
+          <div className="flex flex-row-reverse gap-4">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 "Create Dataset"
+              )}
+            </Button>
+            <Button variant={"outline"} onClick={() => setClose()}>
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Cancel"
               )}
             </Button>
           </div>

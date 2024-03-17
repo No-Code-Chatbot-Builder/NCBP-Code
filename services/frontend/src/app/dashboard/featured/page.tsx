@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,11 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { FeaturedAssistant } from "@/lib/constants";
+import { useAppSelector } from "@/lib/hooks";
 
-import { assistants } from "@/lib/constants";
 import Image from "next/image";
 
 export default function Page() {
+  const featured = useAppSelector((state) => state.featured.featured);
+  console.log(featured);
+
   return (
     <div className="flex flex-col gap-10">
       <div>
@@ -27,7 +32,7 @@ export default function Page() {
         <Separator className="mt-8" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-4">
-        {assistants.map((assistant) => (
+        {featured.map((assistant: FeaturedAssistant) => (
           <Card key={assistant.id}>
             <CardHeader>
               <CardTitle>{assistant.title}</CardTitle>

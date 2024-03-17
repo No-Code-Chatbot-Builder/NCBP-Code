@@ -11,22 +11,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
+import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useAppDispatch } from "@/lib/hooks";
-import { useModal } from "@/providers/modal-provider";
-import { toast } from "sonner";
-import CustomToast from "@/components/global/custom-toast";
-import { uuid } from "uuidv4";
-import { addAssistant } from "@/providers/redux/slice/assistantSlice";
 
-const CreateAssistantForm = () => {
-  const dispatch = useAppDispatch();
-  const { setClose } = useModal();
+const AddDataToDatasetForm = () => {
+  const { toast } = useToast();
 
   const FormSchema = z.object({
     name: z
@@ -48,34 +42,10 @@ const CreateAssistantForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      //updating state, showing toast, closing model
-      dispatch(
-        addAssistant({
-          id: uuid(),
-          name: values.name,
-          description: values.description,
-          owner: "currentuser",
-        })
-      );
-      setClose();
-      toast(
-        CustomToast({
-          title: "Assistant Added",
-          description: "Your Dataset has been created.",
-        })
-      );
-    } catch (error: any) {
-      //throwing error if any
-      toast(
-        CustomToast({
-          title: "Error Creating Assistant",
-          description: error.toString(),
-        })
-      );
-    }
+    } catch (error) {}
   };
-
   const isLoading = form.formState.isSubmitting;
+  const router = useRouter();
 
   return (
     <main className="mt-4">
@@ -89,7 +59,7 @@ const CreateAssistantForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the assistant name" {...field} />
+                  <Input placeholder="Enter the workspace name" {...field} />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
@@ -104,7 +74,8 @@ const CreateAssistantForm = () => {
                 <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter the assistant description"
+                    type="password"
+                    placeholder="Enter the workspace description"
                     {...field}
                   />
                 </FormControl>
@@ -112,19 +83,12 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-          <div className="flex flex-row-reverse gap-4">
+          <div className="flex flex-row-reverse">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Create Assistant"
-              )}
-            </Button>
-            <Button variant={"outline"} onClick={() => setClose()}>
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Cancel"
+                "Add Data"
               )}
             </Button>
           </div>
@@ -134,4 +98,4 @@ const CreateAssistantForm = () => {
   );
 };
 
-export default CreateAssistantForm;
+export default AddDataToDatasetForm;

@@ -12,15 +12,17 @@ import {
 } from "@/components/ui/card";
 
 import { Separator } from "@/components/ui/separator";
-import { dummyAssistant } from "@/lib/constants";
+import { AssistantType } from "@/lib/constants";
+import { useAppSelector } from "@/lib/hooks";
+
 import { useModal } from "@/providers/modal-provider";
 
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { setOpen } = useModal();
-  const router = useRouter();
+  const assistants = useAppSelector((state) => state.assistants.assistants);
+
   const assistantSheet = (
     <CustomSheet
       title="Create New Assiatant"
@@ -59,7 +61,7 @@ export default function Page() {
       </section>
       <section>
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-          {dummyAssistant.map((assistant) => (
+          {assistants.map((assistant: AssistantType) => (
             <Card
               key={assistant.id}
               className="

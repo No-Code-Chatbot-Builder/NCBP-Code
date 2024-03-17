@@ -1,5 +1,7 @@
 "use client";
 
+import AddDataToDatasetForm from "@/components/forms/add-data-to-dataset-form";
+import CustomSheet from "@/components/global/custom-sheet";
 import JsonIcon from "@/components/icons/json-icon";
 import PdfIcon from "@/components/icons/pdf-icon";
 import { Button } from "@/components/ui/button";
@@ -14,9 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DatasetType, dummyDataset } from "@/lib/constants";
-import { Copy, PanelsTopLeft, Plus, Share, Users, Users2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+
+import { useAppSelector } from "@/lib/hooks";
+import { useModal } from "@/providers/modal-provider";
+import { getDatasetById } from "@/providers/redux/slice/datasetSlice";
+import { Plus, Users } from "lucide-react";
 
 type Props = {
   params: {
@@ -25,7 +29,8 @@ type Props = {
 };
 
 const DatasetByIdPage = ({ params }: Props) => {
-  const [dataset, setDataset] = useState<DatasetType | null>(null);
+  const dataset = useAppSelector((state) => getDatasetById(state, params.id));
+  const { setOpen } = useModal();
 
   type QuickType = {
     id: string;
@@ -73,16 +78,11 @@ const DatasetByIdPage = ({ params }: Props) => {
     },
   ];
 
-  useEffect(() => {
-    const fetchedDataset = dummyDataset.find((d) => d.id === params.id);
-    if (fetchedDataset) {
-      setDataset(fetchedDataset);
-    }
-  }, [params.id]);
-
-  if (!dataset) {
-    return <div>Dataset not found</div>;
-  }
+  const addDataSheet = (
+    <CustomSheet title="Add Data" description="Add data to your dataset here.">
+      <AddDataToDatasetForm />
+    </CustomSheet>
+  );
 
   return (
     <main className="flex flex-col gap-10">
@@ -90,20 +90,21 @@ const DatasetByIdPage = ({ params }: Props) => {
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
             <h1 className="text-secondary text-3xl font-bold">
-              {dataset.name}
+              {dataset && dataset.name}
             </h1>
             <p className="text-md text-muted-foreground hidden md:block">
-              {dataset.description}
+              {dataset && dataset.description}
             </p>
           </div>
           <Button
             size={"lg"}
             className="gap-2"
-            variant={"outline"}
-            onClick={() => {}}
+            onClick={() => {
+              setOpen(addDataSheet);
+            }}
           >
             <Plus className="w-5 h-5" />
-            Add Data
+            <p className="flex">Add Data</p>
           </Button>
         </div>
         <Separator className="mt-8" />
@@ -135,7 +136,7 @@ const DatasetByIdPage = ({ params }: Props) => {
               <CardContent>
                 <Table>
                   <TableCaption>
-                    Recently added files in {dataset.name}
+                    Recently added files in {dataset && dataset.name}
                   </TableCaption>
                   <TableHeader>
                     <TableRow>

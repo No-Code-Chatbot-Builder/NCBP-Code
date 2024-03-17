@@ -2,7 +2,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { ChevronsUpDown, Menu, Plus, PlusCircle, Settings } from "lucide-react";
+import {
+  ChevronsUpDown,
+  Menu,
+  Plus,
+  PlusCircle,
+  Settings,
+  User,
+} from "lucide-react";
 import clsx from "clsx";
 import {
   Command,
@@ -206,8 +213,21 @@ const MenuOptions = ({ id, sidebarOpt, defaultOpen }: Props) => {
                 <PopoverTrigger className="hover:bg-card rounded-lg p-1">
                   <PersonalDetails />
                 </PopoverTrigger>
-                <PopoverContent>
-                  <Button onClick={logout}>Sign Out</Button>
+                <PopoverContent className="w-[260px] mb-2">
+                  <Command>
+                    <CommandList>
+                      <CommandGroup heading="">
+                        <CommandItem>
+                          <Button onClick={logout} className="w-full bg-card">
+                            <div className="flex justify-start w-full items-center">
+                              <User className="w-4 h-4 mr-4" />
+                              <p className="text-center"> Sign Out</p>
+                            </div>
+                          </Button>
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
                 </PopoverContent>
               </Popover>
             </section>

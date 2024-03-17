@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { Features } from "@/components/site/features";
 import { StepCard } from "@/lib/constants";
 import { IconRobot } from "@tabler/icons-react";
+import { Button as MovingButton } from "@/components/ui/moving-border";
 
 export default function Home() {
   const { logout, isLoggedIn } = useCustomAuth();
@@ -145,7 +146,7 @@ export default function Home() {
       title: "Use your chatbot",
       description: "You are all done.",
       header: <UseChatBotHeader />,
-      className: "w-full max-w-xs lg:max-w-lg mx-auto", // Adjusted className, considering lg:max-w-lg for a bit larger cards on large screens
+      className: "w-full max-w-xs lg:max-w-lg mx-auto",
       icon: <IconRobot />,
       key: "4",
     },
@@ -162,12 +163,16 @@ export default function Home() {
       {/**Header Section */}
       <section className="relative z-10">
         <div className="flex flex-col gap-y-5 mt-10  p-10 text-center items-center z-20 bg-clip-text">
-          <div className="hidden lg:block p-3 border border-primary rounded-full text-sm bg-info text-info-foreground ">
+          <MovingButton
+            borderRadius="1.75rem"
+            className="hidden lg:block p-3 border border-primary rounded-full text-sm bg-info text-info-foreground"
+          >
             NoCodeBot.ai is currently in Development Mode.{" "}
             <Link className="underline" href={"/features"}>
               Learn More
             </Link>
-          </div>
+          </MovingButton>
+
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
             <h1 className="text-5xl lg:text-7xl font-bold text-center">
               Make Custom AI Assistants

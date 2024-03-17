@@ -1,6 +1,6 @@
 "use client";
 import CreateDatasetForm from "@/components/forms/create-dataset";
-import CustomModel from "@/components/global/custom-model";
+
 import CustomSheet from "@/components/global/custom-sheet";
 import JsonIcon from "@/components/icons/json-icon";
 import PdfIcon from "@/components/icons/pdf-icon";
@@ -13,7 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { dummyDataset } from "@/lib/constants";
+import { DatasetType } from "@/lib/constants";
+import { useAppSelector } from "@/lib/hooks";
 
 import { useModal } from "@/providers/modal-provider";
 import { Plus } from "lucide-react";
@@ -21,6 +22,8 @@ import { useRouter } from "next/navigation";
 
 export default function Page() {
   const { setOpen } = useModal();
+  const datasets = useAppSelector((state) => state.datasets.datasets);
+
   const router = useRouter();
   const datasetSheet = (
     <CustomSheet
@@ -61,7 +64,7 @@ export default function Page() {
       </section>
       <section>
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-          {dummyDataset.map((dataset) => (
+          {datasets.map((dataset: DatasetType) => (
             <Card key={dataset.name}>
               <CardHeader>
                 <CardTitle>{dataset.name}</CardTitle>

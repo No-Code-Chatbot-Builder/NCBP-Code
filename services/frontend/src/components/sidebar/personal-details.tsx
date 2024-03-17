@@ -1,14 +1,13 @@
 import React from "react";
 import { Avatar } from "../ui/avatar";
-import { MoreHorizontal } from "lucide-react";
+import { ChevronsUpDownIcon, MoreHorizontal } from "lucide-react";
 import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { FetchUserAttributesOutput } from "aws-amplify/auth";
 import { useCustomAuth } from "@/providers/auth-provider";
 
 const PersonalDetails = () => {
   const { user } = useCustomAuth();
   return (
-    <div className="flex gap-2 p-2 my-2 justify-between">
+    <div className="flex gap-2 p-2 my-2 justify-between items-center">
       <div className="flex flex-row gap-4">
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" />
@@ -19,7 +18,7 @@ const PersonalDetails = () => {
           <p className="text-xs text-muted-foreground">{user?.email}</p>
         </div>
       </div>
-      <MoreHorizontal />
+      <ChevronsUpDownIcon className="w-4 h-4 opacity-50" />
     </div>
   );
 };
