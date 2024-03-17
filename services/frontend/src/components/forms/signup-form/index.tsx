@@ -63,6 +63,10 @@ const SignUpInput = () => {
       }),
     birthdate: z.date({ required_error: "Please enter your date of birth" }),
     address: z.string().min(1, "Please enter your address"),
+    preferred_username: z
+      .string()
+      .min(1, "Please enter your preferred username"),
+    given_name: z.string().min(1, "Please enter your name"),
   });
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
@@ -72,6 +76,8 @@ const SignUpInput = () => {
       password: "",
       birthdate: new Date(),
       address: "",
+      preferred_username: "",
+      given_name: "",
     },
   });
   const isLoading = form.formState.isSubmitting;
@@ -81,10 +87,12 @@ const SignUpInput = () => {
       password: values.password,
       birthdate: values.birthdate,
       address: values.address,
+      preferred_username: values.preferred_username,
+      given_name: values.given_name,
     });
   };
   return (
-    <div>
+    <div className="">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Sign up for NoCodeBot.ai</h1>
         <p className="text-sm text-secondary">
@@ -187,6 +195,44 @@ const SignUpInput = () => {
                 <FormControl>
                   <Input
                     placeholder="Enter your address"
+                    {...field}
+                    className="border-border"
+                  />
+                </FormControl>
+                <FormMessage className="text-red-600 text-xs px-1" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            disabled={isLoading}
+            control={form.control}
+            name="preferred_username"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel className="text-primary">
+                  Preferred Username
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your preferred username"
+                    {...field}
+                    className="border-border"
+                  />
+                </FormControl>
+                <FormMessage className="text-red-600 text-xs px-1" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            disabled={isLoading}
+            control={form.control}
+            name="given_name"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel className="text-primary">Given Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your name."
                     {...field}
                     className="border-border"
                   />

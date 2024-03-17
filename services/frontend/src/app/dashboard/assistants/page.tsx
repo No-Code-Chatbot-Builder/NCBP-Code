@@ -1,6 +1,5 @@
 "use client";
 import CreateAssistantForm from "@/components/forms/create-assistant";
-import CustomModel from "@/components/global/custom-model";
 import CustomSheet from "@/components/global/custom-sheet";
 import { Button } from "@/components/ui/button";
 import {

@@ -19,30 +19,38 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import React from "react";
+import { Input } from "@/components/ui/input";
 
-const VerificationInput = () => {
-  const VerificationSchema = z.object({
-    pin: z.string().min(6, "Your one-time password must be 6 characters."),
+const ResetPasswordInput = () => {
+  const ResetPasswordSchema = z.object({
+    newPassword: z
+      .string()
+      .min(6, "Your password must be atleast 6 characters."),
+    confirmationCode: z
+      .string()
+      .min(6, "Your one-time password must be 6 characters."),
   });
 
-  const verificationform = useForm<z.infer<typeof VerificationSchema>>({
+  const resetPasswordForm = useForm<z.infer<typeof ResetPasswordSchema>>({
     mode: "onChange",
-    resolver: zodResolver(VerificationSchema),
+    resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
-      pin: "",
+      confirmationCode: "",
+      newPassword: "",
     },
   });
 
-  const isLoadingValidation = verificationform.formState.isSubmitting;
+  const isLoadingResetPassword = resetPasswordForm.formState.isSubmitting;
 
-  const { user, verifyCode, resendVerificationCode } = useCustomAuth();
+  const { user, confirmAuthResetPassword } = useCustomAuth();
 
-  async function handleSignUpConfirmation(
-    values: z.infer<typeof VerificationSchema>
+  async function handleConfirmResetPassword(
+    values: z.infer<typeof ResetPasswordSchema>
   ) {
-    await verifyCode({
+    await confirmAuthResetPassword({
       username: user?.email || "",
-      code: values.pin,
+      confirmationCode: values.confirmationCode,
+      newPassword: values.newPassword,
     });
   }
   return (
@@ -50,37 +58,35 @@ const VerificationInput = () => {
       <div className="flex flex-col h-[100vh] justify-center px-10">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">Enter The Verification Code</h1>
+            <h1 className="text-3xl font-bold">Reset Password</h1>
             <p className="text-sm text-secondary">
-              We have sent you a verification code. Please check your email.
+              We have sent you a reset code. Please check your email.
             </p>
           </div>
           <Button
             className="text-xs text-muted-foreground rounded-full bg-card"
             size={"sm"}
-            onClick={() =>
-              resendVerificationCode({
-                username: user?.email || "",
-              })
-            }
+            onClick={() => {}}
           >
             Resend Code
           </Button>
         </div>
         <div className="mb-4" />
-        <Form {...verificationform}>
+        <Form {...resetPasswordForm}>
           <form
-            onSubmit={verificationform.handleSubmit(handleSignUpConfirmation)}
-            className="space-y-8"
+            onSubmit={resetPasswordForm.handleSubmit(
+              handleConfirmResetPassword
+            )}
+            className="space-y-4"
           >
             <FormField
-              disabled={isLoadingValidation}
-              control={verificationform.control}
-              name="pin"
+              disabled={isLoadingResetPassword}
+              control={resetPasswordForm.control}
+              name="confirmationCode"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel className="text-primary">
-                    Verification Code
+                    Reset Password Code
                   </FormLabel>
 
                   <FormControl>
@@ -109,15 +115,34 @@ const VerificationInput = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              disabled={isLoadingResetPassword}
+              control={resetPasswordForm.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="text-primary">Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter new password"
+                      {...field}
+                      className="border-border"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-600 text-xs px-1" />
+                </FormItem>
+              )}
+            />
             <Button
               className="w-full p-6"
               type="submit"
-              disabled={isLoadingValidation}
+              disabled={isLoadingResetPassword}
             >
-              {isLoadingValidation ? (
+              {isLoadingResetPassword ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Verify Code"
+                "Reset Password"
               )}
             </Button>
           </form>
@@ -127,4 +152,4 @@ const VerificationInput = () => {
   );
 };
 
-export default VerificationInput;
+export default ResetPasswordInput;

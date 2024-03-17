@@ -1,11 +1,15 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
 import {
+  confirmResetPassword,
+  ConfirmResetPasswordInput,
   confirmSignUp,
   fetchAuthSession,
   fetchUserAttributes,
   FetchUserAttributesOutput,
   resendSignUpCode,
+  resetPassword,
+  ResetPasswordInput,
   signIn,
   signOut,
   signUp,
@@ -15,7 +19,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import Cookies from "js-cookie";
-import { decodeJWT } from "@aws-amplify/core";
 
 interface LoginInput {
   username: string;
@@ -27,6 +30,8 @@ interface SignUpInput {
   password: string;
   birthdate: Date;
   address: string;
+  preferred_username: string;
+  given_name: string;
 }
 
 interface VerificationInput {
@@ -38,8 +43,15 @@ interface AuthContextType {
   user: FetchUserAttributesOutput | null;
   isLoggedIn: boolean;
   isVerificationStep: boolean;
+  isPasswordReset: boolean;
   login: ({ username, password }: LoginInput) => Promise<void>;
   logout: () => Promise<void>;
+  resetAuthPassword: ({ username }: ResetPasswordInput) => Promise<void>;
+  confirmAuthResetPassword: ({
+    username,
+    newPassword,
+    confirmationCode,
+  }: ConfirmResetPasswordInput) => Promise<void>;
   signup: ({
     email,
     password,
@@ -54,11 +66,15 @@ const defaultValue: AuthContextType = {
   user: null,
   isLoggedIn: false,
   isVerificationStep: false,
+  isPasswordReset: false,
   login: async () => {
     console.log("Logging in...");
   },
   logout: async () => {
     console.log("Logging out...");
+  },
+  resetAuthPassword: async () => {
+    console.log("Resetting Password");
   },
   signup: async () => {
     console.log("Signing Up");
@@ -68,6 +84,9 @@ const defaultValue: AuthContextType = {
   },
   resendVerificationCode: async () => {
     console.log("Resending Verification Code...");
+  },
+  confirmAuthResetPassword: async () => {
+    console.log("Resending Confirmation Reset Code...");
   },
 };
 
@@ -82,6 +101,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<FetchUserAttributesOutput | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isVerificationStep, setIsVerificationStep] = useState<boolean>(false);
+  const [isPasswordReset, setIsPasswordReset] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchAttributes = async () => {
@@ -153,6 +173,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password,
     birthdate,
     address,
+    preferred_username,
+    given_name,
   }: SignUpInput) => {
     try {
       const formattedBirthdate = format(birthdate, "yyyy-MM-dd");
@@ -165,15 +187,16 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email: email,
             birthdate: formattedBirthdate,
             address: address,
-            preferred_username: email.split("@")[0],
-            given_name: "YourGivenName",
+            preferred_username: preferred_username,
+            given_name: given_name,
           },
         },
       });
       setUser({
         ...user,
         email: email,
-        preferred_username: email.split("@")[0],
+        preferred_username: preferred_username,
+        given_name: given_name,
       });
       if (isSignUpComplete) {
         toast(
@@ -231,6 +254,81 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const confirmAuthResetPassword = async ({
+    username,
+    newPassword,
+    confirmationCode,
+  }: ConfirmResetPasswordInput) => {
+    try {
+      await confirmResetPassword({ username, newPassword, confirmationCode });
+      setIsPasswordReset(false);
+    } catch (error: any) {
+      if (error.name === "CodeMismatchException")
+        toast(
+          <CustomToast
+            title="Invalid Code"
+            description="The Code you entered is incorrect. Try again."
+          />
+        );
+      else {
+        toast(
+          <CustomToast
+            title="Error While Confirm Reset Password"
+            description={error.toString()}
+          />
+        );
+      }
+    }
+  };
+
+  const resetAuthPassword = async ({ username }: ResetPasswordInput) => {
+    try {
+      await resetPassword({ username });
+      setUser({
+        ...user,
+        email: username,
+      });
+      setIsPasswordReset(true);
+      toast(
+        <CustomToast
+          title="We Emailed You a reset code"
+          description={`Your code is on the way. Use this to reset your password.`}
+        />
+      );
+    } catch (error: any) {
+      console.log(error);
+      if (error.name === "EmptyResetPasswordUsername")
+        toast(
+          <CustomToast
+            title="Email is empty"
+            description="You need to enter your email to reset your password"
+          />
+        );
+      else if (error.name === "UserNotFoundException")
+        toast(
+          <CustomToast
+            title="User Not Found"
+            description="No account exists for the following username."
+          />
+        );
+      else if (error.name === "LimitExceededException")
+        toast(
+          <CustomToast
+            title="Limit Exceeded"
+            description="Try again after some time."
+          />
+        );
+      else {
+        toast(
+          <CustomToast
+            title="Error While Resetting Password"
+            description={error.toString()}
+          />
+        );
+      }
+    }
+  };
+
   const logout = async () => {
     try {
       await signOut();
@@ -261,6 +359,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isVerificationStep,
         signup,
         resendVerificationCode,
+        resetAuthPassword,
+        isPasswordReset,
+        confirmAuthResetPassword,
       }}
     >
       {children}

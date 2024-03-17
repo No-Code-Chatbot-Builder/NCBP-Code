@@ -20,9 +20,10 @@ import Link from "next/link";
 import SocialSignInButtons from "@/components/site/auth/social-sign-in-buttons";
 import { useCustomAuth } from "@/providers/auth-provider";
 import VerificationInput from "../signup-form/verification-input";
+import ResetPasswordInput from "./reset-password-input";
 
 const SignUpInput = () => {
-  const { login } = useCustomAuth();
+  const { login, resetAuthPassword } = useCustomAuth();
   const FormSchema = z.object({
     email: z
       .string()
@@ -43,6 +44,7 @@ const SignUpInput = () => {
   });
 
   const isLoading = form.formState.isSubmitting;
+  const watchedEmail = form.watch("email");
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     await login({ username: values.email, password: values.password });
@@ -51,10 +53,23 @@ const SignUpInput = () => {
     <div>
       {" "}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Sign In to NoCodeBot.ai</h1>
-        <p className="text-sm text-secondary">
-          Please enter your login details below.
-        </p>
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">Sign In to NoCodeBot.ai</h1>
+            <p className="text-sm text-secondary">
+              Please enter your login details below.
+            </p>
+          </div>
+          <Button
+            className="text-xs text-muted-foreground rounded-full bg-card"
+            size={"sm"}
+            onClick={() => {
+              resetAuthPassword({ username: watchedEmail });
+            }}
+          >
+            Forgot Password
+          </Button>
+        </div>
       </div>
       <div className="mb-4" />
       <Form {...form}>
@@ -129,11 +144,17 @@ const SignUpInput = () => {
 };
 
 const SignInForm = () => {
-  const { isVerificationStep } = useCustomAuth();
+  const { isVerificationStep, isPasswordReset } = useCustomAuth();
 
   return (
     <div className="flex flex-col h-[100vh] justify-center px-10">
-      {isVerificationStep ? <VerificationInput /> : <SignUpInput />}
+      {isVerificationStep ? (
+        <VerificationInput />
+      ) : isPasswordReset ? (
+        <ResetPasswordInput />
+      ) : (
+        <SignUpInput />
+      )}
     </div>
   );
 };
