@@ -1,8 +1,30 @@
-// app/login/page.tsx
+"use client";
+import { fetchUsers } from "@/lib/api/apiService";
+import React, { useState, useEffect } from "react";
 
-import Login from "@/components/Login";
-import "@aws-amplify/ui-react/styles.css";
+const Page = () => {
+  const [data, setData] = useState(null);
 
-export default function LoginPage() {
-  return <Login />;
-}
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        await fetchUsers();
+      } catch (error) {
+        console.log("Error loading data: ", error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (!data) return <div>Loading...</div>;
+
+  return (
+    <div>
+      <h1>Data from API</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+};
+
+export default Page;

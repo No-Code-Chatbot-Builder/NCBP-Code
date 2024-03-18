@@ -16,7 +16,7 @@ const Steps = ({ title, description, className, stepCard }: Props) => {
   return (
     <div
       className={cn(
-        "lg:grid lg:grid-cols-2 gap-10 xl:gap-0 m-10 lg:place-items-center flex flex-col-reverse lg:w-full justify-center items-center px-16 mx-auto lg:m-0"
+        "md:grid md:grid-cols-2 gap-10 xl:gap-0 m-10 lg:place-items-center flex flex-col-reverse md:w-full justify-center items-center px-16 mx-auto lg:m-0"
       )}
     >
       {/* Shading Effect: Behind the Image */}

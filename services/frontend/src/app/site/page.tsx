@@ -165,7 +165,7 @@ export default function Home() {
         <div className="flex flex-col gap-y-5 mt-10  p-10 text-center items-center z-20 bg-clip-text">
           <MovingButton
             borderRadius="1.75rem"
-            className="hidden lg:block p-3 border border-primary rounded-full text-sm bg-info text-info-foreground"
+            className="hidden md:block p-3 border border-primary rounded-full text-sm bg-info text-info-foreground"
           >
             NoCodeBot.ai is currently in Development Mode.{" "}
             <Link className="underline" href={"/features"}>
@@ -230,7 +230,6 @@ export default function Home() {
           address, password, date of birth and address."
               stepCard={stepCards[0]}
             />
-            {/* <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 dark:border-primary  border-blue-400 right-[450px] -bottom-[250px] rounded-2xl border-dashed -z-10" /> */}
           </div>
           {/*Step 2 */}
           <div className="relative">
@@ -239,9 +238,8 @@ export default function Home() {
               description="  After signing up, create a dataset that will contain your
             essential data, needed to create your custom chatbot."
               stepCard={stepCards[1]}
-              className="lg:order-last"
+              className="md:order-last"
             />
-            {/* <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-l-4 border-spacing-6 dark:border-primary  border-blue-400 right-[450px] -bottom-[250px] rounded-2xl border-dashed -z-10" /> */}
           </div>
           {/*Step 3 */}
           <div className="relative">
@@ -250,7 +248,6 @@ export default function Home() {
               description="Now, Create a Assistant, by providing necessary custom configuration depending on your individual goals and needs."
               stepCard={stepCards[2]}
             />
-            {/* <div className="hidden 2xl:flex absolute w-96 h-96 bg-transparent border-t-4 border-r-4 border-spacing-6 dark:border-primary  border-blue-400 right-[450px] -bottom-[250px] rounded-2xl border-dashed -z-10" /> */}
           </div>
           {/*Step 4 */}
           <div className="relative">
@@ -260,7 +257,7 @@ export default function Home() {
             NoCodeBot.ai makes this process incredibily easy, all without
             writing any line of code."
               stepCard={stepCards[3]}
-              className="lg:order-last"
+              className="md:order-last"
             />
           </div>
         </div>
@@ -280,7 +277,7 @@ export default function Home() {
         <div className="hidden">
           <Button onClick={logout}>Sign Out</Button>
           <div>
-            {isLoggedIn ? <div>I Logged IN</div> : <div>Sorry Im Not</div>}
+            {isLoggedIn ? <div>logged in atm</div> : <div>logged out</div>}
           </div>
         </div>
       </section>
