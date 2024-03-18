@@ -13,8 +13,8 @@ RUN npm install
 # Copy the current directory remaining contents to the container at /app
 COPY . .
 
-# Expose port 5000 to allow communication to and from the container
-EXPOSE 5000
+# Expose port 80 to allow communication to and from the container
+EXPOSE 80
 
 # Run the app
 CMD ["npm", "run", "dev"]

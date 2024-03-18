@@ -10,4 +10,4 @@ services:
     env_file:
       - .env # this contains TABLE NAME for dynamodb
     ports:
-      - "5000:5000"
+      - "80:80"
