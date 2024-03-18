@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "ts-node-dev --files --respawn src/server.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
@@ -31,6 +31,7 @@
     }
   },
   "dependencies": {
+    "aws-jwt-verify": "^4.0.1",
     "aws-sdk": "^2.1550.0",
     "body-parser": "^1.20.2",
     "cognito-express": "^3.0.4",

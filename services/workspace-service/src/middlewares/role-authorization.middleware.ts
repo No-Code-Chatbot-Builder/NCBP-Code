@@ -8,7 +8,7 @@ export const authorize = async (req: Request, res: Response, next: NextFunction)
   const input = req.body;
   const queryUser = new User({
     ...DEFAULT_USER,
-    userId: req.headers['x-user-id'] as string,
+    userId: (req).user.userId
   });
 
   const { error, user } = await getUser(queryUser);
