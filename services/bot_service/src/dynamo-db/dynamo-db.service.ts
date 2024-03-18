@@ -19,7 +19,7 @@ export class DynamoDbService {
       });
     }
   
-    async addData(workspaceId: string, assistantId: string, threadId: string, createdBy: string, createdAt: string): Promise<any> {
+    async addDataToDynamoDB(workspaceId: string, assistantId: string, threadId: string, createdBy: string, createdAt: string, instruction: string): Promise<any> {
       const params = {
         TableName: this.tableName,
         Item: {
@@ -28,7 +28,8 @@ export class DynamoDbService {
           assistantId: assistantId,
           threadId: threadId,
           createdBy: createdBy,
-          createdAt: createdAt
+          createdAt: createdAt,
+          purpose: instruction
         }
       };
     
@@ -54,7 +55,7 @@ export class DynamoDbService {
     }
 
 
-    async fetchingData (workspaceId: string): Promise<any> {
+    async fetchingDataFromDynamoDB (workspaceId: string): Promise<any> {
         const params = {
             TableName: this.tableName,
             KeyConditionExpression: 'PK = :pk',
