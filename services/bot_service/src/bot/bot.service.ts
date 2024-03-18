@@ -138,7 +138,7 @@ export class BotService {
 
     try {
       const response = await this.httpService
-        .post('http://localhost:80/queryVectorEmbeddings', {
+        .post('http://langchain-embedding-service/queryVectorEmbeddings', {
           text: query // Replace with actual texts
         })
         .toPromise(); // Convert Observable to Promise
