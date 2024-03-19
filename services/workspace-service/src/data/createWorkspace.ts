@@ -75,10 +75,10 @@ export const createWorkspace = async (workspace: Workspace) => {
     let statusCode = HttpStatusCode.BAD_REQUEST;
 
     if (error.code === 'TransactionCanceledException') {
-      if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
+      if (error.CancellationReasons[0].Code === 'ConditionalCheckFailed') {
         errorMessage = 'Workspace with this name already exists.';
         statusCode = HttpStatusCode.CONFLICT;
-      } else if (error.cancellationReasons[1].Code === 'ConditionalCheckFailed') {
+      } else if (error.CancellationReasons[1].Code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
         statusCode = HttpStatusCode.CONFLICT;
       }

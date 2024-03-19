@@ -28,51 +28,46 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     const { error, user } = await getUser(queryUser);
     if (error) {
-        throw new Error(error);
+      throw new Error(error);
     }
-
-
 
     if (!user) {
-        throw new Error('User not found');
+      throw new Error('User not found');
     }
 
-    (req).user = user;
+    req.user = user;
     next();
   } catch (error) {
     console.error(error);
-    res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - ' + error});
+    res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - ' + error });
   }
 };
 const verifyToken: (token: string) => Promise<CognitoIdTokenPayload> = async (token: string) => {
   const verifier = CognitoJwtVerifier.create(
     {
-    userPoolId: process.env.COGNITO_USER_POOL_ID as string,
-    tokenUse: 'id',
-    clientId: process.env.COGNITO_CLIENT_ID,
-  },
-  {
-    jwksCache: new SimpleJwksCache({
-      fetcher: new SimpleJsonFetcher({
-        defaultRequestOptions: {
-          responseTimeout: 3000,
-        },
+      userPoolId: process.env.COGNITO_USER_POOL_ID as string,
+      tokenUse: 'id',
+      clientId: process.env.COGNITO_CLIENT_ID,
+    },
+    {
+      jwksCache: new SimpleJwksCache({
+        fetcher: new SimpleJsonFetcher({
+          defaultRequestOptions: {
+            responseTimeout: 3000,
+          },
+        }),
       }),
-    }),
-  }
-);
-
-  console.log('Verifying token...')
+    },
+  );
 
   try {
     const payload = await verifier.verify(token, {
       clientId: process.env.COGNITO_CLIENT_ID as string,
     });
 
-    console.log(payload)
     return payload;
-  } catch(error) {
-    console.log('Error:', error)
+  } catch (error) {
+    console.log('Error:', error);
     console.log('Token not valid!');
     throw new Error('Invalid token');
   }

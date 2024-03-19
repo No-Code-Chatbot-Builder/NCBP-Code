@@ -23,13 +23,13 @@ class User implements IUser {
     }
 
     pk() {
-        return `USER#${this.userId.toLowerCase()}`
+        return `USER#${this.userId}`
     }
 
     key() {
         return {
             'PK': this.pk(),
-            'SK': `USEREMAIL#${this.email.toLowerCase()}`
+            'SK': `USEREMAIL#${this.email}`
         }
     }
 

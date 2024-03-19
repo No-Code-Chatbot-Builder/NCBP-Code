@@ -15,7 +15,8 @@ export const inviteUserHandler = async (input: AddUserToWorkspaceRequest) => {
 
   const { error, membership, statusCode } = await inviteUser(queryMembership);
 
-  await sendEmail(input.userEmail, input.workspaceName);
+  if (!error)
+    await sendEmail(input.userEmail, input.workspaceName);
 
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ membership });
 

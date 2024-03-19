@@ -4,7 +4,7 @@ import 'dotenv/config';
 import { authenticate } from './middlewares/authentication.middleware';
 
 const app = express();
-const port = 80
+const port = process.env.PORT || 80
 
 app.use(express.json());
 

@@ -31,8 +31,8 @@ export const createUser = async (user: User) => {
     let errorMessage = 'Could not create user.';
 
     if (error.code === 'TransactionCanceledException') {
-      if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
-        errorMessage = 'user with this name already exists.';
+      if (error.CancellationReasons[0].Code === 'ConditionalCheckFailed') {
+        errorMessage = 'User with this name already exists.';
       }
     }
 

@@ -31,7 +31,7 @@ export const inviteUser = async (membership: Membership) => {
     let statusCode = HttpStatusCode.BAD_REQUEST;
 
     if (error.code === 'TransactionCanceledException') {
-      if (error.cancellationReasons[0].Code === 'ConditionalCheckFailed') {
+      if (error.CancellationReasons[0].code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
         statusCode = HttpStatusCode.CONFLICT;
       }
