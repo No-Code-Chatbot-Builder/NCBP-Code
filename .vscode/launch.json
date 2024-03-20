@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": ".",
-      "program": "build/Debug/outDebug",
+      "cwd": "c:/Users/zohai/AppData/Local/Temp/3735a4a4-6bff-4a9d-a695-d5f2263fb03b_ml[1].zip.03b",
+      "program": "c:/Users/zohai/AppData/Local/Temp/3735a4a4-6bff-4a9d-a695-d5f2263fb03b_ml[1].zip.03b/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

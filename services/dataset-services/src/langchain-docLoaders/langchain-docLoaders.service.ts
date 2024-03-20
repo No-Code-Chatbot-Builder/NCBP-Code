@@ -38,7 +38,7 @@ export class LangchainDocLoaderService {
 
     try {
       const response = await this.httpService
-        .post('http://langchain-embedding-service/vectorEmbeddings', {
+        .post('http://langchain-embedding-service.services/vectorEmbeddings', {
           texts: texts // Replace with actual texts
         })
         .toPromise(); // Convert Observable to Promise

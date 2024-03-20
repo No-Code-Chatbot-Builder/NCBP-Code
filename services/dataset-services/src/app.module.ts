@@ -16,8 +16,8 @@ import { AuthMiddleware } from './auth/auth.middleware';
   providers: [AppService, PineconeService, LangchainDocLoaderService, DynamoDbService, S3Service, GenerateIdService]
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).exclude({ path: 'datasets/health', method: RequestMethod.ALL },
-    ).forRoutes('*'); // or specify more specific routes or controllers
-  }
-}
+ configure(consumer: MiddlewareConsumer) {
+   consumer.apply(AuthMiddleware).exclude({ path: 'datasets/health', method: RequestMethod.ALL },
+   ).forRoutes('*'); // or specify more specific routes or controllers
+ }
+ }
