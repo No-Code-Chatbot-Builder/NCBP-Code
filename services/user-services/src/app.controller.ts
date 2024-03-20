@@ -2,7 +2,7 @@
 import { Controller, Get, Put, Body, Req, Res, HttpStatus} from '@nestjs/common';
 import { AppService } from './app.service';
 import { UserService } from './user/user.service';
-import { Middleware } from './middleware/auth.middleware'; // Import your middleware
+import {AuthMiddleware} from './auth/auth.service' // Import your middleware
 
 @Controller()
 export class AppController {
@@ -12,22 +12,24 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+  @Get('/user/health')
+  getHealth(): string {
+    return "User Service is working";
+  }
 
   @Get('/users')
-  async getAllUsers(): Promise<any[]> {
-    return await this.dynamoDbService.getAllUsers();
+  async getUserById(@Req() req: Request): Promise<any> {
+   const id = req['user'].id;
+   const email = req['user'].email;
+    return await this.userService.getUserById(id, email);
   }
 
-  @Get('/userById')
-  async getUserById(@Body() body: { PK: string, SK: string }): Promise<any> {
-    const { PK, SK } = body;
-    return await this.userService.getUserById(PK, SK);
-  }
-
-  @Put('/UpdateSpecificUser')
-  async updateUserField(@Body() body: { PK: string, SK: string, [key: string]: any }): Promise<any> {
-    const { PK, SK, ...fieldsToUpdate } = body;
-    return await this.userService.updateUserFields(PK, SK, fieldsToUpdate);
+  @Put('/users')
+  async updateUserField(@Body() body: { [key: string]: any }, @Req() req: Request): Promise<any> {
+    const { ...fieldsToUpdate } = body;
+     const id = req['user'].id;
+     const email = req['user'].email;
+    return await this.userService.updateUserFields(id, email, fieldsToUpdate);
   }
 }
 

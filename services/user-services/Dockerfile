@@ -1,44 +1,63 @@
-# Step 1: Set the base image. Using the official Node.js 20 image we are setting up the image for the build process.
+# Using the official Node.js 20 image as the base image for the builder stage.
+# This version of Node.js is built on the lightweight Alpine Linux.
 FROM node:20-alpine as builder
 
-# Step 2: Set the working directory in the container.
+# Setting the working directory in the container to /usr/src/app.
+# This directory will be used to store our application code inside the container.
 WORKDIR /usr/src/app
 
-# Step 3: Copy package.json and package-lock.json (or yarn.lock if you use yarn).
+# Copying package.json and package-lock.json from the host to the container.
+# The * wildcard ensures that both package.json and package-lock.json are copied.
+# These files define the project's dependencies.
 COPY package*.json ./
 
-# Step 4: Install dependencies.
-RUN npm install
+# Installing all dependencies specified in package.json.
+# This includes both runtime dependencies and 'devDependencies',
+# the latter are required for TypeScript compilation.
+RUN npm install -g npm@9.4.1
 
-# Step 5: Copy the rest of your application's code.
+# Copying the entire application source code from the host to the container.
+# This includes all files and directories in the current directory on the host.
 COPY . .
 
-# Step 6: Compile TypeScript to JavaScript.
+# ENV VARIABLES
+
+# Compiling the TypeScript application to JavaScript.
+# This step transforms the TypeScript code into executable JavaScript code.
 RUN npm run build
 
-# Step 7: Use multi-stage build to reduce the image size. 
-# This step is optional so the we can do it without doing this step too but
-# it is recommended.
+# Starting a new stage for the production build, using the Node.js 20 Alpine image again.
+# This multi-stage build approach allows us to keep the final image size smaller,
+# as it only contains the runtime dependencies and compiled code.
 FROM node:20-alpine as production
 
-# Set the NODE_ENV environment variable to 'production'.
+# Setting the NODE_ENV environment variable to 'production'.
+# This is an industry standard for Node.js applications to differentiate between
+# development and production environments.
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-# Set the working directory in the container.
+# Setting the working directory in this production stage to /usr/src/app.
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json for production dependencies.
+# Copying package.json and package-lock.json again in the production stage.
+# This is necessary to install only the production dependencies in the next step.
 COPY package*.json ./
 
-# Install only production dependencies.
-RUN npm install --only=production
+COPY .env /usr/src/app/.env
+# Installing only the production dependencies.
+# The --only=production flag tells npm to omit 'devDependencies',
+# which are not needed in the production environment.
+RUN npm install --only=production --force
 
-# Copy built assets from the 'builder' stage.
+# Copying the compiled JavaScript code from the 'builder' stage.
+# The /usr/src/app/dist directory contains the output from the TypeScript compilation.
 COPY --from=builder /usr/src/app/dist ./dist
 
-# Step 8: Expose the port your app runs on.
-EXPOSE 3000
+# Exposing port 80, which is the port our application will listen on.
+# This is a convention in Node.js applications and allows the app to be accessed from outside the container.
+EXPOSE 80
 
-# Step 9: Define the command to run your app using Node.js.
+# Defining the command to start the application using Node.js.
+# This command will run the compiled JavaScript starting script located in the /dist directory.
 CMD ["node", "dist/main"]

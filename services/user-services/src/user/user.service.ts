@@ -17,19 +17,7 @@ export class UserService {
       );
     }
   
-    async getAllUsers(): Promise<any[]> {
-      const params = {
-        TableName: this.tableName
-      };
-  
-      try {
-        const data = await this.dynamoDb.scan(params).promise();
-        return data.Items;
-      } catch (error) {
-        console.error("Unable to read item. Error JSON:", JSON.stringify(error, null, 2));
-        throw error;
-      }
-    }
+    
     
     async getUserById(id: string, email: string): Promise<any> {
         const params = {
