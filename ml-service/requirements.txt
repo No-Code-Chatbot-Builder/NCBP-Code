@@ -1,0 +1,15 @@
+fastapi
+numpy==1.22.4
+pydantic==1.9.1
+Pillow==9.1.1
+tensorflow
+locust
+gunicorn
+uvicorn[standard]
+pymupdf
+python-docx
+python-pptx
+spacy==2.1.0
+requests 
+beautifulsoup4
+uuid
