@@ -45,7 +45,7 @@ export class AuthMiddleware implements NestMiddleware {
 
       try {
         const payload = await verifier.verify(token);
-        console.log(payload);
+        //console.log(payload);
 
         //Define DynamoDB parameters
         const params = {

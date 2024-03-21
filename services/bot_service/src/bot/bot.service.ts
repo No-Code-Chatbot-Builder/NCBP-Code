@@ -138,7 +138,7 @@ export class BotService {
 
     try {
       const response = await this.httpService
-        .post('http://langchain-embedding-service/queryVectorEmbeddings', {
+        .post('http://langchain-embedding-service.services/queryVectorEmbeddings', {
           text: query // Replace with actual texts
         })
         .toPromise(); // Convert Observable to Promise
@@ -170,16 +170,29 @@ export class BotService {
     });
   
     console.log(myAssistant);
-    this.createThreadForAssistant(myAssistant.id, workspace, userId, instruction);
+    const threadId = await this.createThreadForAssistant(myAssistant.id, workspace, userId, instruction);
+  
+    // Return an array containing both assistant ID and thread ID
+    return ["success: True","message: Assistant and thread created successfully", "assistantId: " + myAssistant.id, "threadId: " + threadId];
+  } catch (error) {
+    // Handle errors if any
+    throw new Error(`Error creating assistant: ${error.message}`);
   }
+  
 
   //Only Thread with Assistant
   async createThreadForAssistant (assistantId: string, workspace: string, userId: string, instruction: string) {
-    const createdAt = new Date().toISOString();
-    const openai = new OpenAI();
-    const myThread = await openai.beta.threads.create({});
-    this.dynamoDbService.addDataToDynamoDB(workspace, assistantId, myThread.id, userId, createdAt, instruction);
-  
-    console.log(myThread);
+    try {
+      const createdAt = new Date().toISOString();
+      const openai = new OpenAI();
+      const myThread = await openai.beta.threads.create({});
+      this.dynamoDbService.addDataToDynamoDB(workspace, assistantId, myThread.id, userId, createdAt, instruction);
+    
+      console.log(myThread);
+      return myThread.id;
+    } catch (error) {
+      // Handle errors if any
+      throw new Error(`Error creating thread for assistant: ${error.message}`);
+    }
   }
 }

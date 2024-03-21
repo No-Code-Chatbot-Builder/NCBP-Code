@@ -13,7 +13,7 @@ export class AppController {
   //Creating Assistant and Thread only. It also adds into dynamoDB
   @Post('/bot/:workspaceId/assistant')
   async createAssistantAndThread (@Param('workspaceId') workspaceId: string, @Req() req: Request, @Body() requestBody: { purpose: string}) {
-    const {purpose } = requestBody;
+    const {purpose} = requestBody;
     const userId = req['user'].id;
   
     const response = await this.botService.createAssistant(purpose, workspaceId, userId);
