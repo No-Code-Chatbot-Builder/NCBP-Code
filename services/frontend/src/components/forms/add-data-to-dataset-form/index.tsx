@@ -17,13 +17,13 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { useModal } from "@/providers/modal-provider";
+import axios from "axios";
+import CustomToast from "@/components/global/custom-toast";
 
 const AddDataToDatasetForm = () => {
   const { toast } = useToast();
   const { setClose } = useModal();
-  const [preview, setPreview] = useState<string | ArrayBuffer | null>(null);
 
   const FormSchema = z.object({
     file: z.any().refine(
@@ -38,9 +38,7 @@ const AddDataToDatasetForm = () => {
             fileItem.type === "application/json")
         ) {
           const reader = new FileReader();
-          reader.onloadend = () => {
-            setPreview(reader.result);
-          };
+
           reader.readAsDataURL(fileItem);
           return true;
         }
@@ -59,12 +57,40 @@ const AddDataToDatasetForm = () => {
       file: undefined,
     },
   });
+  const apiClient = axios.create({
+    baseURL: process.env.baseURL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer token`,
+    },
+  });
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+    const file = values.file[0];
+    const workspaceId = "workspace-id";
+    const url = `/datasets/${workspaceId}/{datasetId}/data`;
+    const requestBody = {
+      file,
+    };
+
     try {
+      apiClient.post(url, requestBody).then((response: any) => {
+        console.log(response);
+      });
       setClose();
+      toast(
+        CustomToast({
+          title: "File Uploaded",
+          description: "Your File has been uploaded",
+        })
+      );
     } catch (error) {
-      console.log(error);
+      toast(
+        CustomToast({
+          title: "Error During File Upload",
+          description: "An error occured while uploading the file.",
+        })
+      );
     }
   };
   const isLoading = form.formState.isSubmitting;
@@ -99,17 +125,6 @@ const AddDataToDatasetForm = () => {
                     )}
                   />
                 </FormControl>
-                {preview && (
-                  <div className="mt-4">
-                    <p>Preview:</p>
-                    <Image
-                      src={preview.toString()}
-                      width={64}
-                      height={64}
-                      alt="File preview"
-                    />
-                  </div>
-                )}
               </FormItem>
             )}
           />

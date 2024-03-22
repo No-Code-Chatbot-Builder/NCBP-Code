@@ -18,16 +18,24 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import CustomToast from "@/components/global/custom-toast";
+import { useModal } from "@/providers/modal-provider";
+import axios from "axios";
+import { useAppDispatch } from "@/lib/hooks";
+import { v4 as uuid } from "uuid";
+import { addWorkspace } from "@/providers/redux/slice/workspaceSlice";
 
 const CreateWorkspaceForm = () => {
   const { toast } = useToast();
+  const { setClose } = useModal();
+  const dispatch = useAppDispatch();
 
   const FormSchema = z.object({
     name: z
       .string()
-      .min(5, { message: "Name must contain atleast 5 characters long" }),
+      .min(5, { message: "Name must contain at least 5 characters long" }),
     description: z.string().min(5, {
-      message: "Description must contain atleast 5 characters long",
+      message: "Description must contain at least 5 characters long",
     }),
   });
 
@@ -40,9 +48,41 @@ const CreateWorkspaceForm = () => {
     },
   });
 
+  const apiClient = axios.create({
+    baseURL: process.env.baseURL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer token`,
+    },
+  });
+
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-    } catch (error) {}
+      const { data } = await apiClient.post("/workspaces", values);
+      console.log(data);
+      dispatch(
+        addWorkspace({
+          id: uuid(),
+          name: values.name,
+          description: values.description,
+        })
+      );
+
+      setClose();
+      toast(
+        CustomToast({
+          title: "Workspace Created",
+          description: "Workspace has been created successfully",
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "An error occurred while creating the workspace",
+        })
+      );
+    }
   };
   const isLoading = form.formState.isSubmitting;
   const router = useRouter();
@@ -74,7 +114,6 @@ const CreateWorkspaceForm = () => {
                 <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
                   <Input
-                    type="password"
                     placeholder="Enter the workspace description"
                     {...field}
                   />
@@ -83,13 +122,16 @@ const CreateWorkspaceForm = () => {
               </FormItem>
             )}
           />
-          <div className="flex flex-row-reverse">
+          <div className="flex flex-row-reverse gap-4">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 "Create Workspace"
               )}
+            </Button>
+            <Button variant={"outline"} onClick={() => setClose()}>
+              Cancel
             </Button>
           </div>
         </form>

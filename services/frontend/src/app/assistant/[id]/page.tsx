@@ -2,8 +2,8 @@
 
 import { useAppSelector } from "@/lib/hooks";
 import { getAssistantById } from "@/providers/redux/slice/assistantSlice";
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import React from "react";
+
 import { Input } from "@/components/ui/input";
 import { Send, User } from "lucide-react";
 import { Message, useChat } from "ai/react";
@@ -47,12 +47,12 @@ const AssistantIdByPage = ({ params }: Props) => {
 
   return (
     <div className="mt-20 stretch mx-auto w-full md:w-1/2 max-w-4xl py-24">
-      {messages.map((m) => (
-        <div key={m.id} className="whitespace-pre-wrap">
-          {m.role === "user" ? (
-            <UserMessage message={m} />
+      {messages.map((message) => (
+        <div key={message.id} className="whitespace-pre-wrap">
+          {message.role === "user" ? (
+            <UserMessage message={message} />
           ) : (
-            <ChatbotMessage message={m} />
+            <ChatbotMessage message={message} />
           )}
         </div>
       ))}

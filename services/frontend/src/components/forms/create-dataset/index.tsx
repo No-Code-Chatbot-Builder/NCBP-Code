@@ -23,6 +23,7 @@ import { addDataset } from "@/providers/redux/slice/datasetSlice";
 import { uuid } from "uuidv4";
 import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
+import axios from "axios";
 
 const CreateDatasetForm = () => {
   const dispatch = useAppDispatch();
@@ -46,8 +47,28 @@ const CreateDatasetForm = () => {
     },
   });
 
+  const apiClient = axios.create({
+    baseURL: process.env.baseURL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer token`,
+    },
+  });
+
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+    const workspaceId = "workspace-id";
+    const url = `/datasets/${workspaceId}/dataset`;
+
+    const requestBody = {
+      name: values.name,
+      description: values.description,
+    };
+
     try {
+      apiClient.post(url, requestBody).then((response) => {
+        console.log(response);
+      });
+
       //updating state, showing toast, closing model
       dispatch(
         addDataset({
@@ -56,6 +77,7 @@ const CreateDatasetForm = () => {
           description: values.description,
         })
       );
+
       setClose();
       toast(
         CustomToast({
