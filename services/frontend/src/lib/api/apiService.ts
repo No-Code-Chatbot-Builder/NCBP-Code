@@ -1,18 +1,28 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+
+const BASE_URL =
+  "http://fargat-farga-347sdllx4dpa-425634350.us-east-1.elb.amazonaws.com";
 
 const apiClient = axios.create({
-  baseURL:
-    "http://fargat-farga-347sdllx4dpa-425634350.us-east-1.elb.amazonaws.com",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    TOKEN: "Bearer 1234567890",
   },
 });
 
-export const fetchUsers = async () => {
+export const fetchUsers = async (): Promise<void> => {
   try {
-    const response = await apiClient.get("/users");
-    console.log("Response: ", response.data);
-  } catch (error: any) {
-    console.log("Error fetching data", error);
+    const { data } = await apiClient.get("/users");
+    console.log("Response: ", data);
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(
+        "Error fetching data",
+        error.response?.data || error.message
+      );
+    } else {
+      console.error("An unexpected error occurred", error);
+    }
   }
 };

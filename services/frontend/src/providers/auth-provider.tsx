@@ -18,7 +18,6 @@ import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import Cookies from "js-cookie";
 
 interface LoginInput {
   username: string;
@@ -110,17 +109,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log(session.tokens?.idToken?.toString());
         console.log(session.tokens?.idToken?.payload);
 
-        if (session && Cookies.get("userLoggedIn")) {
+        if (session) {
           setIsLoggedIn(true);
           const userAttributes = await fetchUserAttributes();
           setUser(userAttributes);
         } else {
           setIsLoggedIn(false);
-          Cookies.remove("userLoggedIn");
         }
       } catch (err) {
         setIsLoggedIn(false);
-        Cookies.remove("userLoggedIn");
         setUser(null);
       }
     };
@@ -245,7 +242,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         preferred_username: username.split("@")[0],
       });
       setIsLoggedIn(true);
-      Cookies.set("userLoggedIn", "true", { expires: 1 });
       router.push("/dashboard");
     } catch (error: any) {
       toast(
@@ -332,7 +328,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await signOut();
-      Cookies.remove("userLoggedIn");
       toast(
         <CustomToast
           title="User Signed Out"
