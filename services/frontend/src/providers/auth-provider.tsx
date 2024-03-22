@@ -40,6 +40,7 @@ interface VerificationInput {
 
 interface AuthContextType {
   user: FetchUserAttributesOutput | null;
+  token: string;
   isLoggedIn: boolean;
   isVerificationStep: boolean;
   isPasswordReset: boolean;
@@ -64,6 +65,7 @@ interface AuthContextType {
 const defaultValue: AuthContextType = {
   user: null,
   isLoggedIn: false,
+  token: "",
   isVerificationStep: false,
   isPasswordReset: false,
   login: async () => {
@@ -101,6 +103,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isVerificationStep, setIsVerificationStep] = useState<boolean>(false);
   const [isPasswordReset, setIsPasswordReset] = useState<boolean>(false);
+  const [token, setToken] = useState<string>("");
 
   useEffect(() => {
     const fetchAttributes = async () => {
@@ -113,12 +116,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsLoggedIn(true);
           const userAttributes = await fetchUserAttributes();
           setUser(userAttributes);
+          setToken(session.tokens?.idToken?.toString() || "");
         } else {
           setIsLoggedIn(false);
         }
       } catch (err) {
         setIsLoggedIn(false);
         setUser(null);
+        setToken("");
       }
     };
 
@@ -357,6 +362,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         resetAuthPassword,
         isPasswordReset,
         confirmAuthResetPassword,
+        token,
       }}
     >
       {children}

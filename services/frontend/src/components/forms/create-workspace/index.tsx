@@ -15,28 +15,25 @@ import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import CustomToast from "@/components/global/custom-toast";
 import { useModal } from "@/providers/modal-provider";
 import axios from "axios";
 import { useAppDispatch } from "@/lib/hooks";
-import { v4 as uuid } from "uuid";
-import { addWorkspace } from "@/providers/redux/slice/workspaceSlice";
+
+import { useCustomAuth } from "@/providers/auth-provider";
 
 const CreateWorkspaceForm = () => {
   const { toast } = useToast();
   const { setClose } = useModal();
-  const dispatch = useAppDispatch();
+
+  const { user, token } = useCustomAuth();
 
   const FormSchema = z.object({
     name: z
       .string()
       .min(5, { message: "Name must contain at least 5 characters long" }),
-    description: z.string().min(5, {
-      message: "Description must contain at least 5 characters long",
-    }),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -44,29 +41,25 @@ const CreateWorkspaceForm = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
-      description: "",
     },
   });
 
   const apiClient = axios.create({
-    baseURL: process.env.baseURL,
+    baseURL: "http://localhost:2000/",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer token`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+    console.log(token);
     try {
-      const { data } = await apiClient.post("/workspaces", values);
-      console.log(data);
-      dispatch(
-        addWorkspace({
-          id: uuid(),
-          name: values.name,
-          description: values.description,
-        })
-      );
+      await apiClient.post("workspaces/", {
+        name: values.name,
+        userId: user?.sub,
+        userEmail: user?.email,
+      });
 
       setClose();
       toast(
@@ -75,11 +68,12 @@ const CreateWorkspaceForm = () => {
           description: "Workspace has been created successfully",
         })
       );
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error);
       toast(
         CustomToast({
           title: "Error",
-          description: "An error occurred while creating the workspace",
+          description: error.toString(),
         })
       );
     }
@@ -105,7 +99,7 @@ const CreateWorkspaceForm = () => {
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             disabled={isLoading}
             control={form.control}
             name="description"
@@ -121,7 +115,7 @@ const CreateWorkspaceForm = () => {
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
             )}
-          />
+          /> */}
           <div className="flex flex-row-reverse gap-4">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
