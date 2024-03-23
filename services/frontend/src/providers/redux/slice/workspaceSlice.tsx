@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
-interface WorkspaceType {
+export type WorkspaceType = {
   id: string;
   name: string;
   description: string;
-}
+};
 
 interface WorkspaceState {
   workspaces: WorkspaceType[];
@@ -13,6 +14,14 @@ interface WorkspaceState {
 const initialState: WorkspaceState = {
   workspaces: [],
 };
+
+export const fetchWorkspaces = createAsyncThunk(
+  "workspaces/fetchWorkspaces",
+  async () => {
+    //const response = await fetchWorkspacesFromDatabase();
+    //return response.data;
+  }
+);
 
 export const workspaceSlice = createSlice({
   name: "workspaces",
@@ -34,6 +43,11 @@ export const workspaceSlice = createSlice({
         state.workspaces[index] = action.payload;
       }
     },
+  },
+  extraReducers(builder) {
+    builder.addCase(fetchWorkspaces.fulfilled, (state, action) => {
+      // state.workspaces = action.payload;
+    });
   },
 });
 

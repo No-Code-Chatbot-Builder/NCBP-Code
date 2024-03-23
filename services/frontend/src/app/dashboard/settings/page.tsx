@@ -3,6 +3,8 @@ import ManageWorkspaceCard from "@/components/forms/manage-workspace-form";
 import PricingCards from "@/components/pricing/pricing-cards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Delete } from "lucide-react";
+import DeleteWorkspaceCard from "@/components/forms/delete-workspace-form";
 
 export default function Page() {
   return (
@@ -28,6 +30,7 @@ export default function Page() {
           <TabsContent value="workspace">
             <ManageWorkspaceCard />
             <ManageUsersCard />
+            <DeleteWorkspaceCard />
           </TabsContent>
           <TabsContent value="account">
             <div>Account Settings</div>

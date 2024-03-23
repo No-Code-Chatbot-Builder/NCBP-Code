@@ -13,7 +13,14 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  Delete,
+  DeleteIcon,
+  MoreHorizontal,
+  Trash,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,6 +50,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CustomSheet from "@/components/global/custom-sheet";
+import { useModal } from "@/providers/modal-provider";
+import InviteNewUserForm from "../invite-new-user-form";
 
 const data: User[] = [
   {
@@ -132,30 +142,20 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(row.original.id)}
-            >
-              Copy User ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View User Details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant={"destructive"}
+          size={"icon"}
+          onClick={() => alert("Delete user")}
+        >
+          <Trash className="w-4 h-4" />
+        </Button>
       );
     },
   },
 ];
 
 export default function ManageUsersCard() {
+  const { setOpen } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -183,9 +183,18 @@ export default function ManageUsersCard() {
     },
   });
 
+  const inviteUserSheet = (
+    <CustomSheet
+      title="Invite User"
+      description="Invite a user to your workspace"
+    >
+      <InviteNewUserForm />
+    </CustomSheet>
+  );
+
   return (
     <Card className="w-full my-10">
-      <CardHeader>
+      <CardHeader className="">
         <CardTitle>Manage Users</CardTitle>
         <CardDescription>Manage the users in your workspace</CardDescription>
       </CardHeader>
@@ -228,6 +237,9 @@ export default function ManageUsersCard() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button className="ml-auto" onClick={() => setOpen(inviteUserSheet)}>
+            Invite Users
+          </Button>
         </div>
         <div className="rounded-md border dark:border-primary/50">
           <Table>

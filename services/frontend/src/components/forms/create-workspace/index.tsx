@@ -47,7 +47,7 @@ const CreateWorkspaceForm = () => {
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(token);
     try {
-      await createWorkspace(values.name, user?.sub, user?.email);
+      await createWorkspace(values.name, user?.sub || "", user?.email || " ");
 
       setClose();
       toast(

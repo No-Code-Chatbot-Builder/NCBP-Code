@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import {
@@ -41,6 +41,12 @@ import CustomModel from "../global/custom-model";
 import CreateWorkspaceForm from "../forms/create-workspace";
 
 import { useCustomAuth } from "@/providers/auth-provider";
+import { uuid } from "uuidv4";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  WorkspaceType,
+  fetchWorkspaces,
+} from "@/providers/redux/slice/workspaceSlice";
 
 type Props = {
   defaultOpen?: boolean;
@@ -54,9 +60,18 @@ const WorkspaceMenuOptions = ({
 }: {
   sidebarOpt: SidebarOption[];
 }) => {
+  const dispatch = useAppDispatch();
   const { logout } = useCustomAuth();
   const { setOpen } = useModal();
   const pathname = usePathname();
+  const workspaces = useAppSelector((state) => state.workspaces.workspaces);
+
+  const existingWorkspaces = ["Workspace 1", "Workspace 2"];
+
+  useEffect(() => {
+    dispatch(fetchWorkspaces());
+  }, [dispatch]);
+
   return (
     <>
       <Popover>
@@ -101,7 +116,17 @@ const WorkspaceMenuOptions = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="text-muted-foreground">No new workspaces</div>
+                {workspaces.length === 0 ? (
+                  <div className="text-muted-foreground text-sm">
+                    No New Workspaces
+                  </div>
+                ) : (
+                  <div className="text-muted-foreground text-sm">
+                    {workspaces.map((workspace: WorkspaceType) => (
+                      <div key={workspace.id}>{workspace.name}</div>
+                    ))}
+                  </div>
+                )}
                 <Button
                   className="w-full gap-2"
                   onClick={() => {
