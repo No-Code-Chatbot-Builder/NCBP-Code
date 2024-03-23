@@ -25,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { editWorkspace } from "@/lib/api/workspace/service";
 
 const ManageWorkspaceCard = () => {
   const { toast } = useToast();
@@ -53,6 +54,8 @@ const ManageWorkspaceCard = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(values);
+    await editWorkspace(values.workspaceId, values?.workspaceName, values?.workspaceDescription);
+    
   };
   const isLoading = form.formState.isSubmitting;
   return (

@@ -20,8 +20,9 @@ import { Input } from "@/components/ui/input";
 import { useModal } from "@/providers/modal-provider";
 import axios from "axios";
 import CustomToast from "@/components/global/custom-toast";
+import { addData } from "@/lib/api/dataset/service";
 
-const AddDataToDatasetForm = () => {
+const AddDataToDatasetForm = (workspaceName: string, datasetId: string) => {
   const { toast } = useToast();
   const { setClose } = useModal();
 
@@ -57,26 +58,12 @@ const AddDataToDatasetForm = () => {
       file: undefined,
     },
   });
-  const apiClient = axios.create({
-    baseURL: process.env.baseURL,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer token`,
-    },
-  });
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     const file = values.file[0];
-    const workspaceId = "workspace-id";
-    const url = `/datasets/${workspaceId}/{datasetId}/data`;
-    const requestBody = {
-      file,
-    };
 
     try {
-      apiClient.post(url, requestBody).then((response: any) => {
-        console.log(response);
-      });
+      await addData(workspaceName, datasetId, file)
       setClose();
       toast(
         CustomToast({

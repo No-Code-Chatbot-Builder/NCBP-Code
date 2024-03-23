@@ -33,6 +33,7 @@ export default function Page() {
   );
 
   const handleCreateAssistant = () => {
+    
     setOpen(assistantSheet);
   };
 

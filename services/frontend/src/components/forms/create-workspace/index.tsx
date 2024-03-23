@@ -19,10 +19,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import CustomToast from "@/components/global/custom-toast";
 import { useModal } from "@/providers/modal-provider";
-import axios from "axios";
 import { useAppDispatch } from "@/lib/hooks";
 
 import { useCustomAuth } from "@/providers/auth-provider";
+import { createWorkspace } from "@/lib/api/workspace/service";
 
 const CreateWorkspaceForm = () => {
   const { toast } = useToast();
@@ -44,22 +44,10 @@ const CreateWorkspaceForm = () => {
     },
   });
 
-  const apiClient = axios.create({
-    baseURL: "http://localhost:2000/",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(token);
     try {
-      await apiClient.post("workspaces/", {
-        name: values.name,
-        userId: user?.sub,
-        userEmail: user?.email,
-      });
+      await createWorkspace(values.name, user?.sub, user?.email);
 
       setClose();
       toast(

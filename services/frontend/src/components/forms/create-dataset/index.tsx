@@ -24,8 +24,9 @@ import { uuid } from "uuidv4";
 import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import axios from "axios";
+import { createDataset } from "@/lib/api/dataset/service";
 
-const CreateDatasetForm = () => {
+const CreateDatasetForm = (workspaceName: string) => {
   const dispatch = useAppDispatch();
   const { setClose } = useModal();
 
@@ -47,27 +48,12 @@ const CreateDatasetForm = () => {
     },
   });
 
-  const apiClient = axios.create({
-    baseURL: process.env.baseURL,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer token`,
-    },
-  });
+
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-    const workspaceId = "workspace-id";
-    const url = `/datasets/${workspaceId}/dataset`;
-
-    const requestBody = {
-      name: values.name,
-      description: values.description,
-    };
 
     try {
-      apiClient.post(url, requestBody).then((response) => {
-        console.log(response);
-      });
+      await createDataset(workspaceName, values.name, values.description);
 
       //updating state, showing toast, closing model
       dispatch(

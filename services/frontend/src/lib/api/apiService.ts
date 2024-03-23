@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 
 const BASE_URL =
-  "http://fargat-farga-347sdllx4dpa-425634350.us-east-1.elb.amazonaws.com";
+  "http://localhost:8080";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
