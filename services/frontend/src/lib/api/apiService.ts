@@ -3,13 +3,14 @@ import axios, { AxiosError } from "axios";
 const BASE_URL =
   "http://fargat-farga-347sdllx4dpa-425634350.us-east-1.elb.amazonaws.com";
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
     TOKEN: "Bearer 1234567890",
   },
 });
+
 
 
 export const fetchUsers = async (): Promise<void> => {
