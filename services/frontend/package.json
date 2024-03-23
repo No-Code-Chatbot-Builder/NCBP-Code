@@ -45,6 +45,7 @@
     "@tsparticles/engine": "^3.3.0",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.3.0",
+    "ai": "^3.0.13",
     "aws-amplify": "^6.0.18",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",

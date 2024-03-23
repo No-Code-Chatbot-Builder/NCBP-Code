@@ -4,17 +4,19 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import datasetReducer from "@/providers/redux/slice/datasetSlice";
 import featuredReducer from "@/providers/redux/slice/featuredSlice";
 import assistantReducer from "@/providers/redux/slice/assistantSlice";
+import workspaceReducer from "@/providers/redux/slice/workspaceSlice";
 
 const rootReducer = combineReducers({
   featured: featuredReducer,
   datasets: datasetReducer,
   assistants: assistantReducer,
+  workspaces: workspaceReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["datasets", "featured", "assistants"],
+  whitelist: [],
 };
 
 const makeConfiguredStore = () =>

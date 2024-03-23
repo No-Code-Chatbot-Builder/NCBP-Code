@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,42 +10,90 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useModal } from "@/providers/modal-provider";
+import axios from "axios";
+import CustomToast from "@/components/global/custom-toast";
 
 const AddDataToDatasetForm = () => {
   const { toast } = useToast();
+  const { setClose } = useModal();
 
   const FormSchema = z.object({
-    name: z
-      .string()
-      .min(5, { message: "Name must contain atleast 5 characters long" }),
-    description: z.string().min(5, {
-      message: "Description must contain atleast 5 characters long",
-    }),
+    file: z.any().refine(
+      (file) => {
+        if (!(file instanceof FileList) || file.length === 0) {
+          return false;
+        }
+        const fileItem = file[0];
+        if (
+          fileItem.size < 1024 * 1024 * 5 &&
+          (fileItem.type === "application/pdf" ||
+            fileItem.type === "application/json")
+        ) {
+          const reader = new FileReader();
+
+          reader.readAsDataURL(fileItem);
+          return true;
+        }
+        return false;
+      },
+      {
+        message: "File must be a PDF or JSON and smaller than 5MB",
+      }
+    ),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      file: undefined,
+    },
+  });
+  const apiClient = axios.create({
+    baseURL: process.env.baseURL,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer token`,
     },
   });
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+    const file = values.file[0];
+    const workspaceId = "workspace-id";
+    const url = `/datasets/${workspaceId}/{datasetId}/data`;
+    const requestBody = {
+      file,
+    };
+
     try {
-    } catch (error) {}
+      apiClient.post(url, requestBody).then((response: any) => {
+        console.log(response);
+      });
+      setClose();
+      toast(
+        CustomToast({
+          title: "File Uploaded",
+          description: "Your File has been uploaded",
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During File Upload",
+          description: "An error occured while uploading the file.",
+        })
+      );
+    }
   };
   const isLoading = form.formState.isSubmitting;
-  const router = useRouter();
 
   return (
     <main className="mt-4">
@@ -54,42 +102,42 @@ const AddDataToDatasetForm = () => {
           <FormField
             disabled={isLoading}
             control={form.control}
-            name="name"
+            name="file"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">Name</FormLabel>
+                <FormLabel className="text-primary">File Upload</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the workspace name" {...field} />
-                </FormControl>
-                <FormMessage className="text-red-600 text-xs px-1" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            disabled={isLoading}
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel className="text-primary">Description</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter the workspace description"
-                    {...field}
+                  <Controller
+                    name="file"
+                    control={form.control}
+                    render={({ field: { onChange, onBlur, name, ref } }) => (
+                      <Input
+                        type="file"
+                        placeholder="Upload File"
+                        accept=".pdf,.json"
+                        onChange={(e) => {
+                          onChange(e.target.files);
+                        }}
+                        onBlur={onBlur}
+                        name={name}
+                        ref={ref}
+                      />
+                    )}
                   />
                 </FormControl>
-                <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
             )}
           />
-          <div className="flex flex-row-reverse">
+          <div className="flex flex-row-reverse gap-4">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Add Data"
+                "Upload File"
               )}
+            </Button>
+            <Button onClick={setClose} variant="outline">
+              Cancel
             </Button>
           </div>
         </form>

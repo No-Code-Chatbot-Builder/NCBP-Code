@@ -1,37 +1,30 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+
+const BASE_URL =
+  "http://fargat-farga-347sdllx4dpa-425634350.us-east-1.elb.amazonaws.com";
 
 const apiClient = axios.create({
-  baseURL:
-    "http://fargat-farga-347sdllx4dpa-425634350.us-east-1.elb.amazonaws.com",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    "TOKEN": "Bearer acess token",
+    TOKEN: "Bearer 1234567890",
   },
 });
 
-export const createWorkspace = async () => {
-  try {
-    const workspaceData = {
-      name: "IntegrationWorkspace",
-      userId: "24a85488-1041-7031-0713-99f4aaab50a1",
-      userEmail: "hash.hussain53@gmail.com",
-    };
 
-    const response = await apiClient.post("/workspaces/", workspaceData);
-    
-    console.log("Workspace created successfully: ", response.data);
+export const fetchUsers = async (): Promise<void> => {
+  try {
+    const { data } = await apiClient.get("/users");
+    console.log("Response: ", data);
   } catch (error) {
-    console.error("Error creating workspace: ", error);
-  }
-};
-
-
-export const fetchUsers = async () => {
-  try {
-    const response = await apiClient.get("/users");
-    console.log("Response: ", response.data);
-  } catch (error: any) {
-    console.log("Error fetching data", error);
+    if (error instanceof AxiosError) {
+      console.error(
+        "Error fetching data",
+        error.response?.data || error.message
+      );
+    } else {
+      console.error("An unexpected error occurred", error);
+    }
   }
 };
 

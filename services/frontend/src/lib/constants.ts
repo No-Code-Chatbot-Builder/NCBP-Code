@@ -149,3 +149,19 @@ export type DatasetType = {
   name: string;
   description: string;
 };
+
+export type chatThreads = {
+  id: string;
+  name: string;
+};
+
+export const dummyChatThreads: chatThreads[] = [
+  {
+    id: "1",
+    name: "Chat number 1: Welcome",
+  },
+  {
+    id: "2",
+    name: "Semantic Analysis with python",
+  },
+];

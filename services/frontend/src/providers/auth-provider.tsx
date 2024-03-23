@@ -18,7 +18,6 @@ import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import Cookies from "js-cookie";
 
 interface LoginInput {
   username: string;
@@ -41,6 +40,7 @@ interface VerificationInput {
 
 interface AuthContextType {
   user: FetchUserAttributesOutput | null;
+  token: string;
   isLoggedIn: boolean;
   isVerificationStep: boolean;
   isPasswordReset: boolean;
@@ -65,6 +65,7 @@ interface AuthContextType {
 const defaultValue: AuthContextType = {
   user: null,
   isLoggedIn: false,
+  token: "",
   isVerificationStep: false,
   isPasswordReset: false,
   login: async () => {
@@ -102,6 +103,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isVerificationStep, setIsVerificationStep] = useState<boolean>(false);
   const [isPasswordReset, setIsPasswordReset] = useState<boolean>(false);
+  const [token, setToken] = useState<string>("");
 
   useEffect(() => {
     const fetchAttributes = async () => {
@@ -110,18 +112,18 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log(session.tokens?.idToken?.toString());
         console.log(session.tokens?.idToken?.payload);
 
-        if (session && Cookies.get("userLoggedIn")) {
+        if (session) {
           setIsLoggedIn(true);
           const userAttributes = await fetchUserAttributes();
           setUser(userAttributes);
+          setToken(session.tokens?.idToken?.toString() || "");
         } else {
           setIsLoggedIn(false);
-          Cookies.remove("userLoggedIn");
         }
       } catch (err) {
         setIsLoggedIn(false);
-        Cookies.remove("userLoggedIn");
         setUser(null);
+        setToken("");
       }
     };
 
@@ -245,7 +247,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         preferred_username: username.split("@")[0],
       });
       setIsLoggedIn(true);
-      Cookies.set("userLoggedIn", "true", { expires: 1 });
       router.push("/dashboard");
     } catch (error: any) {
       toast(
@@ -332,7 +333,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await signOut();
-      Cookies.remove("userLoggedIn");
       toast(
         <CustomToast
           title="User Signed Out"
@@ -362,6 +362,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         resetAuthPassword,
         isPasswordReset,
         confirmAuthResetPassword,
+        token,
       }}
     >
       {children}

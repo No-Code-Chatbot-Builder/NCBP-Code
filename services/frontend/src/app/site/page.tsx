@@ -274,7 +274,7 @@ export default function Home() {
             <Button className="rounded-lg p-6">Subscribe</Button>
           </div>
         </div>
-        <div className="hidden">
+        <div className="">
           <Button onClick={logout}>Sign Out</Button>
           <div>
             {isLoggedIn ? <div>logged in atm</div> : <div>logged out</div>}
