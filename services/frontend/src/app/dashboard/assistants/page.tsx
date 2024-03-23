@@ -19,7 +19,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createAssistantWithThread } from "@/lib/api/bot/service";
 
-export default function Page(workspaceName:string) {
+export default function Page() {
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
@@ -31,6 +31,10 @@ export default function Page(workspaceName:string) {
     >
       <CreateAssistantForm />
     </CustomSheet>
+  );
+
+  const workspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
   );
 
   const handleCreateAssistant = async () => {
