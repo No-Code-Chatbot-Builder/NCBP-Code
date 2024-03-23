@@ -89,7 +89,7 @@ const InviteNewUserForm = () => {
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Upload File"
+                "Invite User"
               )}
             </Button>
             <Button onClick={setClose} variant="outline">

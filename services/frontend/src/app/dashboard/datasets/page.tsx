@@ -2,6 +2,7 @@
 import CreateDatasetForm from "@/components/forms/create-dataset";
 
 import CustomSheet from "@/components/global/custom-sheet";
+import CustomToast from "@/components/global/custom-toast";
 import JsonIcon from "@/components/icons/json-icon";
 import PdfIcon from "@/components/icons/pdf-icon";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,9 @@ import { DatasetType } from "@/lib/constants";
 import { useAppSelector } from "@/lib/hooks";
 
 import { useModal } from "@/providers/modal-provider";
-import { Plus } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Page() {
   const { setOpen } = useModal();
@@ -33,6 +35,29 @@ export default function Page() {
       <CreateDatasetForm />
     </CustomSheet>
   );
+
+  const handleDatasetDeletion = (datasetId: string, datasetName: string) => {
+    try {
+      // await deleteDataset(datasetId);
+      // dispatch(removeDataset(datasetId)
+      toast(
+        CustomToast({
+          title: `${datasetName} Deleted`,
+          description: `${datasetName} has been deleted successfully.`,
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the dataset. Please try again.",
+        })
+      );
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -67,9 +92,23 @@ export default function Page() {
           {datasets.map((dataset: DatasetType) => (
             <Card key={dataset.name}>
               <CardHeader>
-                <CardTitle>{dataset.name}</CardTitle>
-                <CardDescription>{dataset.description}</CardDescription>
+                <div className="flex justify-between">
+                  <div className="flex flex-col gap-1">
+                    <CardTitle>{dataset.name}</CardTitle>
+                    <CardDescription>{dataset.description}</CardDescription>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant={"destructive"}
+                    onClick={() => {
+                      handleDatasetDeletion(dataset.id, dataset.name);
+                    }}
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
+                </div>
               </CardHeader>
+
               <div className="flex gap-4 px-4">
                 <PdfIcon className="w-12" />
                 <JsonIcon className="w-12" />

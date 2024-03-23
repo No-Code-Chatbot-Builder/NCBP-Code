@@ -9,10 +9,12 @@ export type WorkspaceType = {
 
 interface WorkspaceState {
   workspaces: WorkspaceType[];
+  currentWorkspaceName: string | null;
 }
 
 const initialState: WorkspaceState = {
   workspaces: [],
+  currentWorkspaceName: null,
 };
 
 export const fetchWorkspaces = createAsyncThunk(
@@ -42,6 +44,12 @@ export const workspaceSlice = createSlice({
       if (index !== -1) {
         state.workspaces[index] = action.payload;
       }
+    },
+    setCurrentWorkspace: (state, action: PayloadAction<string | null>) => {
+      state.currentWorkspaceName = action.payload;
+    },
+    clearCurrentWorkspace: (state) => {
+      state.currentWorkspaceName = null;
     },
   },
   extraReducers(builder) {
