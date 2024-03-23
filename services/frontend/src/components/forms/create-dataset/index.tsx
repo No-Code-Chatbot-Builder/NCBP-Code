@@ -54,7 +54,7 @@ const CreateDatasetForm = (workspaceName: string) => {
 
     try {
       await createDataset(workspaceName, values.name, values.description);
-
+      await createDataset()
       //updating state, showing toast, closing model
       dispatch(
         addDataset({

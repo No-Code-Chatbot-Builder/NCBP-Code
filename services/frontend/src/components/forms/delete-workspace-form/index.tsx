@@ -25,9 +25,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { editWorkspace } from "@/lib/api/workspace/service";
+import { deleteWorkspace } from "@/lib/api/workspace/service";
 
-const DeleteWorkspaceCard = () => {
+const DeleteWorkspaceCard = (workspaceName:string) => {
   const { toast } = useToast();
 
   const FormSchema = z.object({
@@ -46,7 +46,7 @@ const DeleteWorkspaceCard = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(values);
-    // await deleteWorkspace();
+    await deleteWorkspace(workspaceName);
   };
   const isLoading = form.formState.isSubmitting;
 

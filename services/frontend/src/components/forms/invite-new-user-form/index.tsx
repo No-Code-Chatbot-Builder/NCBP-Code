@@ -23,8 +23,9 @@ import {
 } from "@/components/ui/form";
 import { useModal } from "@/providers/modal-provider";
 import CustomToast from "@/components/global/custom-toast";
+import { inviteUser } from "@/lib/api/workspace/service";
 
-const InviteNewUserForm = () => {
+const InviteNewUserForm = (workspaceName:string) => {
   const { toast } = useToast();
   const { setClose } = useModal();
 
@@ -44,7 +45,7 @@ const InviteNewUserForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      // await inviteNewUser(values.email);
+      await inviteUser(workspaceName,"user id",values.email);
       toast(
         CustomToast({
           title: "User Invited",

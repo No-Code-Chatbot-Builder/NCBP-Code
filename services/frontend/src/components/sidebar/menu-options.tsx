@@ -64,9 +64,7 @@ const WorkspaceMenuOptions = ({
   const { logout } = useCustomAuth();
   const { setOpen } = useModal();
   const pathname = usePathname();
-  const workspaces = useAppSelector((state) => state.workspaces.workspaces);
-
-  const existingWorkspaces = ["Workspace 1", "Workspace 2"];
+  const workspaces = useAppSelector((state: { workspaces: { workspaces: any; }; }) => state.workspaces.workspaces);
 
   useEffect(() => {
     dispatch(fetchWorkspaces());
