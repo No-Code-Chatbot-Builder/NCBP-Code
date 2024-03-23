@@ -31,14 +31,14 @@ const ManageWorkspaceCard = () => {
   const { toast } = useToast();
 
   const FormSchema = z.object({
-    workspaceId: z.string().min(2, {
-      message: "This is your workspaceId",
-    }),
     workspaceName: z.string().min(2, {
       message: "Workspace Name must be at least 2 characters.",
     }),
     workspaceDescription: z.string().min(2, {
       message: "Workspace Description must be at least 2 characters.",
+    }),
+    website: z.string().min(10, {
+      message: "This is your website",
     }),
   });
 
@@ -46,16 +46,16 @@ const ManageWorkspaceCard = () => {
     mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      workspaceId: "",
       workspaceName: "",
       workspaceDescription: "",
+      website: "",
     },
   });
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(values);
-    await editWorkspace(values.workspaceId, values?.workspaceName, values?.workspaceDescription);
-    
+    await editWorkspace(values?.workspaceName, values?.workspaceDescription,values?.website);
+
   };
   const isLoading = form.formState.isSubmitting;
   return (
@@ -73,24 +73,7 @@ const ManageWorkspaceCard = () => {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-8 lg:px-32"
             >
-              <FormField
-                disabled={isLoading}
-                control={form.control}
-                name="workspaceId"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="">Workspace ID</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="83927392dfeudnski8"
-                        {...field}
-                        className="bg-card dark:border-primary/50"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-600 text-xs px-1" />
-                  </FormItem>
-                )}
-              />
+
               <FormField
                 disabled={isLoading}
                 control={form.control}
@@ -116,6 +99,24 @@ const ManageWorkspaceCard = () => {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel className="">Workspace Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="For University"
+                        {...field}
+                        className="bg-card dark:border-primary/50"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-600 text-xs px-1" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="">Website</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="For University"

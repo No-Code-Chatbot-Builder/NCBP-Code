@@ -12,19 +12,9 @@ export const createWorkspace = async (workspaceName: string, userId: string, use
 };
 
 
-export const editWorkspace = async (workspaceId: string, workspaceName: string, workspaceDescription: string) => {
+export const editWorkspace = async (workspaceName: string, workspaceDescription: string,website:string) => {
     try {
-        const workspaceData = {
-            workspaceName: "IntegrationWorkspace",
-            userId: "24a85488-1041-7031-0713-99f4aaab50a1",
-            userEmail: "hash.hussain53@gmail.com",
-            members: "",
-            website: "",
-            description: "",
-            createdAt: "",
-        };
-
-        const response = await apiClient.put("/workspaces/", workspaceData);
+        const response = await apiClient.put("/workspaces/", {workspaceName,workspaceDescription});
 
         console.log("Workspace updated successfully: ", response.data);
     } catch (error) {
@@ -56,6 +46,7 @@ export const fetchWorkspace = async (workspaceName: string) => {
         console.error("Error fetching workspace: ", error);
     }
 };
+
 //connection remaining
 export const removeUserFromWorkspace = async (userId: string, workspaceName: string) => {
     try {
