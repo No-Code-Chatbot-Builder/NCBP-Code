@@ -17,8 +17,9 @@ import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { createAssistantWithThread } from "@/lib/api/bot/service";
 
-export default function Page() {
+export default function Page(workspaceName:string) {
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
@@ -32,8 +33,8 @@ export default function Page() {
     </CustomSheet>
   );
 
-  const handleCreateAssistant = () => {
-    
+  const handleCreateAssistant = async () => {
+    await createAssistantWithThread(workspaceName, "purpose");
     setOpen(assistantSheet);
   };
 

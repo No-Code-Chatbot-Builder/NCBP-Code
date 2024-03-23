@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { uuid } from "uuidv4";
 import { addAssistant } from "@/providers/redux/slice/assistantSlice";
+import { createAssistantWithThread } from "@/lib/api/bot/service";
 
 const CreateAssistantForm = () => {
   const dispatch = useAppDispatch();
@@ -48,6 +49,7 @@ const CreateAssistantForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
+      await createAssistantWithThread(values.name,values.description);
       //updating state, showing toast, closing model
       dispatch(
         addAssistant({

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { createKey } from "@/lib/api/key/service";
 
 const CreateAPIKeyForm = () => {
   const { toast } = useToast();
@@ -42,6 +43,7 @@ const CreateAPIKeyForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
+      await createKey("values.accessMode","values.userId")
     } catch (error) {}
   };
   const isLoading = form.formState.isSubmitting;
