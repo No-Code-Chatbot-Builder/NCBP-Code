@@ -10,22 +10,38 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh 'echo Building...'
-                // Add your build command here
+                // Check if running on Windows and use 'bat', otherwise 'sh'
+                script {
+                    if (isUnix()) {
+                        sh 'echo Building...'
+                    } else {
+                        bat 'echo Building...'
+                    }
+                }
             }
         }
         
         stage('Test') {
             steps {
-                sh 'echo Running tests...'
-                // Add your test command here
+                script {
+                    if (isUnix()) {
+                        sh 'echo Running tests...'
+                    } else {
+                        bat 'echo Running tests...'
+                    }
+                }
             }
         }
         
         stage('Deploy') {
             steps {
-                sh 'echo Deploying application...'
-                // Add your deployment command here
+                script {
+                    if (isUnix()) {
+                        sh 'echo Deploying application...'
+                    } else {
+                        bat 'echo Deploying application...'
+                    }
+                }
             }
         }
     }
