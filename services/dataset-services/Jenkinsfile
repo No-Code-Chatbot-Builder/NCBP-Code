@@ -5,6 +5,17 @@ pipeline {
         ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_REPO_NAME = 'dataset-service'
         IMAGE_TAG = 'test'
+        DYNAMODB_TABLE_NAME = 'ncbp'
+        S3_BUCKET_NAME = 'ncbp-assets'
+        PINECONE_INDEX_NAME = 'test'
+        USER_POOL_ID = 'us-east-1_X8yePKlex'
+        CLIENT_ID = 'e34tkhfoepujgre0imt7gikpt'
+        
+        AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_ACCESS_KEY_ID = 'AKIAZI2LCWDBE6ALXS4B'
+        AWS_SECRET_ACCESS_KEY = credentials('3ea6997c-f02f-4cb6-a3cd-6e7ec64262da')
+        PINECONE_API_KEY = credentials('a2be5c16-949f-43ad-97f8-f1a9a28e342f')
+
     }
     
     stages {
