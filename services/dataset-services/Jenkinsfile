@@ -14,6 +14,9 @@ pipeline {
             }
         }
         
+        script {
+            bat "dir" // Lists the files in the current directory on Windows
+        }
 
          stage('Build and Tag Image') {
             steps {
