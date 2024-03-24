@@ -16,48 +16,41 @@ COPY package*.json ./
 # the latter are required for TypeScript compilation.
 RUN npm install -g npm@9.4.1
 
+# Installing the Nest CLI locally to avoid the 'nest: not found' error.
+RUN npm install @nestjs/cli
+
 # Copying the entire application source code from the host to the container.
 # This includes all files and directories in the current directory on the host.
 COPY . .
 
 # ENV VARIABLES
+# Be sure to set any environment variables needed for the build here using ENV.
 
 # Compiling the TypeScript application to JavaScript.
 # This step transforms the TypeScript code into executable JavaScript code.
 RUN npm run build
 
 # Starting a new stage for the production build, using the Node.js 20 Alpine image again.
-# This multi-stage build approach allows us to keep the final image size smaller,
-# as it only contains the runtime dependencies and compiled code.
 FROM node:20-alpine as production
 
 # Setting the NODE_ENV environment variable to 'production'.
-# This is an industry standard for Node.js applications to differentiate between
-# development and production environments.
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+ENV NODE_ENV=production
 
 # Setting the working directory in this production stage to /usr/src/app.
 WORKDIR /usr/src/app
 
 # Copying package.json and package-lock.json again in the production stage.
-# This is necessary to install only the production dependencies in the next step.
 COPY package*.json ./
 
-
 # Installing only the production dependencies.
-# The --only=production flag tells npm to omit 'devDependencies',
-# which are not needed in the production environment.
+# The --only=production flag tells npm to omit 'devDependencies'.
 RUN npm install --only=production
 
 # Copying the compiled JavaScript code from the 'builder' stage.
-# The /usr/src/app/dist directory contains the output from the TypeScript compilation.
 COPY --from=builder /usr/src/app/dist ./dist
 
 # Exposing port 80, which is the port our application will listen on.
-# This is a convention in Node.js applications and allows the app to be accessed from outside the container.
 EXPOSE 80
 
 # Defining the command to start the application using Node.js.
-# This command will run the compiled JavaScript starting script located in the /dist directory.
 CMD ["node", "dist/main"]
