@@ -44,7 +44,7 @@ WORKDIR /usr/src/app
 # This is necessary to install only the production dependencies in the next step.
 COPY package*.json ./
 
-COPY .env /usr/src/app/.env
+
 # Installing only the production dependencies.
 # The --only=production flag tells npm to omit 'devDependencies',
 # which are not needed in the production environment.
