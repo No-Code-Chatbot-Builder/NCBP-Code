@@ -16,7 +16,10 @@ pipeline {
         
         stage('Check Workspace') {
             steps {
-                bat "dir" // Lists the files in the current directory on Windows
+                dir('services/dataset-services') {
+                    bat "dir" // Lists the files in the current directory on Windows
+                }
+                
             }
         }
 
