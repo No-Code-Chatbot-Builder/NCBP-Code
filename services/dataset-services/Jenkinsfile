@@ -5,7 +5,6 @@ pipeline {
         ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_REPO_NAME = 'dataset-service'
         IMAGE_TAG = 'test'
-       
     }
     
     stages {
@@ -16,21 +15,17 @@ pipeline {
         }
         
         stage('Check Workspace') {
-    steps {
-        script {
-            bat "dir" // Lists the files in the current directory on Windows
+            steps {
+                bat "dir" // Lists the files in the current directory on Windows
+            }
         }
-    }
-}
 
-         stage('Build and Tag Image') {
-            
+        stage('Build and Tag Image') {
             steps {
                 dir('services/dataset-services') {
-    bat "docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ./"
-}
-                
-                bat "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                    bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
+                    bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
             }
         }
         
@@ -41,28 +36,17 @@ pipeline {
             }
         }
         
-
         stage('Test') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'echo Running tests...'
-                    } else {
-                        bat 'echo Running tests...'
-                    }
-                }
+                bat 'echo Running tests...'
+                // Add your actual test commands here
             }
         }
         
         stage('Deploy') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'echo Deploying application...'
-                    } else {
-                        bat 'echo Deploying application...'
-                    }
-                }
+                bat 'echo Deploying application...'
+                // Add your actual deploy commands here
             }
         }
     }
@@ -79,3 +63,4 @@ pipeline {
         }
     }
 }
+
