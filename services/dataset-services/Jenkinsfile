@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'echo Building...'
+                // Add your build command here
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'echo Running tests...'
+                // Add your test command here
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                sh 'echo Deploying application...'
+                // Add your deployment command here
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'This will always run regardless of the result.'
+        }
+        success {
+            echo 'Build was successful!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
