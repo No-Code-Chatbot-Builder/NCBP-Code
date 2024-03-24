@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 import { SENDER_EMAIL } from "./constants";
 
-AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: "ncbp" });
+// AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: "ncbp" });
 const ses = new AWS.SES({ region: "us-east-1" });
 
 export const sendEmail = async (to: string, workspaceName: string) => {

@@ -2,8 +2,6 @@ import { Response } from "./workspace.dto";
 
 interface CreateWorkspaceRequest {
     name: string;
-    userId: string;
-    userEmail: string;
     website?: string;
     description?: string;
 }
@@ -27,9 +25,7 @@ interface AddUserToWorkspaceRequest {
 }
 
 interface RespondToWorkspaceInviteRequest {
-    userId: string;
     workspaceName: string;
-    userEmail: string;
     response: Response;
 }
 
@@ -40,8 +36,6 @@ interface RemoveUserFromWorkspaceRequest {
 }
 
 interface UpdateWorkspaceRequest {
-    userId: string;
-    userEmail: string;
     members: number;
     createdAt: string;
     website?: string;
@@ -50,7 +44,6 @@ interface UpdateWorkspaceRequest {
 }
 
 interface DeleteWorkspaceRequest {
-    userId: string;
     workspaceName: string;
 }
 

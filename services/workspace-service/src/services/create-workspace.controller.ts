@@ -4,14 +4,15 @@ import { CreateWorkspaceRequest } from '../dtos/request.dto';
 import { Workspace } from '../entities/workspace';
 import { createWorkspace } from '../data/createWorkspace';
 import { HttpStatusCode } from '../utils/constants';
+import { User } from '../entities/user';
 
 
-export const createWorkspaceHandler = async (input: CreateWorkspaceRequest) => {
+export const createWorkspaceHandler = async (input: CreateWorkspaceRequest, user: User) => {
   const workspace = new Workspace({
     name: input.name,
     owner: {
-      id: input.userId,
-      email: input.userEmail
+      id: user.userId,
+      email: user.email
     },
     members: 1,
     website: input.website,

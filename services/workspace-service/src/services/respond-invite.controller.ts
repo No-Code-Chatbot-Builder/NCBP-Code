@@ -4,11 +4,12 @@ import { Membership } from '../entities/membership';
 import { Response, Role } from '../dtos/workspace.dto';
 import { respondInvite } from '../data/respondInvite';
 import { DEFAULT_MEMBERSHIP } from '../utils/constants';
+import { User } from '../entities/user';
 
-export const respondInviteHandler = async (input: RespondToWorkspaceInviteRequest) => {
+export const respondInviteHandler = async (input: RespondToWorkspaceInviteRequest, user: User) => {
   const queryMembership = new Membership({
     ...DEFAULT_MEMBERSHIP,
-    userId: input.userId,
+    userId: user.userId,
     workspaceName: input.workspaceName,
     role: input.response === Response.ACCEPTED ? Role.MEMBER : Role.REJECTED
   })

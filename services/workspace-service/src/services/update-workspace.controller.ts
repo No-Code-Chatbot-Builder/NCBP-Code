@@ -1,14 +1,15 @@
 import {  UpdateWorkspaceRequest } from '../dtos/request.dto';
 import { Workspace } from '../entities/workspace';
 import { updateWorkspace } from '../data/updateWorkspace';
+import { User } from '../entities/user';
 
 
-export const updateWorkspaceHandler = async (input: UpdateWorkspaceRequest) => {
+export const updateWorkspaceHandler = async (input: UpdateWorkspaceRequest, user: User) => {
   const workspace = new Workspace({
     name: input.workspaceName,
     owner: {
-      id: input.userId,
-      email: input.userEmail
+      id: user.userId,
+      email: user.email
     },
     members: input.members,
     website: input.website,

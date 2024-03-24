@@ -43,8 +43,9 @@ workspaceRouter.post("/test", async (req, res) => {
 // POST create a new workspace
 workspaceRouter.post('/', validateCreateWorkspace, async (req, res) => {
   const input: CreateWorkspaceRequest = req.body;
+  const { user } = req;
 
-  const { statusCode, body } = await createWorkspaceHandler(input);
+  const { statusCode, body } = await createWorkspaceHandler(input, user);
   res.status(statusCode).json(JSON.parse(body));
 });
 
@@ -59,8 +60,9 @@ workspaceRouter.post('/invite', authorize, validateAddUserToWorkspace, async (re
 // POST respond to invite of a workspace
 workspaceRouter.post('/respond', async (req, res) => {
   const input: RespondToWorkspaceInviteRequest = req.body;
+  const { user } = req;
 
-  const { statusCode, body } = await respondInviteHandler(input);
+  const { statusCode, body } = await respondInviteHandler(input, user);
   res.status(statusCode).json(JSON.parse(body));
 });
 
@@ -75,8 +77,9 @@ workspaceRouter.put('/remove', async (req, res) => {
 // PUT update a workspace
 workspaceRouter.put('/', authorize, validateUpdateWorkspace, async (req, res) => {
   const input: UpdateWorkspaceRequest = req.body;
+  const { user } = req;
 
-  const { statusCode, body } = await updateWorkspaceHandler(input);
+  const { statusCode, body } = await updateWorkspaceHandler(input, user);
   res.status(statusCode).json(JSON.parse(body));
 });
 

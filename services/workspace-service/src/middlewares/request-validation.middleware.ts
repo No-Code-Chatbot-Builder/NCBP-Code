@@ -2,11 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { HttpStatusCode } from '../utils/constants';
 
-
 const validateCreateWorkspace = (req: Request, res: Response, next: NextFunction) => {
   body('name').notEmpty().isString();
-  body('ownerId').notEmpty().isString();
-  body('ownerEmail').notEmpty().isEmail();
   body('website').optional().isString();
   body('description').optional().isString();
 
@@ -19,7 +16,6 @@ const validateCreateWorkspace = (req: Request, res: Response, next: NextFunction
 };
 
 const validateGetWorkspace = (req: Request, res: Response, next: NextFunction) => {
-  query('userId').notEmpty().isString();
   query('workspaceName').notEmpty().isString();
 
   const errors = validationResult(req);
@@ -57,10 +53,8 @@ const validateRemoveUserFromWorkspace = (req: Request, res: Response, next: Next
 };
 
 const validateUpdateWorkspace = (req: Request, res: Response, next: NextFunction) => {
-  body('userId').notEmpty().isString();
   body('members').notEmpty().isNumeric();
   body('createdAt').notEmpty().isString();
-  body("userEmail").notEmpty().isEmail();
   body('workspaceName').notEmpty().isString();
   body('website').optional().isString();
   body('description').optional().isString();
@@ -78,7 +72,6 @@ const validateUpdateWorkspace = (req: Request, res: Response, next: NextFunction
 };
 
 const validateDeleteWorkspace = (req: Request, res: Response, next: NextFunction) => {
-  body('userId').notEmpty().isString();
   body('workspaceName').notEmpty().isString();
 
   const errors = validationResult(req);
