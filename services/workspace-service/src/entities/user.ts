@@ -1,7 +1,6 @@
 import { IUser } from "../dtos/user.dto"
 
-class User implements IUser {
-
+class User {
     userId: string
     email: string
     fullName: string
@@ -12,8 +11,8 @@ class User implements IUser {
     
     
     
-    constructor({ userId, email, fullName, dateOfBirth, address,createdAt,workspaces }: IUser) {
-        this.userId = userId
+    constructor({ id, email, fullName, dateOfBirth, address,createdAt,workspaces }: IUser) {
+        this.userId = id
         this.email = email
         this.fullName = fullName
         this.dateOfBirth = dateOfBirth
@@ -49,7 +48,7 @@ class User implements IUser {
     
     static fromItem(item: IUser) {
         return new User({
-            userId: item.userId,
+            id: item.id,
             email: item.email,
             fullName: item.fullName,
             dateOfBirth: item.dateOfBirth,

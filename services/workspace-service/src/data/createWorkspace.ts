@@ -9,7 +9,7 @@ export const createWorkspace = async (workspace: Workspace) => {
   
   const user = new User({
     ...DEFAULT_USER,
-    userId: workspace.owner.id,
+    id: workspace.owner.id,
     email: workspace.owner.email,
   });
 
@@ -69,7 +69,7 @@ export const createWorkspace = async (workspace: Workspace) => {
       statusCode: HttpStatusCode.CREATED,
     };
   } catch (error: any) {
-    console.log(error);
+    console.log(error.CancellationReasons);
 
     let errorMessage = 'Could not create workspace.';
     let statusCode = HttpStatusCode.BAD_REQUEST;

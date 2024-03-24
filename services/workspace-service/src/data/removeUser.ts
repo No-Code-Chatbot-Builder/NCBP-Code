@@ -6,7 +6,7 @@ import { dynamoDB } from '../utils/db';
 export const removeUser = async (membership: Membership) => {
   const user = new User({
     ...DEFAULT_USER,
-    userId: membership.userId,
+    id: membership.userId,
     email: membership.userEmail,
   });
 

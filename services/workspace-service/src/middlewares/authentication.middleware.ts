@@ -23,7 +23,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     const queryUser = new User({
       ...DEFAULT_USER,
-      userId: decoded.sub as string,
+      id: decoded.sub as string,
     });
 
     const { error, user } = await getUser(queryUser);

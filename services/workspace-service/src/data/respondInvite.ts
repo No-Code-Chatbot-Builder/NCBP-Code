@@ -8,7 +8,7 @@ export const respondInvite = async (membership: Membership) => {
 
   const user = new User({
     ...DEFAULT_USER,
-    userId: membership.userId,
+    id: membership.userId,
     email: membership.userEmail,
   });
 

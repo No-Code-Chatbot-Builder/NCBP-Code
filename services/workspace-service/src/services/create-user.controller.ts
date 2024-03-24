@@ -4,7 +4,7 @@ import { User } from '../entities/user';
 
 export const createUserHandler = async (input: CreateUserRequest) => {
   const user = new User({
-    userId: input.userId,
+    id: input.userId,
     email: input.email,
     fullName: input.fullName,
     createdAt: new Date().toISOString(),

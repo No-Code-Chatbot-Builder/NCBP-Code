@@ -19,7 +19,7 @@ export const authorize = async (req: Request, res: Response, next: NextFunction)
 
   const queryUser = new User({
     ...DEFAULT_USER,
-    userId: decoded.sub as string,
+    id: decoded.sub as string,
   });
 
   const { error, user } = await getUser(queryUser);
