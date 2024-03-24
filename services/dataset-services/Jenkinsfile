@@ -5,6 +5,7 @@ pipeline {
         ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_REPO_NAME = 'dataset-service'
         IMAGE_TAG = 'test'
+        CONTEXT_DIR = 'services/dataset-services'
     }
     
     stages {
