@@ -19,6 +19,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { createKey } from "@/lib/api/key/service";
+import CustomToast from "@/components/global/custom-toast";
 
 const CreateAPIKeyForm = () => {
   const { toast } = useToast();
@@ -43,11 +44,24 @@ const CreateAPIKeyForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await createKey("values.accessMode","values.userId")
-    } catch (error) {}
+      await createKey("values.accessMode", "values.userId");
+      toast(
+        CustomToast({
+          title: "API Key Created",
+          description: "API Key has been created successfully.",
+        })
+      );
+    } catch (error: any) {
+      toast(
+        CustomToast({
+          title: "Error During API Key Creation",
+          description:
+            "An error occurred while creating the API Key. Please try again.",
+        })
+      );
+    }
   };
   const isLoading = form.formState.isSubmitting;
-  const router = useRouter();
 
   return (
     <main className="mt-4">

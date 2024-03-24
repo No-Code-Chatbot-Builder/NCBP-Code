@@ -22,7 +22,15 @@ import axios from "axios";
 import CustomToast from "@/components/global/custom-toast";
 import { addData } from "@/lib/api/dataset/service";
 
-const AddDataToDatasetForm = (workspaceName: string, datasetId: string) => {
+interface AddDataToDatasetFormProps {
+  workspaceName: string;
+  datasetId: string;
+}
+
+const AddDataToDatasetForm = ({
+  workspaceName,
+  datasetId,
+}: AddDataToDatasetFormProps) => {
   const { toast } = useToast();
   const { setClose } = useModal();
 
@@ -63,7 +71,7 @@ const AddDataToDatasetForm = (workspaceName: string, datasetId: string) => {
     const file = values.file[0];
 
     try {
-      await addData(workspaceName, datasetId, file)
+      await addData(workspaceName, datasetId, file);
       setClose();
       toast(
         CustomToast({

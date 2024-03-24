@@ -18,17 +18,19 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useModal } from "@/providers/modal-provider";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { addDataset } from "@/providers/redux/slice/datasetSlice";
 import { uuid } from "uuidv4";
 import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
-import axios from "axios";
 import { createDataset } from "@/lib/api/dataset/service";
 
-const CreateDatasetForm = (workspaceName: string) => {
+const CreateDatasetForm = () => {
   const dispatch = useAppDispatch();
   const { setClose } = useModal();
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
 
   const FormSchema = z.object({
     name: z
@@ -48,13 +50,18 @@ const CreateDatasetForm = (workspaceName: string) => {
     },
   });
 
-
-
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-
     try {
+<<<<<<< HEAD
       await createDataset(workspaceName, values.name, values.description);
       await createDataset()
+=======
+      await createDataset(
+        currentWorkspaceName,
+        values.name,
+        values.description
+      );
+>>>>>>> bcff44f0d2ab6f3a04de495c26fb0941bdbd023b
       //updating state, showing toast, closing model
       dispatch(
         addDataset({

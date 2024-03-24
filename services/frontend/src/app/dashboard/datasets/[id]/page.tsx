@@ -78,9 +78,13 @@ const DatasetByIdPage = ({ params }: Props) => {
     },
   ];
 
+  const workspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
+
   const addDataSheet = (
     <CustomSheet title="Add Data" description="Add data to your dataset here.">
-      <AddDataToDatasetForm />
+      <AddDataToDatasetForm workspaceName={workspaceName} datasetId={""} />
     </CustomSheet>
   );
 
