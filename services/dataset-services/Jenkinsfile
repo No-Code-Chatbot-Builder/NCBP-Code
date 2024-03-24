@@ -14,11 +14,12 @@ pipeline {
             }
         }
         
-        script {
-            bat "dir" // Lists the files in the current directory on Windows
-        }
+        
 
          stage('Build and Tag Image') {
+            script {
+            bat "dir" // Lists the files in the current directory on Windows
+        }
             steps {
                 bat "docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ./"
                 bat "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
