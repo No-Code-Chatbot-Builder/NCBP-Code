@@ -15,19 +15,20 @@ pipeline {
         }
         
 
-        stage('Build and Tag Image') {
+         stage('Build and Tag Image') {
             steps {
-                bat 'docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev .'
-                bat 'docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}'
+                bat "docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
+                bat "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
             }
         }
         
         stage('Push to ECR') {
             steps {
-                bat '(Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin ${ECR_REGISTRY}'
-                bat 'docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}'
+                bat "(Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                bat "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
             }
         }
+        
 
         stage('Test') {
             steps {
