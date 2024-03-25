@@ -67,7 +67,7 @@ pipeline {
                 // Add your actual deploy commands here
             }
         }
-    }
+    }}
     
     post {
         always {
@@ -82,4 +82,3 @@ pipeline {
     }
 }
 
-}
