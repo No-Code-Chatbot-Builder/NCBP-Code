@@ -2,6 +2,92 @@ pipeline {
     agent any
 
     environment {
+        // Environment variables
+        ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
+        IMAGE_REPO_NAME = 'dataset-service'
+        IMAGE_TAG = 'test'
+        AWS_DEFAULT_REGION = 'us-east-1'
+
+        // Sensitive credentials should be referred to by ID and injected securely
+        // Create credentials in Jenkins with these IDs
+        AWS_CREDENTIALS = credentials('AWS_ACCESS_SECRET_KEYS')
+        PINECONE_API_KEY = credentials('pinecone-api-key-id')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Check Workspace') {
+            steps {
+                dir('services/dataset-services') {
+                    bat "dir" // Lists the files in the current directory on Windows
+                }
+            }
+        }
+
+        stage('Build and Tag Image') {
+            steps {
+                dir('services/dataset-services') {
+                    bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
+                    bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+        
+        stage('Push to ECR') {
+            steps {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: AWS_CREDENTIALS]
+                ]) {
+                    bat "aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%"
+                    bat "docker push %ECR_REGISTRY%/%IMAGE_REPO_NAME%:%IMAGE_TAG%"
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                bat 'echo Running tests...'
+                // Add your actual test commands here. For example, you might run a script to perform unit tests or integration tests.
+}
+}
+
+
+    stage('Deploy') {
+        steps {
+            // Here you'd add steps to deploy your application
+            // This could involve deployment to a server, updating a service, etc.
+            bat 'echo Deploying application...'
+        }
+    }
+}
+
+post {
+    always {
+        echo 'This will always run regardless of the result.'
+    }
+    success {
+        echo 'Build was successful!'
+    }
+    failure {
+        echo 'Build failed!'
+    }
+}
+}
+
+
+
+
+
+/*
+pipeline {
+    agent any
+
+    environment {
         ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_REPO_NAME = 'dataset-service'
         IMAGE_TAG = 'test'
