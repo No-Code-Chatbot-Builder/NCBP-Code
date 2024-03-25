@@ -5,7 +5,7 @@ pipeline {
         // Public environment variables
         ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
         IMAGE_REPO_NAME = 'dataset-service'
-        IMAGE_TAG = 'test'
+        IMAGE_TAG = 'latest'
         AWS_DEFAULT_REGION = 'us-east-1'
     }
     
