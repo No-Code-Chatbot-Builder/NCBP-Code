@@ -34,7 +34,7 @@ pipeline {
         stage('Build and Tag Image') {
                         steps {
                 withCredentials([
-                    string(credentialsId: 'a2be5c16-949f-43ad-97f8-f1a9a28e342f	', variable: 'PINECONE_API_KEY'),
+                    string(credentialsId: 'PINECONE_API_KEY', variable: 'PINECONE_API_KEY'),
                     // AWS credentials should be used with the AmazonWebServicesCredentialsBinding
                     [$class: 'AmazonWebServicesCredentialsBinding', 
                      credentialsId: 'AWS_ACCESS_SECRET_KEYS']
