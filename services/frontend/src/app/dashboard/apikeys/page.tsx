@@ -1,7 +1,6 @@
 "use client";
 import CreateNewAPIKey from "@/components/forms/create-api-key-form";
 import CustomSheet from "@/components/global/custom-sheet";
-import CustomToast from "@/components/global/custom-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -16,7 +15,6 @@ import {
 } from "@/components/ui/table";
 import { useModal } from "@/providers/modal-provider";
 import { Copy, Key, Plus } from "lucide-react";
-import { toast } from "sonner";
 
 export default function Page() {
   const apiKeys = [
@@ -52,12 +50,6 @@ export default function Page() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast(
-      CustomToast({
-        title: "API Key Copied",
-        description: "API Key has been copied to clipboard.",
-      })
-    );
   };
 
   return (

@@ -40,13 +40,11 @@ export default function Page() {
   );
 
   useEffect(() => {
-
     const fetchAndDispatchDatasets = async () => {
       const res = await fetchDatasets("IntegrationWorkspace");
-      dispatch(setDatasets(res.datasets));
-    }
+      dispatch(setDatasets(res?.datasets));
+    };
     fetchAndDispatchDatasets();
-
   }, []);
 
   const handleDatasetDeletion = (datasetId: string, datasetName: string) => {

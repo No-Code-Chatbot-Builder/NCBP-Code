@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getAssistantById } from "@/providers/redux/slice/assistantSlice";
 import React from "react";
 
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Send, User } from "lucide-react";
 import { Message, useChat } from "ai/react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
 
 type Props = {
   params: {
@@ -39,7 +40,15 @@ const ChatbotMessage = ({ message }: { message: Message }) => (
 );
 
 const AssistantIdByPage = ({ params }: Props) => {
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const messages = useAppSelector((state) => state.chatbot.messages);
+  const addMessage = useAppSelector((state) => state.chatbot.addMessage);
+
+  const form = useForm();
+
+  const dispatch = useAppDispatch();
+  const handleSubmit = () => {
+    dispatch(addMessage());
+  };
 
   const assistant = useAppSelector((state) =>
     getAssistantById(state, params.id)
@@ -47,7 +56,7 @@ const AssistantIdByPage = ({ params }: Props) => {
 
   return (
     <div className="mt-20 stretch mx-auto w-full md:w-1/2 max-w-4xl py-24">
-      {messages.map((message) => (
+      {messages.map((message: any) => (
         <div key={message.id} className="whitespace-pre-wrap">
           {message.role === "user" ? (
             <UserMessage message={message} />
@@ -63,8 +72,6 @@ const AssistantIdByPage = ({ params }: Props) => {
             <form onSubmit={handleSubmit}>
               <Input
                 type="text"
-                value={input}
-                onChange={handleInputChange}
                 placeholder="Ask Anything"
                 className="mt-4 border-secondary/30 bg-card rounded-lg text-muted-foreground p-6 shadow-xl"
               />

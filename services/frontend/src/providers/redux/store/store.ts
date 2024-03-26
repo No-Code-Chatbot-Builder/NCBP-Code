@@ -5,12 +5,14 @@ import datasetReducer from "@/providers/redux/slice/datasetSlice";
 import featuredReducer from "@/providers/redux/slice/featuredSlice";
 import assistantReducer from "@/providers/redux/slice/assistantSlice";
 import workspaceReducer from "@/providers/redux/slice/workspaceSlice";
+import chatbotReducer from "@/providers/redux/slice/chatbotSlice";
 
 const rootReducer = combineReducers({
   featured: featuredReducer,
   datasets: datasetReducer,
   assistants: assistantReducer,
   workspaces: workspaceReducer,
+  chatbot: chatbotReducer,
 });
 
 const persistConfig = {
