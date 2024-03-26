@@ -116,7 +116,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsLoggedIn(true);
           const userAttributes = await fetchUserAttributes();
           setUser(userAttributes);
-          setToken(session.tokens?.idToken?.toString() || "");
+          const newToken = session.tokens?.idToken?.toString() || "";
+          setToken(newToken);
+          localStorage.setItem("token", newToken); // Storing token in localStorage
         } else {
           setIsLoggedIn(false);
         }
@@ -124,6 +126,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoggedIn(false);
         setUser(null);
         setToken("");
+        localStorage.removeItem("token"); // Removing token from localStorage on error
       }
     };
 

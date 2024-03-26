@@ -16,7 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 
 import {
   Card,
@@ -26,9 +25,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { deleteWorkspace } from "@/lib/api/workspace/service";
+import { useAppSelector } from "@/lib/hooks";
 
-const DeleteWorkspaceCard = (workspaceName:string) => {
+const DeleteWorkspaceCard = () => {
   const { toast } = useToast();
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
 
   const FormSchema = z.object({
     confirmation: z.string().refine((val) => val.toLowerCase() === "delete", {
@@ -46,7 +49,7 @@ const DeleteWorkspaceCard = (workspaceName:string) => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(values);
-    await deleteWorkspace(workspaceName);
+    await deleteWorkspace(currentWorkspaceName);
   };
   const isLoading = form.formState.isSubmitting;
 

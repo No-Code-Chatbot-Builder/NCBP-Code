@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { useCustomAuth } from "./providers/auth-provider";
 
 export function middleware(req: NextRequest) {
   const { pathname, host } = req.nextUrl;
 
+  const isLoggedIn = req.cookies.get('loggedUser');
+
   const protectedRoutes = pathname.startsWith("/dashboard");
-  if (protectedRoutes) {
-    return NextResponse.next();
+
+  if (isLoggedIn && !protectedRoutes) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   if (
@@ -15,6 +17,7 @@ export function middleware(req: NextRequest) {
   ) {
     return NextResponse.rewrite(new URL("/site", req.url));
   }
+  
 
   return NextResponse.next();
 }

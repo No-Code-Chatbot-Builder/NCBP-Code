@@ -144,10 +144,21 @@ export type AssistantType = {
   owner: string;
 };
 
+export type DataBucketType = {
+  id: string,
+  name: string,
+  path: string,
+  createdBy: string,
+  createdAt: string,
+}
+
 export type DatasetType = {
   id: string;
   name: string;
   description: string;
+  data: DataBucketType[],
+  createdBy: string,
+  createdAt: string,
 };
 
 export type chatThreads = {

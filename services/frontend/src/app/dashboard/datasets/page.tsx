@@ -14,15 +14,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { fetchDatasets } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
-import { useAppSelector } from "@/lib/hooks";
-
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { setDatasets } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
 import { Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
+  const dispatch = useAppDispatch();
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
@@ -35,6 +38,16 @@ export default function Page() {
       <CreateDatasetForm />
     </CustomSheet>
   );
+
+  useEffect(() => {
+
+    const fetchAndDispatchDatasets = async () => {
+      const res = await fetchDatasets("IntegrationWorkspace");
+      dispatch(setDatasets(res.datasets));
+    }
+    fetchAndDispatchDatasets();
+
+  }, []);
 
   const handleDatasetDeletion = (datasetId: string, datasetName: string) => {
     try {

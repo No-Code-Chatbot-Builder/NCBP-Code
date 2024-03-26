@@ -16,11 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { fetchDataset } from "@/lib/api/dataset/service";
+import { DataBucketType } from "@/lib/constants";
 
 import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { getDatasetById } from "@/providers/redux/slice/datasetSlice";
+import { getDatasetById, updateDataset } from "@/providers/redux/slice/datasetSlice";
 import { Plus, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 type Props = {
   params: {
@@ -29,62 +33,63 @@ type Props = {
 };
 
 const DatasetByIdPage = ({ params }: Props) => {
-  const dataset = useAppSelector((state) => getDatasetById(state, params.id));
+  const dispatch = useDispatch();
+  const [file, setFile] = useState([] as any);
+  // const dataset = useAppSelector((state) => getDatasetById(state, params.id));
+  const datasets = useAppSelector((state) => state.datasets.datasets);
+  const dataset = datasets.filter((set: any) => set.id == params.id);
   const { setOpen } = useModal();
-
-  type QuickType = {
-    id: string;
-    title: string;
-    opened: string;
-    icon: React.ElementType;
-  };
-
-  const dummyQuickAccess: QuickType[] = [
-    {
-      id: "1",
-      title: "ML.pdf",
-      opened: "Opened 3 days ago",
-      icon: PdfIcon,
-    },
-    {
-      id: "2",
-      title: "DL.pdf",
-      opened: "Opened 4 days ago",
-      icon: PdfIcon,
-    },
-    {
-      id: "3",
-      title: "Package.json",
-      opened: "Opened 5 days ago",
-      icon: JsonIcon,
-    },
-  ];
-
-  const dummyFiles = [
-    {
-      name: "ml.pdf",
-      addedBy: "@ibrahimsheikh",
-      dateAdded: "2 Months Ago",
-    },
-    {
-      name: "dl.pdf",
-      addedBy: "@hussainmurtaza",
-      dateAdded: "6 Days Ago",
-    },
-    {
-      name: "package.json",
-      addedBy: "@shariqanwar",
-      dateAdded: "A Month Ago",
-    },
-  ];
 
   const workspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
 
+  useEffect(() => {
+
+    const fetchData = async () => {
+      const res = await fetchDataset("IntegrationWorkspace", params.id);
+
+      dispatch(
+        updateDataset({
+          id: res.datasetDetails.datasetId,
+          name: res.datasetDetails.name,
+          description: res.datasetDetails.description,
+          createdAt: res.datasetDetails.createdAt,
+          createdBy: res.datasetDetails.createdBy,
+          data: res.data.map((item : any) => ({
+            id: item.dataId,
+            name: item.name,
+            path: item.path,
+            createdAt: item.createdAt,
+            createdBy: item.createdBy,
+          }))
+        })
+      );
+
+      setFile(
+        res.data.map((item: any) =>
+        ({
+          id: item.dataId,
+          name: item.name,
+          path: item.path,
+          createdAt: item.createdAt,
+          createdBy: item.createdBy,
+        })
+        )
+      )
+
+    }
+
+    fetchData();
+    console.log("datasets-------",datasets);
+
+  }, []);
+
+
+
   const addDataSheet = (
     <CustomSheet title="Add Data" description="Add data to your dataset here.">
-      <AddDataToDatasetForm workspaceName={workspaceName} datasetId={""} />
+      <AddDataToDatasetForm workspaceName={workspaceName} datasetId={params.id} />
     </CustomSheet>
   );
 
@@ -94,10 +99,10 @@ const DatasetByIdPage = ({ params }: Props) => {
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
             <h1 className="text-secondary text-3xl font-bold">
-              {dataset && dataset.name}
+              {datasets && datasets.name}
             </h1>
             <p className="text-md text-muted-foreground hidden md:block">
-              {dataset && dataset.description}
+              {datasets && datasets.description}
             </p>
           </div>
           <Button
@@ -117,15 +122,15 @@ const DatasetByIdPage = ({ params }: Props) => {
         <div className="grid gap-8">
           <h1 className="text-2xl font-bold">Quick Access</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {dummyQuickAccess.map((qa) => (
+            {file?.map((qa: DataBucketType) => (
               <Card key={qa.id}>
                 <CardContent>
-                  <qa.icon className="w-16" />
+                  {/* <qa.icon className="w-16" /> */}
                   <div className="flex justify-between">
-                    <h3 className="text-xl font-semibold">{qa.title}</h3>
+                    <h3 className="text-xl font-semibold">{qa.name}</h3>
                     <Users className="w-5" />
                   </div>
-                  <p className="text-sm text-muted-foreground">{qa.opened}</p>
+                  <p className="text-sm text-muted-foreground">{qa.createdAt}</p>
                 </CardContent>
               </Card>
             ))}
@@ -153,7 +158,7 @@ const DatasetByIdPage = ({ params }: Props) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dummyFiles.map((file, index) => (
+                    {dataset?.map((file: any, index: number) => (
                       <TableRow key={index}>
                         <TableCell className="font-medium">
                           {file.name}

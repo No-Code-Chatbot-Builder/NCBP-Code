@@ -24,10 +24,14 @@ import {
 import { useModal } from "@/providers/modal-provider";
 import CustomToast from "@/components/global/custom-toast";
 import { inviteUser } from "@/lib/api/workspace/service";
+import { useAppSelector } from "@/lib/hooks";
 
-const InviteNewUserForm = (workspaceName:string) => {
+const InviteNewUserForm = () => {
   const { toast } = useToast();
   const { setClose } = useModal();
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
 
   const FormSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -45,7 +49,7 @@ const InviteNewUserForm = (workspaceName:string) => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await inviteUser(workspaceName,"user id",values.email);
+      await inviteUser(currentWorkspaceName,"user id",values.email);
       toast(
         CustomToast({
           title: "User Invited",

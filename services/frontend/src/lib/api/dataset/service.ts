@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/lib/hooks";
 import { apiClient } from "../apiService";
 
 export const createDataset = async (
@@ -7,24 +6,31 @@ export const createDataset = async (
   description: string
 ) => {
   try {
+    console.log("currentWorkspaceName: ", currentWorkspaceName);
+    console.log("name: ", name);
+    console.log("description: ", description);
+
     const response = await apiClient.post(
-      `/datasets/:${currentWorkspaceName}/dataset`,
-      { name, description }
+      '/datasets/IntegrationWorkspace/dataset/',
+      { name: name, description: description }
     );
 
     console.log("Dataset created successfully: ", response.data);
-  } catch (error) {
-    console.error("Error creating workspace: ", error);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error creating Dataset: ", error.response || error);
   }
 };
 
 export const fetchDatasets = async (workspaceName: string) => {
   try {
-    const response = await apiClient.get(`/datasets/:${workspaceName}`);
-
+    // const response = await apiClient.get(`/datasets/${workspaceName}`);
+    console.log("fecthing....")
+    const response = await apiClient.get('/datasets/IntegrationWorkspace/');
     console.log("Datasets fetched successfully: ", response.data);
-  } catch (error) {
-    console.error("Error fetching Datasets: ", error);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error fetching Dataset: ", error.response || error);
   }
 };
 
@@ -34,10 +40,11 @@ export const fetchDataset = async (
 ) => {
   try {
     const response = await apiClient.get(
-      `/datasets/:${workspaceName}/:${datasetId}`
+      `/datasets/IntegrationWorkspace/${datasetId}`
     );
 
     console.log("Dataset fetched successfully: ", response.data);
+    return response.data;
   } catch (error) {
     console.error("Error fetching Dataset: ", error);
   }
@@ -50,11 +57,11 @@ export const addData = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/datasets/:${workspaceName}/:${datasetId}/data`,
+      `/datasets/IntegrationWorkspace/${datasetId}/data`,
       data
     );
-
     console.log("Data added successfully: ", response.data);
+    return response.data;
   } catch (error) {
     console.error("Error adding Data: ", error);
   }
@@ -67,10 +74,11 @@ export const getData = async (
 ) => {
   try {
     const response = await apiClient.get(
-      `/datasets/:${workspaceName}/:${datasetId}/data/${dataId}`
+      `/datasets/:${workspaceName}/${datasetId}/data/${dataId}`
     );
     console.log("Data fetched successfully: ", response.data);
   } catch (error) {
     console.error("Error fetching Data: ", error);
   }
 };
+

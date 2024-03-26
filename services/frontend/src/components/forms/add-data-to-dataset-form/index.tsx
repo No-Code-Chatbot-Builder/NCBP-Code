@@ -13,14 +13,16 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
+import { addFile } from "@/providers/redux/slice/datasetSlice";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/providers/modal-provider";
-import axios from "axios";
 import CustomToast from "@/components/global/custom-toast";
 import { addData } from "@/lib/api/dataset/service";
+import path from "path";
+import { useAppDispatch } from "@/lib/hooks";
 
 interface AddDataToDatasetFormProps {
   workspaceName: string;
@@ -33,6 +35,8 @@ const AddDataToDatasetForm = ({
 }: AddDataToDatasetFormProps) => {
   const { toast } = useToast();
   const { setClose } = useModal();
+  const dispatch = useAppDispatch();
+
 
   const FormSchema = z.object({
     file: z.any().refine(
@@ -69,9 +73,20 @@ const AddDataToDatasetForm = ({
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     const file = values.file[0];
-
+    const formData = new FormData();
+    formData.append("file", file);
     try {
-      await addData(workspaceName, datasetId, file);
+      const res = await addData(workspaceName, datasetId, formData);
+      dispatch(
+        addFile(
+          {
+            id: res?.id,
+            name: res?.name,
+            path: res?.path,
+            createdAt: res?.createdAt,
+            createdBy: res?.createdBy,
+          }
+        ));
       setClose();
       toast(
         CustomToast({

@@ -44,7 +44,7 @@ const CreateAPIKeyForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await createKey("values.accessMode", "values.userId");
+      await createKey("values.accessMode");
       toast(
         CustomToast({
           title: "API Key Created",

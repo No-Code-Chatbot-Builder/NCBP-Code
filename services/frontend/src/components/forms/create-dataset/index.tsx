@@ -20,7 +20,6 @@ import { Loader2 } from "lucide-react";
 import { useModal } from "@/providers/modal-provider";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { addDataset } from "@/providers/redux/slice/datasetSlice";
-import { uuid } from "uuidv4";
 import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import { createDataset } from "@/lib/api/dataset/service";
@@ -52,22 +51,20 @@ const CreateDatasetForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-<<<<<<< HEAD
-      await createDataset(workspaceName, values.name, values.description);
-      await createDataset()
-=======
-      await createDataset(
+      const res = await createDataset(
         currentWorkspaceName,
         values.name,
         values.description
       );
->>>>>>> bcff44f0d2ab6f3a04de495c26fb0941bdbd023b
       //updating state, showing toast, closing model
       dispatch(
         addDataset({
-          id: uuid(),
-          name: values.name,
-          description: values.description,
+          id: res.id,
+          name: res.name,
+          description: res.description,
+          createdAt: res.createdAt,
+          createdBy: res.createdBy,
+          data: [],
         })
       );
 

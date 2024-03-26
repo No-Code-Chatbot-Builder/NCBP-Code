@@ -68,6 +68,7 @@
     "react-resizable-panels": "^2.0.3",
     "redux-persist": "^6.0.0",
     "sonner": "^1.4.0",
+    "swr": "^2.2.5",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uuidv4": "^6.2.13",

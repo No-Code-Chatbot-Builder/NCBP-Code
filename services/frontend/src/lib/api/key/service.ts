@@ -1,9 +1,9 @@
 import { apiClient } from "../apiService";
 
-export const createKey = async (accessMode: string, userId: string) => {
+export const createKey = async (accessMode: string) => {
     try {
 
-        const response = await apiClient.post('/keys/', {accessMode,userId});
+        const response = await apiClient.post('/keys/', {accessMode});
 
         console.log("key created successfully: ", response.data);
     } catch (error) {
