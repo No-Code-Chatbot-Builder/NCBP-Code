@@ -6,11 +6,12 @@ import { DynamoDbService } from './dynamo-db/dynamo-db.service';
 import { ConfigModule } from '@nestjs/config'; 
 import { AuthMiddleware} from './auth/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
+//import { WebsocketService } from './websocket/websocket.service';
 
 @Module({
   imports: [ConfigModule.forRoot(), HttpModule],
   controllers: [AppController],
-  providers: [AppService, BotService, DynamoDbService], 
+  providers: [AppService, BotService, DynamoDbService, /*WebsocketService*/], 
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
