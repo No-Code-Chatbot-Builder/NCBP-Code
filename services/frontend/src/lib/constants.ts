@@ -124,7 +124,6 @@ export const sidebarOpt: SidebarOption[] = [
     heading: "",
     items: [
       { name: "Featured", icon: "featured", link: "/dashboard/featured" },
-
       { name: "Assistants", icon: "assistants", link: "/dashboard/assistants" },
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
       { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
@@ -145,20 +144,20 @@ export type AssistantType = {
 };
 
 export type DataBucketType = {
-  id: string,
-  name: string,
-  path: string,
-  createdBy: string,
-  createdAt: string,
-}
+  id: string;
+  name: string;
+  path: string;
+  createdBy: string;
+  createdAt: string;
+};
 
 export type DatasetType = {
   id: string;
   name: string;
   description: string;
-  data: DataBucketType[],
-  createdBy: string,
-  createdAt: string,
+  data: DataBucketType[];
+  createdBy: string;
+  createdAt: string;
 };
 
 export type chatThreads = {

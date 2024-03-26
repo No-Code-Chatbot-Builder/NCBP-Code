@@ -28,6 +28,7 @@ export default function Page() {
   const dispatch = useAppDispatch();
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
+  console.log(datasets);
 
   const router = useRouter();
   const datasetSheet = (
@@ -40,17 +41,23 @@ export default function Page() {
   );
 
   useEffect(() => {
-    const fetchAndDispatchDatasets = async () => {
+    const fetchCurrentDatasets = async () => {
       const res = await fetchDatasets("IntegrationWorkspace");
-      dispatch(setDatasets(res?.datasets));
+      if (datasets.length !== res.datasets.length) {
+        dispatch(setDatasets(res.datasets));
+      }
     };
-    fetchAndDispatchDatasets();
+    fetchCurrentDatasets();
   }, []);
 
-  const handleDatasetDeletion = (datasetId: string, datasetName: string) => {
+  const handleDatasetDeletion = async (
+    datasetId: string,
+    datasetName: string
+  ) => {
     try {
+      // Placeholder for actual deletion logic
       // await deleteDataset(datasetId);
-      // dispatch(removeDataset(datasetId)
+      // dispatch(removeDataset(datasetId));
       toast(
         CustomToast({
           title: `${datasetName} Deleted`,
@@ -100,42 +107,46 @@ export default function Page() {
       </section>
       <section>
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-          {datasets.map((dataset: DatasetType) => (
-            <Card key={dataset.name}>
-              <CardHeader>
-                <div className="flex justify-between">
-                  <div className="flex flex-col gap-1">
-                    <CardTitle>{dataset.name}</CardTitle>
-                    <CardDescription>{dataset.description}</CardDescription>
+          {datasets.length > 0 ? (
+            datasets.map((dataset: DatasetType) => (
+              <Card key={dataset.name}>
+                <CardHeader>
+                  <div className="flex justify-between">
+                    <div className="flex flex-col gap-1">
+                      <CardTitle>{dataset.name}</CardTitle>
+                      <CardDescription>{dataset.description}</CardDescription>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant={"destructive"}
+                      onClick={() => {
+                        handleDatasetDeletion(dataset.id, dataset.name);
+                      }}
+                    >
+                      <Trash className="w-4 h-4" />
+                    </Button>
                   </div>
+                </CardHeader>
+
+                <div className="flex gap-4 px-4">
+                  <PdfIcon className="w-12" />
+                  <JsonIcon className="w-12" />
+                </div>
+                <CardContent>
                   <Button
-                    size="icon"
-                    variant={"destructive"}
+                    className="w-full gap-2"
                     onClick={() => {
-                      handleDatasetDeletion(dataset.id, dataset.name);
+                      router.push(`/dashboard/datasets/${dataset.id}`);
                     }}
                   >
-                    <Trash className="w-4 h-4" />
+                    Manage Files
                   </Button>
-                </div>
-              </CardHeader>
-
-              <div className="flex gap-4 px-4">
-                <PdfIcon className="w-12" />
-                <JsonIcon className="w-12" />
-              </div>
-              <CardContent>
-                <Button
-                  className="w-full gap-2"
-                  onClick={() => {
-                    router.push(`/dashboard/datasets/${dataset.id}`);
-                  }}
-                >
-                  Manage Files
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <p>No datasets available.</p>
+          )}
         </div>
       </section>
     </div>

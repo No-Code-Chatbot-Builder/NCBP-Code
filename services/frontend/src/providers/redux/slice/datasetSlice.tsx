@@ -31,11 +31,16 @@ export const datasetSlice = createSlice({
       if (index !== -1) {
         state.datasets[index].data.push(action.payload);
       }
+      console.log(state.datasets[index].data);
     },
     updateDataset: (state, action: PayloadAction<DatasetType>) => {
+      console.log("fromUpdateDatasets");
+      console.log(action.payload.id);
+      console.log(state.datasets);
       const index = state.datasets.findIndex(
         (dataset) => dataset.id === action.payload.id
       );
+      console.log(index);
       if (index !== -1) {
         state.datasets[index] = action.payload;
       }
@@ -43,8 +48,13 @@ export const datasetSlice = createSlice({
   },
 });
 
-export const { addDataset, setDatasets, addFile,removeDataset, updateDataset } =
-  datasetSlice.actions;
+export const {
+  addDataset,
+  setDatasets,
+  addFile,
+  removeDataset,
+  updateDataset,
+} = datasetSlice.actions;
 
 export const getDatasetById = createSelector(
   [

@@ -106,7 +106,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string>("");
 
   useEffect(() => {
-    const fetchAttributes = async () => {
+    const initializeAuth = async () => {
       try {
         const session = await fetchAuthSession();
         console.log(session.tokens?.idToken?.toString());
@@ -118,7 +118,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(userAttributes);
           const newToken = session.tokens?.idToken?.toString() || "";
           setToken(newToken);
-          localStorage.setItem("token", newToken); // Storing token in localStorage
+          localStorage.setItem("token", newToken);
         } else {
           setIsLoggedIn(false);
         }
@@ -126,11 +126,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoggedIn(false);
         setUser(null);
         setToken("");
-        localStorage.removeItem("token"); // Removing token from localStorage on error
+        localStorage.removeItem("token");
       }
     };
 
-    fetchAttributes();
+    initializeAuth();
   }, []);
 
   const verifyCode = async ({ username, code }: VerificationInput) => {

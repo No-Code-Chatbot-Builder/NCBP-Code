@@ -11,7 +11,7 @@ export const createDataset = async (
     console.log("description: ", description);
 
     const response = await apiClient.post(
-      '/datasets/IntegrationWorkspace/dataset/',
+      "/datasets/IntegrationWorkspace/dataset/",
       { name: name, description: description }
     );
 
@@ -25,8 +25,8 @@ export const createDataset = async (
 export const fetchDatasets = async (workspaceName: string) => {
   try {
     // const response = await apiClient.get(`/datasets/${workspaceName}`);
-    console.log("fecthing....")
-    const response = await apiClient.get('/datasets/IntegrationWorkspace/');
+    console.log("fetching....");
+    const response = await apiClient.get("/datasets/IntegrationWorkspace/");
     console.log("Datasets fetched successfully: ", response.data);
     return response.data;
   } catch (error: any) {
@@ -34,10 +34,7 @@ export const fetchDatasets = async (workspaceName: string) => {
   }
 };
 
-export const fetchDataset = async (
-  workspaceName: string,
-  datasetId: string
-) => {
+export const fetchFiles = async (workspaceName: string, datasetId: string) => {
   try {
     const response = await apiClient.get(
       `/datasets/IntegrationWorkspace/${datasetId}`
@@ -81,4 +78,3 @@ export const getData = async (
     console.error("Error fetching Data: ", error);
   }
 };
-
