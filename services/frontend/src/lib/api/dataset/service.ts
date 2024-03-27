@@ -6,12 +6,9 @@ export const createDataset = async (
   description: string
 ) => {
   try {
-    console.log("currentWorkspaceName: ", currentWorkspaceName);
-    console.log("name: ", name);
-    console.log("description: ", description);
 
     const response = await apiClient.post(
-      "/datasets/IntegrationWorkspace/dataset/",
+      `/datasets/${currentWorkspaceName}/dataset/`,
       { name: name, description: description }
     );
 
@@ -26,7 +23,7 @@ export const fetchDatasets = async (workspaceName: string) => {
   try {
     // const response = await apiClient.get(`/datasets/${workspaceName}`);
     console.log("fetching....");
-    const response = await apiClient.get("/datasets/IntegrationWorkspace/");
+    const response = await apiClient.get(`/datasets/${workspaceName}/`);
     console.log("Datasets fetched successfully: ", response.data);
     return response.data;
   } catch (error: any) {
@@ -37,7 +34,7 @@ export const fetchDatasets = async (workspaceName: string) => {
 export const fetchFiles = async (workspaceName: string, datasetId: string) => {
   try {
     const response = await apiClient.get(
-      `/datasets/IntegrationWorkspace/${datasetId}`
+      `/datasets/${workspaceName}/${datasetId}`
     );
 
     console.log("Dataset fetched successfully: ", response.data);
@@ -54,7 +51,7 @@ export const addData = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/datasets/IntegrationWorkspace/${datasetId}/data`,
+      `/datasets/${workspaceName}/${datasetId}/data`,
       data
     );
     console.log("Data added successfully: ", response.data);

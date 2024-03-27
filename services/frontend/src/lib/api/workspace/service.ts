@@ -52,6 +52,7 @@ export const fetchWorkspaces = async () => {
         const response = await apiClient.get("/users/");
 
         console.log("Workspace fetched successfully: ", response.data);
+        return response.data.workspaces;
     } catch (error) {
         console.error("Error fetching workspace: ", error);
     }

@@ -53,7 +53,7 @@ const DatasetByIdPage = ({ params }: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!dataset) return; // Early return if dataset is undefined
-      const res = await fetchFiles("IntegrationWorkspace", params.id);
+      const res = await fetchFiles(workspaceName, params.id);
       if (!res.data.length) return;
 
       const updatedFileArray = res.data.map((item: any) => ({

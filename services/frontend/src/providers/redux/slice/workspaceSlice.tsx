@@ -2,9 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export type WorkspaceType = {
-  id: string;
+  // id: string;
   name: string;
-  description: string;
+  role: string;
 };
 
 interface WorkspaceState {
@@ -32,14 +32,17 @@ export const workspaceSlice = createSlice({
     addWorkspace: (state, action: PayloadAction<WorkspaceType>) => {
       state.workspaces.push(action.payload);
     },
+    setWorkspaces: (state, action: PayloadAction<WorkspaceType[]>) => {
+      state.workspaces = action.payload;
+    },
     removeWorkspace: (state, action: PayloadAction<string>) => {
       state.workspaces = state.workspaces.filter(
-        (workspace) => workspace.id !== action.payload
+        (workspace) => workspace.name !== action.payload
       );
     },
     updateWorkspace: (state, action: PayloadAction<WorkspaceType>) => {
       const index = state.workspaces.findIndex(
-        (workspace) => workspace.id === action.payload.id
+        (workspace) => workspace.name === action.payload.name
       );
       if (index !== -1) {
         state.workspaces[index] = action.payload;
@@ -59,7 +62,7 @@ export const workspaceSlice = createSlice({
   },
 });
 
-export const { addWorkspace, removeWorkspace, updateWorkspace } =
+export const { addWorkspace, setWorkspaces, removeWorkspace, updateWorkspace, setCurrentWorkspace } =
   workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

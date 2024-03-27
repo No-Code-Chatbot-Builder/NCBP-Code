@@ -28,8 +28,9 @@ export default function Page() {
   const dispatch = useAppDispatch();
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
-  console.log(datasets);
-
+  const workspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
   const router = useRouter();
   const datasetSheet = (
     <CustomSheet
@@ -42,7 +43,7 @@ export default function Page() {
 
   useEffect(() => {
     const fetchCurrentDatasets = async () => {
-      const res = await fetchDatasets("IntegrationWorkspace");
+      const res = await fetchDatasets(workspaceName);
       if (datasets.length !== res.datasets.length) {
         dispatch(setDatasets(res.datasets));
       }

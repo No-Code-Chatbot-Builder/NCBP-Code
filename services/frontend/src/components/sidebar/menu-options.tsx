@@ -41,12 +41,11 @@ import CustomModel from "../global/custom-model";
 import CreateWorkspaceForm from "../forms/create-workspace";
 
 import { useCustomAuth } from "@/providers/auth-provider";
-import { uuid } from "uuidv4";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
-  WorkspaceType,
-  fetchWorkspaces,
+  WorkspaceType, setWorkspaces, setCurrentWorkspace,
 } from "@/providers/redux/slice/workspaceSlice";
+import { fetchWorkspaces } from "@/lib/api/workspace/service";
 
 type Props = {
   defaultOpen?: boolean;
@@ -65,10 +64,40 @@ const WorkspaceMenuOptions = ({
   const { setOpen } = useModal();
   const pathname = usePathname();
   const workspaces = useAppSelector((state: { workspaces: { workspaces: any; }; }) => state.workspaces.workspaces);
+  const currentWorkspace = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
+
 
   useEffect(() => {
-    dispatch(fetchWorkspaces());
+
+    const fetch = async () => {
+      const workspaces = await fetchWorkspaces();
+      const formattedWorkspaces: WorkspaceType[] = Object.entries(workspaces).map(([key, value]: [string, unknown]) => ({
+        name: key,
+        role: value as string,
+      }));
+
+      console.log(formattedWorkspaces);
+
+      dispatch(
+        setWorkspaces(
+          formattedWorkspaces
+        )
+      );
+      dispatch(
+        setCurrentWorkspace(formattedWorkspaces[0].name)
+      )
+    }
+    fetch();
+
   }, [dispatch]);
+
+  const changeCurrentWorkspace = (name: string) => {
+    dispatch(
+      setCurrentWorkspace(name)
+    );
+  }
 
   return (
     <>
@@ -96,7 +125,7 @@ const WorkspaceMenuOptions = ({
                     NoCodeBot.ai
                   </h1>
                   <p className="text-muted-foreground text-sm font-normal">
-                    Workspace 1
+                    {currentWorkspace}
                   </p>
                 </div>
               </div>
@@ -120,8 +149,8 @@ const WorkspaceMenuOptions = ({
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-sm">
-                    {workspaces.map((workspace: WorkspaceType) => (
-                      <div key={workspace.id}>{workspace.name}</div>
+                    {workspaces?.map((workspace: WorkspaceType) => (
+                      <div onClick={() => changeCurrentWorkspace(workspace.name)} key={workspace.name} className={`${workspace.name == currentWorkspace ? 'bg-primary' : ''} hover:pointer-cursor p-2 my-2 border-2 border-text-muted rounded-md`}>{workspace.name}</div>
                     ))}
                   </div>
                 )}
@@ -171,7 +200,7 @@ const WorkspaceMenuOptions = ({
                         className={clsx(
                           "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1",
                           {
-                            "bg-sidebar-hover text-sidebar-foreground  ":
+                            "bg-sidebar-hover text-sidebar-foreground":
                               pathname === option.link,
                           }
                         )}
