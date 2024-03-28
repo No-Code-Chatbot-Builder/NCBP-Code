@@ -32,7 +32,7 @@ import {
 import { Plus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { format } from "date-fns"; // Import format from date-fns
+import { format } from "date-fns";
 
 type Props = {
   params: {
@@ -42,8 +42,10 @@ type Props = {
 
 const DatasetByIdPage = ({ params }: Props) => {
   const dispatch = useDispatch();
-  const datasets = useAppSelector((state) => state.datasets.datasets);
-  const dataset = datasets.find((set: any) => set.id === params.id);
+  const datasetState = useAppSelector((state) => state.datasets);
+  const dataset = datasetState.datasets.find(
+    (set: any) => set.id === params.id
+  );
   const { setOpen } = useModal();
 
   const workspaceName = useAppSelector(
@@ -52,7 +54,7 @@ const DatasetByIdPage = ({ params }: Props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!dataset) return; // Early return if dataset is undefined
+      if (!dataset) return;
       const res = await fetchFiles(workspaceName, params.id);
       if (!res.data.length) return;
 
@@ -60,7 +62,7 @@ const DatasetByIdPage = ({ params }: Props) => {
         id: item.dataId,
         name: item.name,
         path: item.path,
-        createdAt: format(new Date(item.createdAt), "MM-dd-YY"), // Convert date to readable format
+        createdAt: format(new Date(item.createdAt), "MM-dd-YY"),
         createdBy: item.createdBy,
       }));
 
@@ -77,7 +79,7 @@ const DatasetByIdPage = ({ params }: Props) => {
     };
 
     fetchData();
-  }, []);
+  }, [dataset, dispatch, params.id, workspaceName]);
 
   if (!dataset) {
     return <div>Dataset not found</div>;

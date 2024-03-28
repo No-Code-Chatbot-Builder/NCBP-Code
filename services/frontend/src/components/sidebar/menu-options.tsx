@@ -43,7 +43,9 @@ import CreateWorkspaceForm from "../forms/create-workspace";
 import { useCustomAuth } from "@/providers/auth-provider";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
-  WorkspaceType, setWorkspaces, setCurrentWorkspace,
+  WorkspaceType,
+  setWorkspaces,
+  setCurrentWorkspace,
 } from "@/providers/redux/slice/workspaceSlice";
 import { fetchWorkspaces } from "@/lib/api/workspace/service";
 
@@ -63,41 +65,37 @@ const WorkspaceMenuOptions = ({
   const { logout } = useCustomAuth();
   const { setOpen } = useModal();
   const pathname = usePathname();
-  const workspaces = useAppSelector((state: { workspaces: { workspaces: any; }; }) => state.workspaces.workspaces);
+  const workspaces = useAppSelector(
+    (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
+  );
   const currentWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
 
-
   useEffect(() => {
-
     const fetch = async () => {
       const workspaces = await fetchWorkspaces();
-      const formattedWorkspaces: WorkspaceType[] = Object.entries(workspaces).map(([key, value]: [string, unknown]) => ({
-        name: key,
-        role: value as string,
-      }));
+      console.log(workspaces);
+      if (workspaces) {
+        const formattedWorkspaces: WorkspaceType[] = Object.entries(
+          workspaces
+        ).map(([key, value]: [string, unknown]) => ({
+          name: key,
+          role: value as string,
+        }));
 
-      console.log(formattedWorkspaces);
+        console.log(formattedWorkspaces);
 
-      dispatch(
-        setWorkspaces(
-          formattedWorkspaces
-        )
-      );
-      dispatch(
-        setCurrentWorkspace(formattedWorkspaces[0].name)
-      )
-    }
+        dispatch(setWorkspaces(formattedWorkspaces));
+        dispatch(setCurrentWorkspace(formattedWorkspaces[0].name));
+      }
+    };
     fetch();
-
   }, [dispatch]);
 
   const changeCurrentWorkspace = (name: string) => {
-    dispatch(
-      setCurrentWorkspace(name)
-    );
-  }
+    dispatch(setCurrentWorkspace(name));
+  };
 
   return (
     <>
@@ -150,7 +148,15 @@ const WorkspaceMenuOptions = ({
                 ) : (
                   <div className="text-muted-foreground text-sm">
                     {workspaces?.map((workspace: WorkspaceType) => (
-                      <div onClick={() => changeCurrentWorkspace(workspace.name)} key={workspace.name} className={`${workspace.name == currentWorkspace ? 'bg-primary' : ''} hover:pointer-cursor p-2 my-2 border-2 border-text-muted rounded-md`}>{workspace.name}</div>
+                      <div
+                        onClick={() => changeCurrentWorkspace(workspace.name)}
+                        key={workspace.name}
+                        className={`${
+                          workspace.name == currentWorkspace ? "bg-primary" : ""
+                        } hover:pointer-cursor p-2 my-2 border-2 border-text-muted rounded-md`}
+                      >
+                        {workspace.name}
+                      </div>
                     ))}
                   </div>
                 )}
