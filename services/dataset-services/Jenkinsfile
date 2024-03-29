@@ -46,6 +46,19 @@ pipeline {
             }
         }
 
+
+        stage('Ensure ECS Cluster Exists') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
+                    script {
+                        echo "Creating ECS cluster named ${ECS_CLUSTER_NAME}."
+                        bat "aws ecs create-cluster --cluster-name ${ECS_CLUSTER_NAME}"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Register ECS Task Definition') {
             steps {
                 withCredentials([[
