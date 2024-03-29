@@ -63,7 +63,7 @@ pipeline {
     steps {
         withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding', 
-            credentialsId: AWS_CREDENTIALS_ID
+             credentialsId: 'AWS_ACCESS_SECRET_KEYS'
         ]]) {
             script {
                 // Check if the ECS service already exists
