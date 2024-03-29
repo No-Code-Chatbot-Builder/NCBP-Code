@@ -66,15 +66,8 @@ pipeline {
              credentialsId: 'AWS_ACCESS_SECRET_KEYS'
         ]]) {
             script {
-                // Check if the ECS service already exists
-                def serviceExists = bat(script: "aws ecs describe-services --cluster ${ECS_CLUSTER_NAME} --services ${ECS_SERVICE_NAME}", returnStatus: true) == 0
-                if (serviceExists) {
-                    // Update the existing service
-                    bat "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME}"
-                } else {
-                    // Create a new service because it does not exist
                     bat "aws ecs create-service --cluster ${ECS_CLUSTER_NAME} --service-name ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count 1"
-                }
+                
             }
         }
     }
