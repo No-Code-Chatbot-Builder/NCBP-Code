@@ -7,8 +7,6 @@
         "name": "test-container",
         "image": "637423235266.dkr.ecr.us-east-1.amazonaws.com/dataset-service:latest",
         "essential": true,
-        "memory": 512,
-        "cpu": 256,
         "portMappings": [
           {
             "containerPort": 80,
@@ -41,7 +39,9 @@
     ],
     "requiresCompatibilities": [
         "FARGATE"
-      ]
+      ],
+      "cpu": "256",
+  "memory": "512"
     
     
   }
