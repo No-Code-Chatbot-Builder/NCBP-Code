@@ -68,7 +68,7 @@ pipeline {
         stage('Deploy to ECS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId:'AWS_ACCESS_SECRET_KEYS']]) {
-                    bat "aws ecs create-service --cluster ${ECS_CLUSTER_NAME} --service-name ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count 1 --launch-type FARGATE --network-configuration \"awsvpcConfiguration={subnets=[subnet-id1, subnet-id2],securityGroups=[sg-id],assignPublicIp=ENABLED}\""
+                    bat "aws ecs create-service --cluster ${ECS_CLUSTER_NAME} --service-name ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME}"
                 }
             }
         }
