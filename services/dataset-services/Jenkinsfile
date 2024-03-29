@@ -10,7 +10,7 @@ pipeline {
         // Define ECS-related environment variables
         ECS_CLUSTER_NAME = 'test-cluster'
         ECS_SERVICE_NAME = 'test-service'
-        ECS_TASK_FAMILY_NAME = 'test-family-new'
+        ECS_TASK_FAMILY_NAME = 'test-family'
         ECS_TASK_DEFINITION_FILE = 'container-definition.json' // Path relative to the repo root
 
         // Define AWS environment variables
