@@ -1,38 +1,40 @@
-[
-    {
+{
+    "family": "test-family",
+    "containerDefinitions": [
+      {
         "name": "my-container",
-        "image": "637423235266.dkr.ecr.us-east-1.amazonaws.com/dataset-service:latest",
+        "image": "637423235266.dkr.ecr.us-east-1.amazonaws.com/my-image:my-tag",
         "essential": true,
         "memory": 512,
         "cpu": 256,
         "portMappings": [
-            {
-                "containerPort": 80,
-                "hostPort": 80
-            }
+          {
+            "containerPort": 80,
+            "hostPort": 80
+          }
         ],
         "secrets": [
-            {
-                "name": "DATASETS_SERVICE",
-                "valueFrom": "arn:aws:secretsmanager:us-east-1:account-id:secret:datasets-service-AbCdEf"
-            }
-            
+          {
+            "name": "DATASETS_SERVICE",
+            "valueFrom": "arn:aws:secretsmanager:us-east-1:account-id:secret:datasets-service-AbCdEf"
+          }
         ],
         "logConfiguration": {
-            "logDriver": "awslogs",
-            "options": {
-                "awslogs-group": "/ecs/my-container",
-                "awslogs-region": "us-east-1",
-                "awslogs-stream-prefix": "ecs"
-            }
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/my-container",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "ecs"
+          }
         },
         "entryPoint": [
-            "powershell",
-            "-Command"
+          "powershell",
+          "-Command"
         ],
         "command": [
-            "Start-MyService.ps1"
+          "Start-MyService.ps1"
         ]
-       
-    }
-]
+      }
+    ]
+  }
+  
