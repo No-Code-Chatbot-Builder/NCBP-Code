@@ -84,7 +84,7 @@ pipeline {
                 --desired-count ${ECS_DESIRED_COUNT} \
                         --launch-type ${ECS_LAUNCH_TYPE} \
                         --network-configuration "awsvpcConfiguration={subnets=[${ECS_SUBNET_ID}],securityGroups=[${ECS_SECURITY_GROUP_ID}],assignPublicIp=ENABLED}" \
-                        --region ${AWS_DEFAULT_REGION}--region ${AWS_DEFAULT_REGION}
+                        --region ${AWS_DEFAULT_REGION}
             """
                 }
             }
