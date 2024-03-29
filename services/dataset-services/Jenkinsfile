@@ -15,6 +15,7 @@ pipeline {
 
         // Define AWS environment variables
         AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_CREDENTIALS_ID = 'AWS_ACCESS_SECRET_KEYS' // Assuming you have this setup in Jenkins credentials
     }
 
     stages {
@@ -23,7 +24,6 @@ pipeline {
                 checkout scm
             }
         }
-
 
         stage('Build and Tag Image') {
             steps {
@@ -36,23 +36,19 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding', 
-                    credentialsId: 'AWS_ACCESS_SECRET_KEYS'
-                ]]) {
-                    bat "aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%"
-                    bat "docker push %ECR_REGISTRY%/%IMAGE_REPO_NAME%:%IMAGE_TAG%"
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
+                    bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    bat "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
                 }
             }
         }
 
-
-        stage('Ensure ECS Cluster Exists') {
+        stage('ECS Cluster') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
                     script {
-                        echo "Creating ECS cluster named ${ECS_CLUSTER_NAME}."
-                        bat "aws ecs create-cluster --cluster-name ${ECS_CLUSTER_NAME}"
+                            echo "Creating ECS cluster named ${ECS_CLUSTER_NAME}."
+                            bat "aws ecs create-cluster --cluster-name ${ECS_CLUSTER_NAME}"
                         }
                     }
                 }
@@ -61,42 +57,31 @@ pipeline {
 
         stage('Register ECS Task Definition') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding', 
-                    credentialsId: 'AWS_ACCESS_SECRET_KEYS'
-                ]]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
                     dir('services/dataset-services') {
-                
-                    bat "aws ecs register-task-definition --cli-input-json file://%ECS_TASK_DEFINITION_FILE% --family %ECS_TASK_FAMILY_NAME%"
+                        bat "aws ecs register-task-definition --cli-input-json file://${ECS_TASK_DEFINITION_FILE} --family ${ECS_TASK_FAMILY_NAME}"
+                    }
                 }
             }
         }
-        }
+
         stage('Deploy to ECS') {
-    steps {
-        withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding', 
-             credentialsId: 'AWS_ACCESS_SECRET_KEYS'
-        ]]) {
-            script {
-                    bat "aws ecs create-service --cluster ${ECS_CLUSTER_NAME} --service-name ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count 1"
-                
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId:'AWS_ACCESS_SECRET_KEYS']]) {
+                    bat "aws ecs create-service --cluster ${ECS_CLUSTER_NAME} --service-name ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count 1 --launch-type FARGATE --network-configuration \"awsvpcConfiguration={subnets=[subnet-id1, subnet-id2],securityGroups=[sg-id],assignPublicIp=ENABLED}\""
+                }
             }
         }
-    }
-}
 
         stage('Test') {
             steps {
                 bat 'echo Running tests...'
-                // Add your actual test commands here.
             }
         }
 
         stage('Deploy') {
             steps {
                 bat 'echo Deploying application...'
-                // Add your actual deploy commands here.
             }
         }
     }
@@ -113,7 +98,3 @@ pipeline {
         }
     }
 }
-
-
-
-
