@@ -24,13 +24,6 @@ pipeline {
             }
         }
 
-        stage('Check Workspace') {
-            steps {
-                dir('services/dataset-services') {
-                    bat "dir"
-                }
-            }
-        }
 
         stage('Build and Tag Image') {
             steps {
@@ -59,6 +52,8 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding', 
                     credentialsId: 'AWS_ACCESS_SECRET_KEYS'
                 ]]) {
+                    dir('services/dataset-services') {
+                
                     bat "aws ecs register-task-definition --cli-input-json file://%ECS_TASK_DEFINITION_FILE% --family %ECS_TASK_FAMILY_NAME%"
                 }
             }
