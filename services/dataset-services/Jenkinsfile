@@ -25,7 +25,7 @@ pipeline {
         ECS_SUBNET_ID = 'subnet-083edf7355995a61f' 
         ECS_SECURITY_GROUP_ID = 'sg-0f5339fdde1858d77' 
     }
-    }
+    
 
     stages {
         stage('Checkout') {
