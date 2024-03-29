@@ -1,9 +1,10 @@
 {
     "family": "test-family",
+    "executionRoleArn": "arn:aws:iam::637423235266:role/ecsTaskExecutionRole",
     "containerDefinitions": [
       {
-        "name": "my-container",
-        "image": "637423235266.dkr.ecr.us-east-1.amazonaws.com/my-image:my-tag",
+        "name": "test-container",
+        "image": "637423235266.dkr.ecr.us-east-1.amazonaws.com/dataset-service:latest",
         "essential": true,
         "memory": 512,
         "cpu": 256,
@@ -34,7 +35,10 @@
         "command": [
           "Start-MyService.ps1"
         ]
+        
       }
     ]
+    
   }
+  
   
