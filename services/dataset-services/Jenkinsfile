@@ -74,7 +74,6 @@ pipeline {
                 --task-definition ${ECS_TASK_FAMILY_NAME} \
                 --desired-count 1 \
                 --launch-type FARGATE \
-                --network-configuration "awsvpcConfiguration={subnets=[subnet-12345abcde,subnet-67890fghij],securityGroups=[sg-12345abcde],assignPublicIp=ENABLED}" \
                 --region ${AWS_DEFAULT_REGION}
             """
                 }
