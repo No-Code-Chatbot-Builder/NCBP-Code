@@ -144,7 +144,6 @@ export class BotService {
         })
         .toPromise(); 
 
-    console.log("response", response)
       context = await this.fetchPineconeMatchText(response.data, workspaceId);
     } catch (error) {
       console.error('Error sending text to server:', error);
@@ -164,7 +163,6 @@ export class BotService {
       model: "gpt-3.5-turbo",
     });
   
-    console.log(myAssistant);
     const threadId = await this.createThreadForAssistant(myAssistant.id, workspace, userId, instruction);
 
     return ["success: True","message: Assistant and thread created successfully", "assistantId: " + myAssistant.id, "threadId: " + threadId];
