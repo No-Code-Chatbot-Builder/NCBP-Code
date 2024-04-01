@@ -26,7 +26,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-socket.io": "^10.3.5",
-    "@nestjs/websockets": "^10.3.5",
+    "@nestjs/websockets": "^10.3.6",
     "@pinecone-database/pinecone": "^2.1.0",
     "aws-jwt-verify": "^4.0.1",
     "aws-sdk": "^2.1574.0",
@@ -34,7 +34,9 @@
     "nest-aws-sdk": "^3.0.1",
     "openai": "^4.29.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "socket.io": "^4.7.5",
+    "stream": "^0.0.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

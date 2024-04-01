@@ -6,28 +6,26 @@ import { BotService } from './bot/bot.service';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly botService: BotService, // Inject BotServiceService
-  ) {}
+    private readonly botService: BotService,
 
+  ) {}
 
   //Creating Assistant and Thread only. It also adds into dynamoDB
   @Post('/bot/:workspaceId/assistant')
   async createAssistantAndThread (@Param('workspaceId') workspaceId: string, @Req() req: Request, @Body() requestBody: { purpose: string}) {
     const {purpose} = requestBody;
     const userId = req['user'].id;
-  
     const response = await this.botService.createAssistant(purpose, workspaceId, userId);
     return { response };
   }
 
    //Sending workspace id to dynamoDb so that it fetches AssitantId and ThreadId to create msg and run
    @Post('/bot/:workspaceId/runAssistant')
-   async runAssistant (@Param('workspaceId') workspaceId: string, @Body() requestBody: { query: string }) {
+   async runAssistant (@Param('workspaceId') workspaceId: string,  @Req() req: Request, @Body() requestBody: { query: string }) {
      const { query } = requestBody;
-     const response = await this.botService.fetchingAssistantIdFromDynamoDB(workspaceId, query);
+     const response = await this.botService.initiateResponseProcess(workspaceId, query);
      return { response };
    }
-
 
   //Connection check
   @Get()
@@ -40,12 +38,12 @@ export class AppController {
     return "Bot Service is working";
   }
 
-//   //Demo
-//   @Post('/gpt')
-//   async handleQuery2() {
-//     const response = await this.botService.demo();
-//     return { response };
-//   }
+  // //Demo
+  // @Post('/gpt')
+  // async handleQuery2() {
+  //   const response = await this.botService.demo();
+  //   return { response };
+  // }
 
 //   //Create Assistant - complete cycle in one go 
 //   //This API will create assistant, thread, message, and run, all in one go

@@ -4,28 +4,29 @@ import OpenAI from "openai";
 import { DynamoDbService } from 'src/dynamo-db/dynamo-db.service';
 import { HttpService } from '@nestjs/axios';
 import { Pinecone, QueryResponse } from '@pinecone-database/pinecone';
+import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer } from '@nestjs/websockets';
+import { Server } from 'socket.io';
 
-@Injectable()
+@WebSocketGateway()
 export class BotService {
-  
+  @WebSocketServer() server: Server;
+
     constructor(private dynamoDbService: DynamoDbService, private configService: ConfigService, private httpService: HttpService,) 
-    {
-        
-    }  
+    {}  
     
-    async demo()
-    {
+    async demo() {
+      console.log("hello")
         const openai = new OpenAI();
         const completion = await openai.chat.completions.create({
             messages: [{ role: "system", content: "Can you tell me what exactly Compiler Construction is?" }],
             model: "gpt-3.5-turbo",
           });
-        
-          return (completion.choices[0]);
-          //console.log(completion.choices[0]);
-    }
 
-    async createAssistantOnly (){
+          console.log(completion.choices[0]);
+          return (completion.choices[0]);
+        }
+
+    async createAssistantOnly () {
       const openai = new OpenAI();
       const myAssistant = await openai.beta.assistants.create({
         instructions:
@@ -39,13 +40,12 @@ export class BotService {
       this.createThread(myAssistant.id);
     }
 
-    async ListAssistants (){
+    async ListAssistants () {
       const openai = new OpenAI();
       const myAssistants = await openai.beta.assistants.list({
         limit: 1,
       });
-    
-      console.log(myAssistants.data);
+    console.log(myAssistants.data);
     }
 
     async retrieveAssistant(assistantId: string){
@@ -83,41 +83,41 @@ export class BotService {
         role: "user",
         content: query,
       });
-    
-      //console.log(myMessage);
-      return(this.createRun(threadId, assistantId, query));
+      return(this.createRunAndStream(threadId, assistantId, query));
     }
 
-
-    async createRun (threadId: string, assistantId: string, query: string) {
+    async createRunAndStream(threadId: string, assistantId: string, query: string) {
       const openai = new OpenAI();
-      const myRun = await openai.beta.threads.runs.create(threadId, {
+      const stream = openai.beta.threads.runs.createAndStream(threadId, {
         assistant_id: assistantId,
         instructions: query,
       });
-
-     // console.log(myRun);
     
-      return(this.createResponse(myRun.id, threadId));
+      stream.on('textCreated', (text) => {
+        this.server.emit('gptResponse', { event: 'textCreated', data: text });
+      });
+    
+      stream.on('textDelta', (textDelta, snapshot) => {
+        this.server.emit('gptResponse', { event: 'textDelta', data: textDelta.value });
+      });
+    
+      stream.on('toolCallCreated', (toolCall) => {
+        this.server.emit('gptResponse', { event: 'toolCallCreated', data: toolCall });
+      });
+    
+      stream.on('toolCallDelta', (toolCallDelta, snapshot) => {
+        if (toolCallDelta.type === 'code_interpreter') {
+          const outputData = {
+            input: toolCallDelta.code_interpreter.input,
+            outputs: toolCallDelta.code_interpreter.outputs,
+          };
+          this.server.emit('gptResponse', { event: 'toolCallDelta', data: outputData });
+        }
+      });
     }
-
-    async createResponse(runId, threadId) {
-      const openai = new OpenAI();
-      const interval = 1000; // Set the interval to 1 second (adjust as needed)
+    
   
-      while (true) { // Run indefinitely until completion
-          const run = await openai.beta.threads.runs.retrieve(threadId, runId);
-  
-          if (run.status === 'completed') {
-              const messagesFromThread = await openai.beta.threads.messages.list(threadId);
-              return(messagesFromThread.data[0].content[0]["text"]["value"]);
-          }  
-          await new Promise(resolve => setTimeout(resolve, interval));
-      }
-  }
-
-  
-  async pineConeEmbeddingOfQuery (query: number[]) {
+  async fetchPineconeMatchText (query: number[], workspaceId: string) {
     const apiKey: string = this.configService.get<string>('PINECONE_API_KEY');
     const pc: Pinecone = new Pinecone({ apiKey: apiKey });
     const index = pc.index("test");
@@ -126,38 +126,33 @@ export class BotService {
         vector: query,
         topK: 1,
         includeMetadata: true,
+        filter: {
+          workspaceId: workspaceId 
+        }
     });
-
     //console.log("query response", queryResponse.matches[0].metadata.text);
     return queryResponse.matches[0].metadata.text;
 }
 
-  async fetchingAssistantIdFromDynamoDB (workspaceId: string, query: string) {
-
+  async initiateResponseProcess (workspaceId: string, query: string) {
     let context;
 
     try {
       const response = await this.httpService
         .post('http://localhost:80/queryVectorEmbeddings', {
-          text: query // Replace with actual texts
+          text: query 
         })
-        .toPromise(); // Convert Observable to Promise
+        .toPromise(); 
 
-      //this.pineconeService.upsertRecords(response.data, userId, workspaceId, datasetId);
-      //console.log(response)
-      context = await this.pineConeEmbeddingOfQuery(response.data);
+    console.log("response", response)
+      context = await this.fetchPineconeMatchText(response.data, workspaceId);
     } catch (error) {
       console.error('Error sending text to server:', error);
     }
-    const data = await this.dynamoDbService.fetchingDataFromDynamoDB(workspaceId);
-    const prompt = "The following text is the query:\n" + query  + "\n\nPlease answer while staying in the following context:\n" + context
-    //console.log(prompt)
-    //console.log(data.datasets[0].assistantId);
-    //console.log(data.datasets[0].threadId);
-    //console.log(query);
+    const data = await this.dynamoDbService.fetchingDataFromDB(workspaceId);
+    const prompt = "The following text is the query:\n" + query  + "\n\nPlease answer while staying in the following context:\n" + context;
     return(this.createMessage(data.datasets[0].threadId, data.datasets[0].assistantId, prompt));
   }
-
 
   //Only Assistant with Thread
   async createAssistant (instruction: string, workspace: string, userId: string) {
@@ -171,11 +166,9 @@ export class BotService {
   
     console.log(myAssistant);
     const threadId = await this.createThreadForAssistant(myAssistant.id, workspace, userId, instruction);
-  
-    // Return an array containing both assistant ID and thread ID
+
     return ["success: True","message: Assistant and thread created successfully", "assistantId: " + myAssistant.id, "threadId: " + threadId];
   } catch (error) {
-    // Handle errors if any
     throw new Error(`Error creating assistant: ${error.message}`);
   }
   
@@ -186,13 +179,31 @@ export class BotService {
       const createdAt = new Date().toISOString();
       const openai = new OpenAI();
       const myThread = await openai.beta.threads.create({});
-      this.dynamoDbService.addDataToDynamoDB(workspace, assistantId, myThread.id, userId, createdAt, instruction);
+      this.dynamoDbService.addDataToDB(workspace, assistantId, myThread.id, userId, createdAt, instruction);
     
       console.log(myThread);
       return myThread.id;
     } catch (error) {
-      // Handle errors if any
       throw new Error(`Error creating thread for assistant: ${error.message}`);
+    }
+  }
+
+  @SubscribeMessage('botService')
+  async handleGptRequest(@MessageBody() rawData: any) {
+    try {
+      const data = JSON.parse(rawData);
+      console.log("Received data:", data);
+      const workspaceId = data.workspaceId;
+      const query = data.query;
+
+      if (!workspaceId || !query) {
+        console.error('Field is undefined!');
+        return;
+      }
+      
+      this.initiateResponseProcess(workspaceId, query);
+    } catch (error) {
+      console.error('Error parsing data:', error);
     }
   }
 }

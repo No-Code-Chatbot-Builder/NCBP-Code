@@ -6,20 +6,14 @@ import { ConfigService } from '@nestjs/config';
 export class DynamoDbService {
     private dynamodb: AWS.DynamoDB.DocumentClient;
     private tableName = this.configService.get<string>('DYNAMODB_TABLE_NAME');
-    //private botService: BotService;
   
-    constructor(
-      private configService: ConfigService,
-      
-    ) {
-      // Inject S3Service) {
-      // Initialize the DynamoDB DocumentClient
+    constructor(private configService: ConfigService) {
       this.dynamodb = new AWS.DynamoDB.DocumentClient({
         region: 'us-east-1'
       });
     }
   
-    async addDataToDynamoDB(workspaceId: string, assistantId: string, threadId: string, createdBy: string, createdAt: string, instruction: string): Promise<any> {
+    async addDataToDB(workspaceId: string, assistantId: string, threadId: string, createdBy: string, createdAt: string, instruction: string): Promise<any> {
       const params = {
         TableName: this.tableName,
         Item: {
@@ -47,7 +41,6 @@ export class DynamoDbService {
             createdAt: createdAt
           }
         };
-    
         return response;
       } catch (error) {
         throw new Error(`Unable to create thread: ${error.message}`);
@@ -55,7 +48,7 @@ export class DynamoDbService {
     }
 
 
-    async fetchingDataFromDynamoDB (workspaceId: string): Promise<any> {
+    async fetchingDataFromDB (workspaceId: string): Promise<any> {
         const params = {
             TableName: this.tableName,
             KeyConditionExpression: 'PK = :pk',
@@ -78,9 +71,7 @@ export class DynamoDbService {
                 assistantId: item.assistantId,
                 threadId: item.threadId,
                 createdAt: item.createdAt,
-                createdBy: item.createdBy,
-                
-                
+                createdBy: item.createdBy
               }))
             };
             return response;
