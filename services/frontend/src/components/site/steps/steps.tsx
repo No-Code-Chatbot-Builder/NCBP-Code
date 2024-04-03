@@ -20,11 +20,14 @@ const Steps = ({ title, description, className, stepCard }: Props) => {
       )}
     >
       {/* Shading Effect: Behind the Image */}
-      <div className="absolute inset-0 -z-50">
-        <div className="hidden dark:block">
-          <div className="absolute top-10 -left-10  w-full h-full bg-primary/10 rounded-full mix-blend-multiply  filter blur-3xl opacity-50 animate-blob" />
-          <div className="absolute top-10 -right-10  w-1/2  bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opactity-50 animate-blob animation-delay-2000" />
-        </div>
+      <div className="-z-50 absolute inset-0">
+        {className ? (
+          <div className="absolute top-5 right-32 w-1/4 h-full bg-primary/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
+        ) : (
+          <div className="">
+            <div className="absolute top-5 left-32 w-1/4 h-full bg-primary/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
+          </div>
+        )}
       </div>
       <div className={cn("", className)}>
         <BentoGridItem
@@ -37,8 +40,10 @@ const Steps = ({ title, description, className, stepCard }: Props) => {
         />
       </div>
       <div className={cn("flex flex-col gap-4", className ? "lg:mx-20" : "")}>
-        <h1 className="text-xl lg:text-3xl font-bold">{title}</h1>
-        <p className="text-sm lg:text-md leading-normal text-muted-foreground w-full lg:w-full">
+        <h1 className="text-3xl lg:text-4xl font-bold text-secondary">
+          {title}
+        </h1>
+        <p className="text-sm lg:text-lg leading-normal text-muted-foreground w-full lg:w-full">
           {description}
         </p>
       </div>

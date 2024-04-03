@@ -18,6 +18,7 @@ export const createAssistantWithThread = async (
       })
     );
   } catch (error) {
+    console.log(error);
     toast(
       CustomToast({
         title: "Error",
@@ -41,6 +42,7 @@ export const runAssistant = async (workspaceName: string, query: string) => {
       })
     );
   } catch (error) {
+    console.log(error);
     toast(
       CustomToast({
         title: "Error",
