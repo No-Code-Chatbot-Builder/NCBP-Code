@@ -13,7 +13,7 @@ export class DynamoDbService {
       });
     }
   
-    async addDataToDB(workspaceId: string, assistantId: string, threadId: string, createdBy: string, createdAt: string, instruction: string): Promise<any> {
+    async createAssistantRecord(workspaceId: string, assistantId: string, threadId: string, createdBy: string, createdAt: string, instruction: string): Promise<any> {
       const params = {
         TableName: this.tableName,
         Item: {
@@ -48,7 +48,7 @@ export class DynamoDbService {
     }
 
 
-    async fetchingDataFromDB (workspaceId: string): Promise<any> {
+    async getAssistantRecord (workspaceId: string): Promise<any> {
         const params = {
             TableName: this.tableName,
             KeyConditionExpression: 'PK = :pk',

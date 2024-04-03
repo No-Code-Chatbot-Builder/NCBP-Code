@@ -12,20 +12,20 @@ export class AppController {
 
   //Creating Assistant and Thread only. It also adds into dynamoDB
   @Post('/bot/:workspaceId/assistant')
-  async createAssistantAndThread (@Param('workspaceId') workspaceId: string, @Req() req: Request, @Body() requestBody: { purpose: string}) {
-    const {purpose} = requestBody;
+  async createAssistantAndThread (@Param('workspaceId') workspaceId: string, @Req() req: Request, @Body() requestBody: { purpose: string, assistantName: string, tool: any, models: string}) {
+    const {purpose, assistantName, tool, models} = requestBody;
     const userId = req['user'].id;
-    const response = await this.botService.createAssistant(purpose, workspaceId, userId);
+    const response = await this.botService.createAssistant(purpose, workspaceId, userId, assistantName, tool, models);
     return { response };
   }
 
    //Sending workspace id to dynamoDb so that it fetches AssitantId and ThreadId to create msg and run
-   @Post('/bot/:workspaceId/runAssistant')
-   async runAssistant (@Param('workspaceId') workspaceId: string,  @Req() req: Request, @Body() requestBody: { query: string }) {
-     const { query } = requestBody;
-     const response = await this.botService.initiateResponseProcess(workspaceId, query);
-     return { response };
-   }
+  //  @Post('/bot/:workspaceId/runAssistant')
+  //  async runAssistant (@Param('workspaceId') workspaceId: string,  @Req() req: Request, @Body() requestBody: { query: string }) {
+  //    const { query } = requestBody;
+  //    const response = await this.botService.initiateResponseProcess(workspaceId, query);
+  //    return { response };
+  //  }
 
   //Connection check
   @Get()
