@@ -156,37 +156,34 @@ export default function Home() {
     <>
       {/**Grid and Linear Gradient */}
       <section className="absolute inset-0 z-0">
-        <div className="h-[50rem] w-full dark:bg-grid-white/[0.1] bg-grid-black/[0.1] relative flex items-center justify-center">
-          <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-gradient-to-b from-[#1C65EE]/60 to-bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_10%,black)]" />
+        <div className="h-[50rem] w-full dark:bg-dot-white/[0.1] bg-dot-black/[0.1] relative flex items-center justify-center">
+          <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-gradient-to-b from-[#1C65EE]/50 to-bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_40%,black)]" />
         </div>
       </section>
       {/**Header Section */}
       <section className="relative z-10">
-        <div className="flex flex-col gap-y-5 mt-10  p-10 text-center items-center z-20 bg-clip-text">
+        <div className="flex flex-col gap-y-6 mt-10 p-0 lg:p-10 text-center items-center z-20 bg-clip-text">
           <MovingButton
             borderRadius="1.75rem"
-            className="hidden md:block p-3 border border-primary rounded-full text-sm bg-info text-info-foreground"
+            className="p-3 border border-primary rounded-full text-sm bg-info text-info-foreground"
           >
             NoCodeBot.ai is currently in Development Mode.{" "}
-            <Link className="underline" href={"/features"}>
-              Learn More
-            </Link>
           </MovingButton>
 
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
-            <h1 className="text-5xl lg:text-7xl font-bold text-center">
+            <h1 className="text-6xl lg:text-8xl font-bold text-center">
               Make Custom AI Assistants
             </h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-lg">
             Easily create custom AI Agents according to your specific longterm
-            needs - no coding required
+            needs.
           </p>
 
           <Link href="/sign-in">
             <Button
               size={"lg"}
-              className="w-fit flex flex-row gap-2 rounded-lg"
+              className="w-fit flex flex-row gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-10 py-6"
             >
               <LogIn />
               Get Started Now
@@ -210,14 +207,14 @@ export default function Home() {
       </section>
       {/**Features Section */}
       <section className="relative z-10 flex justify-center items-center flex-col gap-4 mt-4 md:mt-20 lg:gap-10">
-        <h2 className="text-4xl lg:text-5xl font-bold text-center mt-10 lg:my-14 leading-tight">
+        <h2 className="text-5xl font-bold text-center my-14 leading-tight px-10 text-secondary">
           What can NoCodeBot.ai do?
         </h2>
         <Features />
       </section>
       {/**Steps Section */}
       <section className="z-10 flex-col gap-4 mt-20 justify-center px-4 xl:px-48">
-        <h2 className="text-4xl lg:text-5xl font-bold text-center mt-10 lg:my-14 leading-tight">
+        <h2 className="text-5xl font-bold text-center my-14 leading-tight text-secondary">
           Get Started Now!
         </h2>
 
@@ -263,8 +260,8 @@ export default function Home() {
         </div>
         {/**Early Access Section */}
         <div className="grid gap-12 w-9/12 lg:w-8/12 mx-auto my-32">
-          <h1 className="text-4xl font-bold text-center">
-            Get Early Access and Notified On Launch Day
+          <h1 className="text-5xl font-bold text-center text-secondary">
+            Join the Waitlist
           </h1>
           <div className="flex gap-4">
             <Input
@@ -274,7 +271,7 @@ export default function Home() {
             <Button className="rounded-lg p-6">Subscribe</Button>
           </div>
         </div>
-        <div className="">
+        <div className="hidden">
           <Button onClick={logout}>Sign Out</Button>
           <div>
             {isLoggedIn ? <div>logged in atm</div> : <div>logged out</div>}
