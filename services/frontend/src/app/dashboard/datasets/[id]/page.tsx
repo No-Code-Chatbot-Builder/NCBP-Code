@@ -29,10 +29,12 @@ import {
   getDatasetById,
   updateDataset,
 } from "@/providers/redux/slice/datasetSlice";
-import { Plus, Users } from "lucide-react";
+import { Plus, Trash, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { format } from "date-fns";
+import { toast } from "sonner";
+import CustomToast from "@/components/global/custom-toast";
 
 type Props = {
   params: {
@@ -56,13 +58,13 @@ const DatasetByIdPage = ({ params }: Props) => {
     const fetchData = async () => {
       if (!dataset) return;
       const res = await fetchFiles(workspaceName, params.id);
-      if (!res.data.length) return;
+      if (!res?.data?.length) return;
 
       const updatedFileArray = res.data.map((item: any) => ({
         id: item.dataId,
         name: item.name,
         path: item.path,
-        createdAt: format(new Date(item.createdAt), "MM-dd-YY"),
+        createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
         createdBy: item.createdBy,
       }));
 
@@ -71,7 +73,7 @@ const DatasetByIdPage = ({ params }: Props) => {
           id: res.datasetDetails.datasetId,
           name: res.datasetDetails.name,
           description: res.datasetDetails.description,
-          createdAt: format(new Date(res.datasetDetails.createdAt), "MM-dd-YY"),
+          createdAt: format(new Date(res.datasetDetails.createdAt), "MM-dd-yy"),
           createdBy: res.datasetDetails.createdBy,
           data: updatedFileArray,
         })
@@ -79,10 +81,37 @@ const DatasetByIdPage = ({ params }: Props) => {
     };
 
     fetchData();
-  }, [dataset, dispatch, params.id, workspaceName]);
+  }, []);
+
+
+  const handleDataDeletion = async (
+    dataId: string,
+    datasetName: string
+  ) => {
+    try {
+      // Placeholder for actual deletion logic
+      // await deleteDataset(workspaceName,datasetId);
+      // dispatch(removeDataset(datasetId));
+      toast(
+        CustomToast({
+          title: `${datasetName} Deleted`,
+          description: `${datasetName} has been deleted successfully.`,
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the dataset. Please try again.",
+        })
+      );
+      console.error(error);
+    }
+  };
 
   if (!dataset) {
-    return <div>Dataset not found</div>;
+    return <div className="text-center">Dataset not found</div>;
   }
 
   const addDataSheet = (
@@ -98,12 +127,18 @@ const DatasetByIdPage = ({ params }: Props) => {
     <main className="flex flex-col gap-10">
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
-          <div className="flex flex-col gap-4 w-5/6 mr-10">
+          <div className="flex flex-col gap-2 w-5/6 mr-10">
             <h1 className="text-secondary text-3xl font-bold">
               {dataset.name}
             </h1>
             <p className="text-md text-muted-foreground hidden md:block">
               {dataset.description}
+            </p>
+            <p className="text-md text-muted-foreground hidden md:block">
+              Date Created : {dataset.createdAt}
+            </p>
+            <p className="text-md text-muted-foreground hidden md:block">
+              Created By : {dataset.createdBy}
             </p>
           </div>
           <Button
@@ -122,13 +157,24 @@ const DatasetByIdPage = ({ params }: Props) => {
       <section>
         <div className="grid gap-8">
           <h1 className="text-2xl font-bold">Quick Access</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {dataset.data?.map((qa: DataBucketType) => (
               <Card key={qa.id}>
-                <CardHeader>
-                  <CardTitle>{qa.name}</CardTitle>
-                  <CardDescription></CardDescription>
-                </CardHeader>
+                <div className="flex justify-between items-center mr-4">
+                  <CardHeader>
+                    <CardTitle>{qa.name}</CardTitle>
+                    <CardDescription>Description</CardDescription>
+                  </CardHeader>
+                  <Button
+                    size="icon"
+                    variant={"destructive"}
+                    onClick={() => {
+                      handleDataDeletion(dataset.id, dataset.name);
+                    }}
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
+                </div>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
                     {qa.createdAt}

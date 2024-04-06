@@ -1,6 +1,14 @@
-import { apiClient } from "../apiService";
+// import { apiClient } from "../apiService";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
+import axios from "axios";
+
+const BASE_URL = "http://localhost:3004";
+
+export const apiClient = axios.create({
+  baseURL: BASE_URL,
+  // timeout : 10000,
+});
 
 export const createAssistantWithThread = async (
   workspaceName: string,
@@ -8,7 +16,7 @@ export const createAssistantWithThread = async (
 ) => {
   try {
     const response = await apiClient.post(`/bot/${workspaceName}/assistant`, {
-      purpose,
+      purpose: purpose,
     });
 
     toast(
@@ -17,6 +25,7 @@ export const createAssistantWithThread = async (
         description: "Assistant created successfully.",
       })
     );
+    return response.data;
   } catch (error) {
     toast(
       CustomToast({
@@ -29,17 +38,20 @@ export const createAssistantWithThread = async (
 
 export const runAssistant = async (workspaceName: string, query: string) => {
   try {
+    console.log("running...")
+    console.log(workspaceName, query);
     const response = await apiClient.post(
-      `/datasets/:${workspaceName}/runAssistant`,
-      { query }
+      `/bot/${workspaceName}/runAssistant`,
+      { query: query }
     );
-
+    console.log(response);
     toast(
       CustomToast({
         title: "Success",
-        description: "Datasets fetched successfully.",
+        description: "Assistant responded successfully.",
       })
     );
+    return response.data;
   } catch (error) {
     toast(
       CustomToast({

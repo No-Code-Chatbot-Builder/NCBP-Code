@@ -17,7 +17,7 @@ import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
@@ -46,17 +46,25 @@ const CreateAssistantForm = () => {
       description: "",
     },
   });
+  
+  const workspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await createAssistantWithThread(values.name,values.description);
+      const res = await createAssistantWithThread(workspaceName,values.description);
+      console.log(res.response);
+      console.log(res.response[3]);
+
       //updating state, showing toast, closing model
       dispatch(
         addAssistant({
-          id: uuid(),
+          id : res.response[2].assistantId,
           name: values.name,
           description: values.description,
           owner: "currentuser",
+          threadId : res.response[3].threadId,
         })
       );
       setClose();

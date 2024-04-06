@@ -14,10 +14,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { fetchDatasets } from "@/lib/api/dataset/service";
+import { deleteDataset, fetchDatasets } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { setDatasets } from "@/providers/redux/slice/datasetSlice";
+import { removeDataset, setDatasets } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
 import { Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -43,13 +43,13 @@ export default function Page() {
 
   useEffect(() => {
     const fetchCurrentDatasets = async () => {
+      console.log(workspaceName);
       const res = await fetchDatasets(workspaceName);
-      if (datasets.length !== res.datasets.length) {
-        dispatch(setDatasets(res.datasets));
-      }
+      dispatch(setDatasets(res.datasets));
     };
+
     fetchCurrentDatasets();
-  }, []);
+  }, [workspaceName]);
 
   const handleDatasetDeletion = async (
     datasetId: string,
@@ -57,8 +57,8 @@ export default function Page() {
   ) => {
     try {
       // Placeholder for actual deletion logic
-      // await deleteDataset(datasetId);
-      // dispatch(removeDataset(datasetId));
+      await deleteDataset(workspaceName,datasetId);
+      dispatch(removeDataset(datasetId));
       toast(
         CustomToast({
           title: `${datasetName} Deleted`,
@@ -110,7 +110,7 @@ export default function Page() {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
           {datasets.length > 0 ? (
             datasets.map((dataset: DatasetType) => (
-              <Card key={dataset.name}>
+              <Card key={dataset.id}>
                 <CardHeader>
                   <div className="flex justify-between">
                     <div className="flex flex-col gap-1">

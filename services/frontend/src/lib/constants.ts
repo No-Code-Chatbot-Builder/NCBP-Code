@@ -141,6 +141,7 @@ export type AssistantType = {
   name: string;
   description: string;
   owner: string;
+  threadId : string;
 };
 
 export type DataBucketType = {
@@ -156,7 +157,7 @@ export type DatasetType = {
   name: string;
   description: string;
   data: DataBucketType[];
-  createdBy: string;
+  createdBy: string | undefined;
   createdAt: string;
 };
 

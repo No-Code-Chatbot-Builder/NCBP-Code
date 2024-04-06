@@ -1,7 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+export interface ChatState {
+  content: string;
+  role: string;
+}
+
 interface ChatbotState {
-  messages: string[];
+  messages: ChatState[];
 }
 
 const initialState: ChatbotState = {
@@ -12,12 +17,15 @@ export const chatbotSlice = createSlice({
   name: "chatbot",
   initialState,
   reducers: {
-    addMessage: (state, action: PayloadAction<string>) => {
+    addMessage: (state, action: PayloadAction<ChatState>) => {
       state.messages.push(action.payload);
+    },
+    updateMessage: (state, action: PayloadAction<string>) => {
+      state.messages[state.messages.length - 1].content += action.payload;
     },
   },
 });
 
-export const { addMessage } = chatbotSlice.actions;
+export const { addMessage ,updateMessage} = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;

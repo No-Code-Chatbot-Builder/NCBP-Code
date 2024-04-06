@@ -9,7 +9,7 @@ export const createDataset = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/datasets/${currentWorkspaceName}/dataset/`,
+      `/dataset-service/datasets/${currentWorkspaceName}/dataset/`,
       { name: name, description: description }
     );
 
@@ -25,9 +25,35 @@ export const createDataset = async (
     toast(
       CustomToast({
         title: "Error",
-        description: `Error creating Dataset. ${
-          error.response?.data?.message || error.message
-        }`,
+        description: `Error creating Dataset. ${error.response?.data?.message || error.message
+          }`,
+      })
+    );
+  }
+};
+
+
+export const deleteDataset = async (
+  currentWorkspaceName: string,
+  datasetId: string,
+) => {
+  try {
+    const response = await apiClient.delete(
+      `/dataset-service/datasets/${currentWorkspaceName}/dataset/${datasetId}`);
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "Dataset deleted successfully.",
+      })
+    );
+    return response.data;
+  } catch (error: any) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: `Error deleting Dataset. ${error.response?.data?.message || error.message
+          }`,
       })
     );
   }
@@ -35,7 +61,7 @@ export const createDataset = async (
 
 export const fetchDatasets = async (workspaceName: string) => {
   try {
-    const response = await apiClient.get(`/datasets/${workspaceName}/`);
+    const response = await apiClient.get(`/dataset-service/datasets/${workspaceName}/`);
     toast(
       CustomToast({
         title: "Success",
@@ -48,18 +74,18 @@ export const fetchDatasets = async (workspaceName: string) => {
     toast(
       CustomToast({
         title: "Error",
-        description: `Error fetching Dataset. ${
-          error.response?.data?.message || error.message
-        }`,
+        description: `Error fetching Dataset. ${error.response?.data?.message || error.message
+          }`,
       })
     );
   }
 };
 
 export const fetchFiles = async (workspaceName: string, datasetId: string) => {
+  console.log(workspaceName, datasetId);
   try {
     const response = await apiClient.get(
-      `/datasets/${workspaceName}/${datasetId}`
+      `/dataset-service/datasets/${workspaceName}/${datasetId}`
     );
 
     toast(
@@ -68,15 +94,15 @@ export const fetchFiles = async (workspaceName: string, datasetId: string) => {
         description: "Dataset fetched successfully.",
       })
     );
+    console.log(response.data);
     return response.data;
   } catch (error: any) {
     console.log(error);
     toast(
       CustomToast({
         title: "Error",
-        description: `Error fetching Dataset. ${
-          error.response?.data?.message || error.message
-        }`,
+        description: `Error fetching Dataset. ${error.response?.data?.message || error.message
+          }`,
       })
     );
   }
@@ -89,7 +115,7 @@ export const addData = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/datasets/${workspaceName}/${datasetId}/data`,
+      `/dataset-service/datasets/${workspaceName}/${datasetId}/data`,
       data
     );
     toast(
@@ -104,9 +130,8 @@ export const addData = async (
     toast(
       CustomToast({
         title: "Error",
-        description: `Error adding Data. ${
-          error.response?.data?.message || error.message
-        }`,
+        description: `Error adding Data. ${error.response?.data?.message || error.message
+          }`,
       })
     );
   }
@@ -119,7 +144,7 @@ export const getData = async (
 ) => {
   try {
     const response = await apiClient.get(
-      `/datasets/:${workspaceName}/${datasetId}/data/${dataId}`
+      `/dataset-service/datasets/${workspaceName}/${datasetId}/data/${dataId}`
     );
     toast(
       CustomToast({
@@ -127,14 +152,14 @@ export const getData = async (
         description: "Data fetched successfully.",
       })
     );
+    return response.data;
   } catch (error: any) {
     console.log(error);
     toast(
       CustomToast({
         title: "Error",
-        description: `Error fetching Data. ${
-          error.response?.data?.message || error.message
-        }`,
+        description: `Error fetching Data. ${error.response?.data?.message || error.message
+          }`,
       })
     );
   }

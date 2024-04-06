@@ -23,6 +23,7 @@ import { addDataset } from "@/providers/redux/slice/datasetSlice";
 import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import { createDataset } from "@/lib/api/dataset/service";
+import { useCustomAuth } from "@/providers/auth-provider";
 
 const CreateDatasetForm = () => {
   const dispatch = useAppDispatch();
@@ -30,6 +31,8 @@ const CreateDatasetForm = () => {
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
+
+  const user = useCustomAuth().user;
 
   const FormSchema = z.object({
     name: z
@@ -56,14 +59,15 @@ const CreateDatasetForm = () => {
         values.name,
         values.description
       );
+      
       //updating state, showing toast, closing model
       dispatch(
         addDataset({
-          id: res.id,
-          name: res.name,
-          description: res.description,
-          createdAt: res.createdAt,
-          createdBy: res.createdBy,
+          id: res.datasetDetails.datasetId,
+          name: res.datasetDetails.name,
+          description: res.datasetDetails.description,
+          createdAt: new Date().toISOString(),
+          createdBy: user?.sub,
           data: [],
         })
       );

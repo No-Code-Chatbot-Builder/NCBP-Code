@@ -4,6 +4,7 @@ const BASE_URL = "http://localhost:8080";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
+  // timeout : 10000,
 });
 
 apiClient.interceptors.request.use(
