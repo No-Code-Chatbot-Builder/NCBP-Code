@@ -3,7 +3,6 @@
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getAssistantById } from "@/providers/redux/slice/assistantSlice";
 import React, { useEffect } from "react";
-
 import { Input } from "@/components/ui/input";
 import { Send, User } from "lucide-react";
 import Image from "next/image";
@@ -11,7 +10,9 @@ import { useForm } from "react-hook-form";
 import { Socket, io } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 import { ChatState, addMessage, updateMessage } from "@/providers/redux/slice/chatbotSlice";
-
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 
 type Props = {
@@ -30,21 +31,49 @@ const UserMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-const ChatbotMessage = ({ message }: { message: string }) => (
-  <div>
-    <div className="flex items-center gap-2">
-      <Image
-        src="/assets/ncbai.svg"
-        alt="Chatbot"
-        width={40}
-        height={40}
-        className="w-4 h-4"
-      />
-      <p className="text-lg font-bold">Bot</p>
+const customStyle = {
+  lineHeight: '1.5',
+  fontSize: '1rem',
+  borderRadius: '5px',
+  backgroundColor: '#000000',
+  padding: '20px'
+};
+
+const ChatbotMessage = ({ message }: { message: string }) => {
+  const hasCode = message.includes('<code>') && message.includes('</code>');
+  let chunks: string[] = [message];
+  if (hasCode) {
+    chunks = message.split(/(<code>[\s\S]*?<\/code>)/g);
+  }
+  return (
+    <div className="mb-4">
+      <div className="flex items-center gap-2">
+        <Image
+          src="/assets/ncbai.svg"
+          alt="Chatbot"
+          width={40}
+          height={40}
+          className="w-4 h-4"
+        />
+        <p className="text-lg font-bold">Bot</p>
+      </div>
+      {chunks.map((chunk, index) => {
+        if (hasCode && chunk.startsWith('<code>') && chunk.endsWith('</code>')) {
+          const codeContent = chunk.slice(7, -8);
+          return (
+            <SyntaxHighlighter key={index} language="javascript" style={vscDarkPlus} customStyle={customStyle} showLineNumbers>
+              {codeContent}
+            </SyntaxHighlighter>
+          );
+        } else {
+          return <p key={index}>{chunk}</p>;
+        }
+      })}
     </div>
-    <p>{message}</p>
-  </div>
-);
+  );
+};
+
+
 
 const AssistantIdByPage = ({ params }: Props) => {
   const messages = useAppSelector((state) => state.chatbot.messages);
