@@ -6,6 +6,9 @@ import {
   Settings,
   Star,
   Zap,
+  CookingPot,
+  Bell,
+  ShoppingBag
 } from "lucide-react";
 
 export type StepCard = {
@@ -37,6 +40,10 @@ export const icons = [
     value: "datasets",
     label: "Datasets",
     path: Database,
+  },{
+    value: "finetune",
+    label: "Fine Tune",
+    path: CookingPot,
   },
   {
     value: "apikeys",
@@ -52,6 +59,16 @@ export const icons = [
     value: "settings",
     label: "Settings",
     path: Settings,
+  },
+  {
+    value: "notifications",
+    label: "Notifications",
+    path: Bell,
+  },
+  {
+    value: "tools",
+    label: "Tools",
+    path: ShoppingBag ,
   },
 ];
 
@@ -126,8 +143,12 @@ export const sidebarOpt: SidebarOption[] = [
       { name: "Featured", icon: "featured", link: "/dashboard/featured" },
       { name: "Assistants", icon: "assistants", link: "/dashboard/assistants" },
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
+      { name: "Fine Tuning", icon: "finetune", link: "/dashboard/finetune" },
       { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
+      { name: "Notifications", icon: "notifications", link: "/dashboard/notifications" },
+      { name: "Tools", icon: "tools", link: "/dashboard/tools" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
+
     ],
   },
   {

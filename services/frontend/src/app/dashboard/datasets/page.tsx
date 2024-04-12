@@ -19,13 +19,14 @@ import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { removeDataset, setDatasets } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Plus, Trash } from "lucide-react";
+import { Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Page() {
   const dispatch = useAppDispatch();
+  const [loader, setLoader] = useState(true);
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
   const workspaceName = useAppSelector(
@@ -49,6 +50,7 @@ export default function Page() {
     };
 
     fetchCurrentDatasets();
+    setLoader(false);
   }, [workspaceName]);
 
   const handleDatasetDeletion = async (
@@ -57,7 +59,7 @@ export default function Page() {
   ) => {
     try {
       // Placeholder for actual deletion logic
-      await deleteDataset(workspaceName,datasetId);
+      await deleteDataset(workspaceName, datasetId);
       dispatch(removeDataset(datasetId));
       toast(
         CustomToast({
@@ -76,7 +78,6 @@ export default function Page() {
       console.error(error);
     }
   };
-
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -106,50 +107,55 @@ export default function Page() {
         </div>
         <Separator className="mt-8" />
       </section>
-      <section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-          {datasets.length > 0 ? (
-            datasets.map((dataset: DatasetType) => (
-              <Card key={dataset.id}>
-                <CardHeader>
-                  <div className="flex justify-between">
-                    <div className="flex flex-col gap-1">
-                      <CardTitle>{dataset.name}</CardTitle>
-                      <CardDescription>{dataset.description}</CardDescription>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant={"destructive"}
-                      onClick={() => {
-                        handleDatasetDeletion(dataset.id, dataset.name);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
+      {
+        loader ? <div className="flex justify-center items-center w-full">
+          <Loader2 className="w-20 h-20 animate-spin" />
+        </div> :
+          <section>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+              {datasets.length > 0 ? (
+                datasets.map((dataset: DatasetType) => (
+                  <Card key={dataset.id}>
+                    <CardHeader>
+                      <div className="flex justify-between">
+                        <div className="flex flex-col gap-1">
+                          <CardTitle>{dataset.name}</CardTitle>
+                          <CardDescription>{dataset.description}</CardDescription>
+                        </div>
+                        <Button
+                          size="icon"
+                          variant={"destructive"}
+                          onClick={() => {
+                            handleDatasetDeletion(dataset.id, dataset.name);
+                          }}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
 
-                <div className="flex gap-4 px-4">
-                  <PdfIcon className="w-12" />
-                  <JsonIcon className="w-12" />
-                </div>
-                <CardContent>
-                  <Button
-                    className="w-full gap-2"
-                    onClick={() => {
-                      router.push(`/dashboard/datasets/${dataset.id}`);
-                    }}
-                  >
-                    Manage Files
-                  </Button>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <p>No datasets available.</p>
-          )}
-        </div>
-      </section>
+                    <div className="flex gap-4 px-4">
+                      <PdfIcon className="w-12" />
+                      <JsonIcon className="w-12" />
+                    </div>
+                    <CardContent>
+                      <Button
+                        className="w-full gap-2"
+                        onClick={() => {
+                          router.push(`/dashboard/datasets/${dataset.id}`);
+                        }}
+                      >
+                        Manage Files
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <p>No datasets available. Create One</p>
+              )}
+            </div>
+          </section>
+      }
     </div>
   );
 }

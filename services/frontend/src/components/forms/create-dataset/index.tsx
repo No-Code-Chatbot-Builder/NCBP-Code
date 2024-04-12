@@ -59,7 +59,7 @@ const CreateDatasetForm = () => {
         values.name,
         values.description
       );
-      
+
       //updating state, showing toast, closing model
       dispatch(
         addDataset({
@@ -135,11 +135,7 @@ const CreateDatasetForm = () => {
               )}
             </Button>
             <Button variant={"outline"} onClick={() => setClose()}>
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Cancel"
-              )}
+              "Cancel"
             </Button>
           </div>
         </form>

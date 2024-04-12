@@ -45,7 +45,7 @@ export default function Page() {
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
-            <h1 className="text-secondary text-3xl font-bold">Assistants</h1>
+            <h1 className="text-secondary text-3xl font-bold">Fine Tuned Models</h1>
             <p className="text-md text-muted-foreground hidden sm:block">
               Assistants help you through your daily workflow tasks. Create
               custom assistants according to your personal needs and
@@ -56,7 +56,7 @@ export default function Page() {
           <Button size={"lg"} className="gap-2" onClick={handleCreateAssistant}>
             <Plus className="w-5 h-5" />
             <p className="flex">
-              Create <span className="hidden lg:block">&nbsp;Assistant</span>
+              Create <span className="hidden lg:block">&nbsp;FineTuned&nbsp;Model</span>
             </p>
           </Button>
         </div>

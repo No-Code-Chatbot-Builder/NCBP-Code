@@ -3,20 +3,27 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3004";
+const BASE_URL = "http://localhost:5000";
 
-export const apiClient = axios.create({
+const apiClient = axios.create({
   baseURL: BASE_URL,
   // timeout : 10000,
 });
 
 export const createAssistantWithThread = async (
   workspaceName: string,
-  purpose: string
+  name: string,
+  purpose: string,
+  model: string,
+  tool: string,
 ) => {
+  console.log(workspaceName,name, purpose,model,tool);
   try {
     const response = await apiClient.post(`/bot/${workspaceName}/assistant`, {
       purpose: purpose,
+      assistantName: name,
+      tool: tool,
+      models: model,
     });
 
     toast(
