@@ -3,12 +3,26 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:3004";
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
   // timeout : 10000,
 });
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    console.log(token);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const createAssistantWithThread = async (
   workspaceName: string,
@@ -25,13 +39,6 @@ export const createAssistantWithThread = async (
       tool: tool,
       models: model,
     });
-
-    toast(
-      CustomToast({
-        title: "Assistant Creation",
-        description: "Assistant created successfully.",
-      })
-    );
     return response.data;
   } catch (error) {
     console.log(error);
