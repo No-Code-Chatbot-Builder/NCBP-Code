@@ -25,6 +25,7 @@ import { authorize } from '../middlewares/role-authorization.middleware';
 import { createUserHandler } from '../services/create-user.controller';
 import { respondInviteHandler } from '../services/respond-invite.controller';
 import { removeUserHandler } from '../services/remove-user.controller';
+import { listInvitesHandler } from '../services/list-invites.controller';
 
 const workspaceRouter = express.Router();
 
@@ -54,6 +55,14 @@ workspaceRouter.post('/invite', authorize, validateAddUserToWorkspace, async (re
   const input: AddUserToWorkspaceRequest = req.body;
 
   const { statusCode, body } = await inviteUserHandler(input);
+  res.status(statusCode).json(JSON.parse(body));
+});
+
+// GET list of workspace invites
+workspaceRouter.get('/invites', async (req, res) => {
+  const { user } = req;
+
+  const { statusCode, body } = await listInvitesHandler(user);
   res.status(statusCode).json(JSON.parse(body));
 });
 

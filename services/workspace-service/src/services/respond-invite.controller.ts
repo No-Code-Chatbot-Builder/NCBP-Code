@@ -10,6 +10,7 @@ export const respondInviteHandler = async (input: RespondToWorkspaceInviteReques
   const queryMembership = new Membership({
     ...DEFAULT_MEMBERSHIP,
     userId: user.userId,
+    userEmail: user.email,
     workspaceName: input.workspaceName,
     role: input.response === Response.ACCEPTED ? Role.MEMBER : Role.REJECTED
   })

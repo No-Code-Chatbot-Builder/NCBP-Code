@@ -15,8 +15,9 @@ export const inviteUserHandler = async (input: AddUserToWorkspaceRequest) => {
 
   const { error, membership, statusCode } = await inviteUser(queryMembership);
 
-  if (!error)
-    await sendEmail(input.userEmail, input.workspaceName);
+  // TODO: enable when SES is out of sandbox
+  // if (!error)
+  //   await sendEmail(input.userEmail, input.workspaceName);
 
   const body = error ? JSON.stringify({ error }) : JSON.stringify({ membership });
 

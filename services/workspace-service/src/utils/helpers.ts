@@ -10,7 +10,7 @@ export const sendEmail = async (to: string, workspaceName: string) => {
     const subject = "Invitation to join Workspace " + workspaceName + " on NCBP!";
     const body = `You have just been invited to Workspace ${workspaceName} on NCBP!
 
-    Click here to join: https://ncbp.com/invitations
+    Click here to join: http://localhost:3000/invitations
     
     Let us know if you have any questions as you explore your customized recommendations. We're always happy to help!
     

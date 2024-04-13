@@ -23,6 +23,10 @@ export const deleteWorkspace = async (workspace: Workspace) => {
       };
     }
 
+    // TODO: delete all bots
+
+    // TODO: delete all datasets
+
     const items = results.Items;
     const workspace = items[items.length - 1] as IWorkspace;
 

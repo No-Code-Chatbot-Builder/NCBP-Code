@@ -37,6 +37,7 @@ export const respondInvite = async (membership: Membership) => {
     ExpressionAttributeValues: {
       ':role': membership.role,
     },
+    // TODO: revert to attribute_exists(PK) AND attribute_exists(SK) after fixing the ses sandbox issue
     ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)',
   };
 
@@ -59,7 +60,7 @@ export const respondInvite = async (membership: Membership) => {
       statusCode: HttpStatusCode.OK,
     };
   } catch (error: any) {
-    console.log(error);
+    console.log(error.CancellationReasons);
 
     let errorMessage = 'Could not accept invite.';
     let statusCode = HttpStatusCode.BAD_REQUEST;  
@@ -68,6 +69,10 @@ export const respondInvite = async (membership: Membership) => {
       if (error.CancellationReasons[0].Code === 'ConditionalCheckFailed') {
         errorMessage = 'User already a member of workspace with this name.';
         statusCode = HttpStatusCode.CONFLICT;
+      }
+      else if (error.CancellationReasons[1].Code === 'ConditionalCheckFailed') {
+        errorMessage = 'User does not have an invite or does not exists';
+        statusCode = HttpStatusCode.NOT_FOUND;
       }
     }
 
