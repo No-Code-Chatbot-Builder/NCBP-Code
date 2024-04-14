@@ -9,7 +9,7 @@ export const createDataset = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/dataset-service/datasets/${currentWorkspaceName}/dataset/`,
+      `/dataset-service/datasets/${currentWorkspaceName}`,
       { name: name, description: description }
     );
 

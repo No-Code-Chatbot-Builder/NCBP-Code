@@ -38,7 +38,7 @@ const CreateAssistantForm = () => {
     }),
     tool: z.string().min(1, { message: "Select the tool", }),
     model: z.string().min(1, { message: "Select the model" }),
-    dataset: z.string().min(1, { message: "Select the dataset" }),
+    //dataset: z.string().min(1, { message: "Select the dataset" }),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -130,6 +130,8 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
+        
+        {/* 
           <FormField
             disabled={isLoading}
             control={form.control}
@@ -157,7 +159,10 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-
+        
+        
+        */}
+          
           <FormField
             disabled={isLoading}
             control={form.control}
