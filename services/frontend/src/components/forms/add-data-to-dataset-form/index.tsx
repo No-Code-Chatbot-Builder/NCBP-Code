@@ -36,7 +36,6 @@ const AddDataToDatasetForm = ({
   const { toast } = useToast();
   const { setClose } = useModal();
   const dispatch = useAppDispatch();
-
   const FormSchema = z.object({
     file: z.any().refine(
       (file) => {
@@ -45,26 +44,21 @@ const AddDataToDatasetForm = ({
         }
         const fileItem = file[0];
         const allowedTypes = [
-          "application/pdf",
           "application/json",
+          "application/pdf",
           "application/msword",
-          "text/plain",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "application/vnd.ms-powerpoint",
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "text/plain",
         ];
-        if (allowedTypes.includes(fileItem.type)) {
-          const reader = new FileReader();
-
-          reader.readAsDataURL(fileItem);
-          return true;
-        }
-        return false;
+        return allowedTypes.includes(fileItem.type);
       },
       {
-        message: "File must be a PDF, JSON, DOC, TXT, or PPT",
+        message: "File must be a JSON, Word, PPT, or TXT file",
       }
     ),
   });
-
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
     resolver: zodResolver(FormSchema),
@@ -125,7 +119,7 @@ const AddDataToDatasetForm = ({
                       <Input
                         type="file"
                         placeholder="Upload File"
-                        accept=".pdf,.json"
+                        accept=".docx,.txt,.pdf,.pptx,.json,.doc,.ppt"
                         onChange={(e) => {
                           onChange(e.target.files);
                         }}
