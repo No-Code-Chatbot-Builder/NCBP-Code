@@ -8,7 +8,7 @@ import {
   Zap,
   CookingPot,
   Bell,
-  ShoppingBag
+  ShoppingBag,
 } from "lucide-react";
 
 export type StepCard = {
@@ -40,7 +40,8 @@ export const icons = [
     value: "datasets",
     label: "Datasets",
     path: Database,
-  },{
+  },
+  {
     value: "finetune",
     label: "Fine Tune",
     path: CookingPot,
@@ -68,7 +69,7 @@ export const icons = [
   {
     value: "tools",
     label: "Tools",
-    path: ShoppingBag ,
+    path: ShoppingBag,
   },
 ];
 
@@ -145,10 +146,13 @@ export const sidebarOpt: SidebarOption[] = [
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
       { name: "Fine Tuning", icon: "finetune", link: "/dashboard/finetune" },
       { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
-      { name: "Notifications", icon: "notifications", link: "/dashboard/notifications" },
+      {
+        name: "Notifications",
+        icon: "notifications",
+        link: "/dashboard/notifications",
+      },
       { name: "Tools", icon: "tools", link: "/dashboard/tools" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
-
     ],
   },
   {
@@ -162,7 +166,7 @@ export type AssistantType = {
   name: string;
   description: string;
   owner: string;
-  threadId : string;
+  threadId: string;
 };
 
 export type DataBucketType = {

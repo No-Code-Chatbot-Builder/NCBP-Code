@@ -5,7 +5,7 @@ import { Code, Database, LogIn, User } from "lucide-react";
 import Link from "next/link";
 import Steps from "@/components/site/steps/steps";
 import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { useCustomAuth } from "@/providers/auth-provider";
@@ -14,10 +14,27 @@ import { Features } from "@/components/site/features";
 import { StepCard } from "@/lib/constants";
 import { IconRobot } from "@tabler/icons-react";
 import { Button as MovingButton } from "@/components/ui/moving-border";
+import { useRef } from "react";
 
 export default function Home() {
   const { logout, isLoggedIn } = useCustomAuth();
   const { theme } = useTheme();
+  const previewRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: previewRef });
+
+  const step1Ref = useRef(null);
+  const step2Ref = useRef(null);
+  const step3Ref = useRef(null);
+  const step4Ref = useRef(null);
+
+  const isStep1inView = useInView(step1Ref, { once: true });
+  const isStep2inView = useInView(step2Ref, { once: true });
+  const isStep3inView = useInView(step3Ref, { once: true });
+  const isStep4inView = useInView(step4Ref, { once: true });
+
+  const rotate = useTransform(scrollYProgress, [1, 0], [0, 5]);
+  const scale = useTransform(scrollYProgress, [1, 0], [0.9, 1]);
+  const translate = useTransform(scrollYProgress, [1, 0], [0, -50]);
 
   const SignInHeader = () => {
     return (
@@ -161,7 +178,7 @@ export default function Home() {
         </div>
       </section>
       {/**Header Section */}
-      <section className="relative z-10">
+      <section className="relative z-10 mx-10">
         <div className="flex flex-col gap-y-6 mt-10 p-0 lg:p-10 text-center items-center z-20 bg-clip-text">
           <MovingButton
             borderRadius="1.75rem"
@@ -181,16 +198,26 @@ export default function Home() {
           </p>
 
           <Link href="/sign-in">
-            <Button
-              size={"lg"}
-              className="w-fit flex flex-row gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 px-10 py-6"
+            <motion.button
+              className="w-fit flex flex-row gap-2 rounded-lg bg-primary px-10 py-4 font-medium text-white"
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ bounceDamping: 10 }}
             >
               <LogIn />
               Get Started Now
-            </Button>
+            </motion.button>
           </Link>
 
-          <div className="hidden md:block px-4 md:px-10 mt-20">
+          <motion.div
+            ref={previewRef}
+            style={{
+              rotateX: rotate,
+              scale,
+              translateY: translate,
+            }}
+            className="hidden md:block px-4 md:p-10 mt-20 bg-card/40 rounded-2xl border border-muted backdrop-blur-2xl dark:bg-dot-white/[0.1] bg-dot-black/[0.1] mx-10"
+          >
             <Image
               src={
                 theme === "dark"
@@ -200,9 +227,9 @@ export default function Home() {
               width={1200}
               height={1200}
               alt="preview image"
-              className="rounded-2xl border border-muted lg:max-w-[1000px] "
+              className="rounded-2xl lg:max-w-[1000px] "
             />
-          </div>
+          </motion.div>
         </div>
       </section>
       {/**Features Section */}
@@ -220,7 +247,15 @@ export default function Home() {
 
         <div className="">
           {/*Step 1 */}
-          <div className="relative">
+          <div
+            className="relative py-10 lg:py-0"
+            ref={step1Ref}
+            style={{
+              transform: isStep1inView ? "none" : "translateX(-200px)",
+              opacity: isStep1inView ? 1 : 0,
+              transition: "all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1) 0.5s",
+            }}
+          >
             <Steps
               title="Sign Up"
               description="Create an account with NoCodeBot.ai by providing us your email
@@ -229,7 +264,15 @@ export default function Home() {
             />
           </div>
           {/*Step 2 */}
-          <div className="relative">
+          <div
+            className="relative py-10 lg:py-0"
+            ref={step2Ref}
+            style={{
+              transform: isStep2inView ? "none" : "translateX(200px)",
+              opacity: isStep2inView ? 1 : 0,
+              transition: "all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1) 0.5s",
+            }}
+          >
             <Steps
               title="Create a Dataset"
               description="  After signing up, create a dataset that will contain your
@@ -239,7 +282,15 @@ export default function Home() {
             />
           </div>
           {/*Step 3 */}
-          <div className="relative">
+          <div
+            className="relative py-10 lg:py-0"
+            ref={step3Ref}
+            style={{
+              transform: isStep3inView ? "none" : "translateX(-200px)",
+              opacity: isStep3inView ? 1 : 0,
+              transition: "all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1) 0.5s",
+            }}
+          >
             <Steps
               title="Create an Assistant"
               description="Now, Create a Assistant, by providing necessary custom configuration depending on your individual goals and needs."
@@ -247,7 +298,15 @@ export default function Home() {
             />
           </div>
           {/*Step 4 */}
-          <div className="relative">
+          <div
+            className="relative py-10 lg:py-0"
+            ref={step4Ref}
+            style={{
+              transform: isStep4inView ? "none" : "translateX(200px)",
+              opacity: isStep4inView ? 1 : 0,
+              transition: "all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1) 0.5s",
+            }}
+          >
             <Steps
               title="All Done! Use your Assistant now."
               description="Now you can use your assistant whenever you need it for your task.

@@ -37,7 +37,6 @@ const AddDataToDatasetForm = ({
   const { setClose } = useModal();
   const dispatch = useAppDispatch();
 
-
   const FormSchema = z.object({
     file: z.any().refine(
       (file) => {
@@ -45,11 +44,14 @@ const AddDataToDatasetForm = ({
           return false;
         }
         const fileItem = file[0];
-        if (
-          fileItem.size < 1024 * 1024 * 5 &&
-          (fileItem.type === "application/pdf" ||
-            fileItem.type === "application/json")
-        ) {
+        const allowedTypes = [
+          "application/pdf",
+          "application/json",
+          "application/msword",
+          "text/plain",
+          "application/vnd.ms-powerpoint",
+        ];
+        if (allowedTypes.includes(fileItem.type)) {
           const reader = new FileReader();
 
           reader.readAsDataURL(fileItem);
@@ -58,7 +60,7 @@ const AddDataToDatasetForm = ({
         return false;
       },
       {
-        message: "File must be a PDF or JSON and smaller than 5MB",
+        message: "File must be a PDF, JSON, DOC, TXT, or PPT",
       }
     ),
   });
@@ -78,15 +80,14 @@ const AddDataToDatasetForm = ({
     try {
       const res = await addData(workspaceName, datasetId, formData);
       dispatch(
-        addFile(
-          {
-            id: res?.id,
-            name: res?.name,
-            path: res?.path,
-            createdAt: res?.createdAt,
-            createdBy: res?.createdBy,
-          }
-        ));
+        addFile({
+          id: res?.id,
+          name: res?.name,
+          path: res?.path,
+          createdAt: res?.createdAt,
+          createdBy: res?.createdBy,
+        })
+      );
       setClose();
       toast(
         CustomToast({

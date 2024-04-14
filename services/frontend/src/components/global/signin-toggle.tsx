@@ -6,9 +6,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User } from "lucide-react";
+import { Menu, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCustomAuth } from "@/providers/auth-provider";
+import { IconMenu2 } from "@tabler/icons-react";
 
 export function SignInToggle() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function SignInToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
-          <User className="text-secondary" />
+          <IconMenu2 className="text-secondary" />
           <span className="sr-only">User Options</span>
         </Button>
       </DropdownMenuTrigger>
