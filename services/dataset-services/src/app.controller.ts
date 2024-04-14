@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseInterceptors, UploadedFile, BadRequestException, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseInterceptors, UploadedFile, BadRequestException, Req, Put, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AppService } from './app.service';
 import { PineconeService } from './pinecone/pinecone.service';
@@ -40,7 +40,7 @@ export class AppController {
     return response;
   }
 
-  @Post('datasets/:workspaceId/dataset')
+  @Post('datasets/:workspaceId')
   async createDataset(@Req() req: Request, @Body() body: { name: string; description?: string }, @Param('workspaceId') workspaceId: string): Promise<any> {
     const { name, description } = body;
 
@@ -96,5 +96,29 @@ export class AppController {
     return response;
   }
 
+  @Put('datasets/:workspaceId/:datasetId')
+  async updateDatasetById(@Body() body: { name: string; description?: string }, @Param('workspaceId') workspaceId: string, @Param('datasetId') datasetId: string): Promise<any> {
+    const { name, description } = body;
+    const response = await this.dynamoDbService.updateDatasetById(workspaceId, datasetId, {name, description});
+    return response;
+  }
+
+  @Delete('datasets/:workspaceId/:datasetId')
+  async softDeleteDatasetById(@Param('workspaceId') workspaceId: string, @Param('datasetId') datasetId: string): Promise<any> {  
+    const response = await this.dynamoDbService.softDeleteDatasetById(workspaceId, datasetId);
+    return response;
+  }
+
+  @Delete('datasets/:workspaceId')
+  async softDeleteDatasets(@Param('workspaceId') workspaceId: string): Promise<any> {
+    const response = await this.dynamoDbService.softDeleteDatasets(workspaceId);
+    return response;
+  }
+
+  @Delete('datasets/:workspaceId/:datasetId/data/:dataId')
+  async softDeleteDataItemsById(@Param('datasetId') datasetId: string, @Param('dataId') dataId: string): Promise<any> {
+    const response = await this.dynamoDbService.softDeleteDataItemsById(datasetId, dataId);
+    return response;
+  }
 
 }

@@ -49,7 +49,9 @@ export class DynamoDbService {
         datasetDetails: {
           datasetId: datasetId,
           name: name,
-          description: description
+          description: description,
+          createdAt: datasetDetails.createdAt,
+          createdBy: userId
         }
       };
 
@@ -134,7 +136,7 @@ export class DynamoDbService {
           dataDetails: {
             dataId: dataId,
             type: type,
-            path: path
+            path: path,
           }
         }
       };
@@ -211,7 +213,8 @@ export class DynamoDbService {
       KeyConditionExpression: 'PK = :pk',
       ExpressionAttributeValues: {
         ':pk': `WORKSPACE#${workspaceId}`
-      }
+      },
+      FilterExpression: 'attribute_not_exists(deletedAt)'
     };
 
     try {
@@ -243,7 +246,8 @@ export class DynamoDbService {
       ExpressionAttributeValues: {
         ':pk': `WORKSPACE#${workspaceId}`,
         ':sk': `DATASET#${datasetId}`
-      }
+      },
+      FilterExpression: 'attribute_not_exists(deletedAt)'
     };
 
     try {
@@ -269,7 +273,8 @@ export class DynamoDbService {
           KeyConditionExpression: 'PK = :pk',
           ExpressionAttributeValues: {
             ':pk': `DATASET#${datasetId}`
-          }
+          },
+          FilterExpression: 'attribute_not_exists(deletedAt)'
         };
 
         try {
@@ -326,4 +331,331 @@ export class DynamoDbService {
       throw new Error(`Unable to get data: ${error.message}`);
     }
   }
+
+  async updateDatasetById(workspaceId: string, datasetId: string, updateData: { name?: string; description?: string }): Promise<any> {
+    const updateExpression: string[] = [];
+    const expressionAttributeNames: { [key: string]: string } = {};
+    const expressionAttributeValues: { [key: string]: any } = {};
+
+    try {
+
+      if (Object.keys(updateData).length === 0) {
+        throw new Error('No update data provided');
+      }
+    
+      // Constructing the update expression based on which attributes are present in updateData
+      if (updateData.name) {
+        updateExpression.push('#name = :name');
+        expressionAttributeNames['#name'] = 'name';
+        expressionAttributeValues[':name'] = updateData.name;
+      }
+    
+      if (updateData.description) {
+        updateExpression.push('#description = :description');
+        expressionAttributeNames['#description'] = 'description';
+        expressionAttributeValues[':description'] = updateData.description;
+      }
+    
+  
+      updateExpression.push('#updatedAt = :updatedAt');
+      expressionAttributeNames['#updatedAt'] = 'updatedAt';
+      expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+  
+      const params = {
+        TableName: this.tableName,
+        Key: {
+          PK: `WORKSPACE#${workspaceId}`,
+          SK: `DATASET#${datasetId}`
+        },
+        UpdateExpression: 'SET ' + updateExpression.join(', '),
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: 'UPDATED_NEW'
+      };
+    
+      try {
+        const updateResult = await this.dynamodb.update(params).promise();
+        return {
+          success: true,
+          message: 'Dataset updated successfully.',
+          attributes: updateResult.Attributes
+        };
+      } catch (error) {
+        console.error('Error updating dataset:', error);
+        throw new Error(`Unable to update dataset: ${error.message}`);
+      }
+
+    }
+    
+    catch (error) {
+      console.error('Error updating dataset:', error);
+      
+    }
+  
+  }
+
+  async softDeleteDatasetById(workspaceId: string, datasetId: string): Promise<any> {
+    // First, retrieve the current dataset to see if it's already marked as deleted.
+    const getParams = {
+      TableName: this.tableName,
+      Key: {
+        PK: `WORKSPACE#${workspaceId}`,
+        SK: `DATASET#${datasetId}`
+      }
+    };
+  
+    let currentData;
+    try {
+      const getResult = await this.dynamodb.get(getParams).promise();
+      currentData = getResult.Item;
+    } catch (error) {
+      console.error('Error retrieving dataset:', error);
+      throw new Error(`Unable to retrieve dataset: ${error.message}`);
+    }
+  
+    // If the dataset is already marked as deleted, we return an appropriate message.
+    if (currentData && currentData.deletedAt) {
+      return {
+        success: false,
+        message: 'Dataset is already marked as deleted.',
+        deletedAt: currentData.deletedAt
+      };
+    }
+ 
+    let response;
+
+    try {
+        const response = await this.softDeleteDataItems(datasetId);
+    }
+    catch (error)
+    {
+      console.error('Error during soft deletion of data items:', error);
+      throw new Error(`Unable to soft delete data items: ${error.message}`);
+    }
+    // Proceed to mark the dataset as deleted if it's not already marked.
+    const updateParams = {
+      TableName: this.tableName,
+      Key: {
+        PK: `WORKSPACE#${workspaceId}`,
+        SK: `DATASET#${datasetId}`
+      },
+      UpdateExpression: 'set #deletedAt = :deletedAt',
+      ExpressionAttributeNames: {
+        '#deletedAt': 'deletedAt'
+      },
+      ExpressionAttributeValues: {
+        ':deletedAt': new Date().toISOString()
+      },
+      ReturnValues: 'UPDATED_NEW'
+    };
+  
+    try {
+      const updateResult = await this.dynamodb.update(updateParams).promise();
+      return {
+        success: true,
+        message: 'Dataset marked as deleted successfully.',
+        attributes: updateResult.Attributes
+      };
+    } catch (error) {
+      console.error('Error marking dataset as deleted:', error);
+      throw new Error(`Unable to mark dataset as deleted: ${error.message}`);
+    }
+  }
+  
+  async softDeleteDatasets(workspaceId: string): Promise<any> {
+    // First, query all datasets within the workspace that are not already soft-deleted.
+    const queryParams = {
+      TableName: this.tableName,
+      KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': `WORKSPACE#${workspaceId}`,
+        ':sk': 'DATASET#'
+      },
+      FilterExpression: 'attribute_not_exists(deletedAt)'
+    };
+  
+    try {
+      const queryResult = await this.dynamodb.query(queryParams).promise();
+      const datasets = queryResult.Items;
+  
+      // If no datasets to delete, return early.
+      if (!datasets || datasets.length === 0) {
+        return {
+          success: true,
+          message: 'No datasets to soft delete.'
+        };
+      }
+  
+
+      // Perform soft delete on each dataset.
+      const updatePromises = datasets.map((dataset) => {
+        
+        const updateParams = {
+          TableName: this.tableName,
+          Key: {
+            PK: dataset.PK,
+            SK: dataset.SK
+          },
+          UpdateExpression: 'set #deletedAt = :deletedAt',
+          ExpressionAttributeNames: {
+            '#deletedAt': 'deletedAt'
+          },
+          ExpressionAttributeValues: {
+            ':deletedAt': new Date().toISOString()
+          },
+          ReturnValues: 'ALL_NEW'
+        };
+        
+        return this.dynamodb.update(updateParams).promise();
+      });
+  
+      // Wait for all the soft delete operations to complete.
+      const results = await Promise.allSettled(updatePromises);
+      
+      // Filter out successful updates and prepare the response.
+      const successfulUpdates = results.filter(result => result.status === 'fulfilled').map((result) => {
+        const value = (result as PromiseFulfilledResult<any>).value;
+        return {
+          id: value.Attributes.id, // Extract the id from the Attributes
+          deletedAt: value.Attributes.deletedAt // Extract the deletedAt timestamp from the Attributes
+        };
+      });
+
+  return {
+    success: true,
+    message: 'Datasets processed for soft deletion.',
+    datasets: successfulUpdates // Include the id and deletedAt in the response
+  };
+    } catch (error) {
+      console.error('Error during soft deletion of datasets:', error);
+      throw new Error(`Unable to soft delete datasets: ${error.message}`);
+    }
+  }
+  
+  async softDeleteDataItemsById(datsetId: string, dataId: string): Promise<any> {
+    // First, retrieve the current data to see if it's already marked as deleted.
+    const getParams = {
+      TableName: this.tableName,
+      Key: {
+        PK: `DATASET#${datsetId}`,
+        SK: `DATA#${dataId}`
+      }
+    };
+  
+    let currentData;
+    try {
+      const getResult = await this.dynamodb.get(getParams).promise();
+      currentData = getResult.Item;
+    } catch (error) {
+      console.error('Error retrieving data:', error);
+      throw new Error(`Unable to retrieve data: ${error.message}`);
+    }
+  
+    // If the data is already marked as deleted, we return an appropriate message.
+    if (currentData && currentData.deletedAt) {
+      return {
+        success: false,
+        message: 'Data is already marked as deleted.',
+        deletedAt: currentData.deletedAt
+      };
+    }
+  
+    // Proceed to mark the data as deleted if it's not already marked.
+    const updateParams = {
+      TableName: this.tableName,
+      Key: {
+        PK: `DATASET#${datsetId}`,
+        SK: `DATA#${dataId}`
+      },
+      UpdateExpression: 'set #deletedAt = :deletedAt',
+      ExpressionAttributeNames: {
+        '#deletedAt': 'deletedAt'
+      },
+      ExpressionAttributeValues: {
+        ':deletedAt': new Date().toISOString()
+      },
+      ReturnValues: 'UPDATED_NEW'
+    };
+  
+    try {
+      const updateResult = await this.dynamodb.update(updateParams).promise();
+      return {
+        success: true,
+        message: 'Data marked as deleted successfully.',
+        dataId: dataId,
+        deletedAt: updateResult.Attributes
+      };
+    } catch (error) {
+      console.error('Error marking data as deleted:', error);
+    }
+  }
+
+  async softDeleteDataItems(datasetId: string): Promise<any> {
+    // First, query all data items within the dataset that are not already soft-deleted.
+    const queryParams = {
+      TableName: this.tableName,
+      KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+      ExpressionAttributeValues: {
+        ':pk': `DATASET#${datasetId}`,
+        ':sk': 'DATA#'
+      },
+      FilterExpression: 'attribute_not_exists(deletedAt)'
+    };
+  
+    try {
+      const queryResult = await this.dynamodb.query(queryParams).promise();
+      const dataItems = queryResult.Items;
+  
+      // If no data items to delete, return early.
+      if (!dataItems || dataItems.length === 0) {
+        return {
+          success: true,
+          message: 'No data items to soft delete.'
+        };
+      }
+  
+      // Perform soft delete on each data item.
+      const updatePromises = dataItems.map((dataItem) => {
+        const updateParams = {
+          TableName: this.tableName,
+          Key: {
+            PK: dataItem.PK,
+            SK: dataItem.SK
+          },
+          UpdateExpression: 'set #deletedAt = :deletedAt',
+          ExpressionAttributeNames: {
+            '#deletedAt': 'deletedAt'
+          },
+          ExpressionAttributeValues: {
+            ':deletedAt': new Date().toISOString()
+          },
+          ReturnValues: 'ALL_NEW'
+        };
+  
+        return this.dynamodb.update(updateParams).promise();
+      });
+  
+      // Wait for all the soft delete operations to complete.
+      const results = await Promise.allSettled(updatePromises);
+  
+      // Filter out successful updates and prepare the response.
+      const successfulUpdates = results.filter(result => result.status === 'fulfilled').map((result) => {
+        const value = (result as PromiseFulfilledResult<any>).value;
+        return {
+          id: value.Attributes.id, // Assuming the SK is in the format DATA#dataId, extract the dataId
+          deletedAt: value.Attributes.deletedAt // Extract the deletedAt timestamp from the Attributes
+        };
+      });
+  
+      return {
+        success: true,
+        message: 'Data items processed for soft deletion.',
+        dataItems: successfulUpdates // Include the id and deletedAt in the response
+      };
+    } catch (error) {
+      console.error('Error during soft deletion of data items:', error);
+      throw new Error(`Unable to soft delete data items: ${error.message}`);
+    }
+  }
+  
 }

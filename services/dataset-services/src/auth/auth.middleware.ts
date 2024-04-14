@@ -1,6 +1,4 @@
 import { HttpException, HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
-import { DynamoDB } from 'aws-sdk';
 import { NextFunction } from 'express';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { SimpleJwksCache } from 'aws-jwt-verify/jwk';
@@ -71,6 +69,11 @@ export class AuthMiddleware implements NestMiddleware {
         console.log(error);
         console.log('Token not valid!');
       }
+    }
+    else 
+    {
+      console.log("No token")
+      return;
     }
   }
 }
