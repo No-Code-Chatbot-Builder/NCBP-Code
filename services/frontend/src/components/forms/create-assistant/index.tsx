@@ -77,7 +77,7 @@ const CreateAssistantForm = () => {
       toast(
         CustomToast({
           title: "Assistant Added",
-          description: "Your Dataset has been created.",
+          description: "Your Assistant has been created.",
         })
       );
     } catch (error: any) {
