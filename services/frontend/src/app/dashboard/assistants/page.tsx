@@ -17,12 +17,14 @@ import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { retrieveAssistants } from "@/lib/api/bot/service";
 
 export default function Page() {
   const [loader, setLoader] = useState(true);
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
+  const currentWorkspace = useAppSelector((state) => state.workspaces.currentWorkspaceName);
 
   const assistantSheet = (
     <CustomSheet
@@ -34,8 +36,15 @@ export default function Page() {
   );
 
   useEffect(() => {
+    const fetchAssistants = async () => {
+      const res = await retrieveAssistants(currentWorkspace);
+
+    };
+
+    // fetchAssistants();
     setLoader(false);
-  }, [])
+  }, [currentWorkspace]);
+
 
   const handleCreateAssistant = async () => {
     setOpen(assistantSheet);

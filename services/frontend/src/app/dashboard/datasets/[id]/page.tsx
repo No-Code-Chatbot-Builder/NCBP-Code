@@ -60,7 +60,7 @@ const DatasetByIdPage = ({ params }: Props) => {
       const res = await fetchFiles(workspaceName, params.id);
       if (!res?.data?.length) return;
 
-      const updatedFileArray = res.data.map((item: any) => ({
+      const updatedFileArray = res?.data?.map((item: any) => ({
         id: item.dataId,
         name: item.name,
         path: item.path,

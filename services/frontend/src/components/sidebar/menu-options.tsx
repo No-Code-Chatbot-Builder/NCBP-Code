@@ -147,17 +147,19 @@ const WorkspaceMenuOptions = ({
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-sm">
-                    {workspaces?.map((workspace: WorkspaceType) => (
-                      <div
-                        onClick={() => changeCurrentWorkspace(workspace.name)}
-                        key={workspace.name}
-                        className={`${
-                          workspace.name == currentWorkspace ? "bg-primary" : ""
-                        } hover:pointer-cursor p-2 my-2 border-2 border-text-muted rounded-md`}
-                      >
-                        {workspace.name}
-                      </div>
-                    ))}
+                    <div className="overflow-y-auto max-h-44 md:max-h-96">
+                      {workspaces?.map((workspace: WorkspaceType) => (
+                        <div
+                          onClick={() => changeCurrentWorkspace(workspace.name)}
+                          key={workspace.name}
+                          className={`${
+                            workspace.name == currentWorkspace ? "bg-primary" : "hover:bg-black/20"
+                          } hover:cursor-pointer p-2 my-2 border-2 border-text-muted rounded-md`}
+                        >
+                          {workspace.name}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
                 <Button
@@ -187,7 +189,7 @@ const WorkspaceMenuOptions = ({
           <CommandEmpty>No Results Found</CommandEmpty>
           {sidebarOpt.map((sidebarOption) => (
             <React.Fragment key={sidebarOption.heading}>
-              <div className="px-4 py-2" key={sidebarOption.heading}>
+              <div className=" py-2" key={sidebarOption.heading}>
                 <h3 className="text-sm text-primary font-medium">
                   {sidebarOption.heading}
                 </h3>

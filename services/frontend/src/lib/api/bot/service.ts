@@ -31,7 +31,7 @@ export const createAssistantWithThread = async (
   model: string,
   tool: string,
 ) => {
-  console.log(workspaceName,name, purpose,model,tool);
+  console.log(workspaceName, name, purpose, model, tool);
   try {
     const response = await apiClient.post(`/bot/${workspaceName}/assistant`, {
       purpose: purpose,
@@ -50,6 +50,24 @@ export const createAssistantWithThread = async (
     );
   }
 };
+
+export const retrieveAssistants = async (
+  workspaceName: string,
+) => {
+  try {
+    const response = await apiClient.get(`/bot/${workspaceName}/assistant`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: "Error creating Assistant.",
+      })
+    );
+  }
+};
+
 
 export const runAssistant = async (workspaceName: string, query: string) => {
   try {

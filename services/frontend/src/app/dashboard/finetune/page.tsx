@@ -17,6 +17,7 @@ import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import CreateFineTuneModelForm from "@/components/forms/create-finetune-model";
 
 export default function Page() {
   const [loader, setLoader] = useState(true);
@@ -24,12 +25,12 @@ export default function Page() {
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
 
-  const assistantSheet = (
+  const finetuneSheet = (
     <CustomSheet
-      title="Create New Assistant"
-      description="Configure the assistant by filling in the details"
+      title="Create New FineTune Model"
+      description="Configure the model by filling in the details"
     >
-      <CreateAssistantForm />
+      <CreateFineTuneModelForm />
     </CustomSheet>
   );
 
@@ -38,7 +39,7 @@ export default function Page() {
   }, [])
 
   const handleCreateAssistant = async () => {
-    setOpen(assistantSheet);
+    setOpen(finetuneSheet);
   };
   return (
     <div className="flex flex-col gap-10">

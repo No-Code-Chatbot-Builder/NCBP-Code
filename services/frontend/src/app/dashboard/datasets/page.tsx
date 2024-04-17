@@ -42,11 +42,13 @@ export default function Page() {
     </CustomSheet>
   );
 
+
   useEffect(() => {
+    setLoader(true);
     const fetchCurrentDatasets = async () => {
       console.log(workspaceName);
       const res = await fetchDatasets(workspaceName);
-      dispatch(setDatasets(res.datasets));
+      dispatch(setDatasets(res?.datasets));
     };
 
     fetchCurrentDatasets();
@@ -113,7 +115,7 @@ export default function Page() {
         </div> :
           <section>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
-              {datasets.length > 0 ? (
+              {datasets?.length > 0 ? (
                 datasets.map((dataset: DatasetType) => (
                   <Card key={dataset.id}>
                     <CardHeader>
