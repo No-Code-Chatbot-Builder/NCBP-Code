@@ -56,10 +56,11 @@ const Navigation = () => {
             </Link>
           )}
         </div>
+
+        <ModeToggle />
         <div className="md:hidden block">
           <SignInToggle />
         </div>
-        <ModeToggle />
       </aside>
     </div>
   );

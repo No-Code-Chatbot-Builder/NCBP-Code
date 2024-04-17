@@ -8,20 +8,17 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
 import { addFile } from "@/providers/redux/slice/datasetSlice";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/providers/modal-provider";
 import CustomToast from "@/components/global/custom-toast";
 import { addData } from "@/lib/api/dataset/service";
-import path from "path";
 import { useAppDispatch } from "@/lib/hooks";
 
 interface AddDataToDatasetFormProps {
@@ -36,8 +33,6 @@ const AddDataToDatasetForm = ({
   const { toast } = useToast();
   const { setClose } = useModal();
   const dispatch = useAppDispatch();
-
-
   const FormSchema = z.object({
     file: z.any().refine(
       (file) => {
@@ -45,24 +40,22 @@ const AddDataToDatasetForm = ({
           return false;
         }
         const fileItem = file[0];
-        if (
-          fileItem.size < 1024 * 1024 * 5 &&
-          (fileItem.type === "application/pdf" ||
-            fileItem.type === "application/json")
-        ) {
-          const reader = new FileReader();
-
-          reader.readAsDataURL(fileItem);
-          return true;
-        }
-        return false;
+        const allowedTypes = [
+          "application/json",
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/vnd.ms-powerpoint",
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "text/plain",
+        ];
+        return allowedTypes.includes(fileItem.type);
       },
       {
-        message: "File must be a PDF or JSON and smaller than 5MB",
+        message: "File must be a JSON, Word, PPT, or TXT file",
       }
     ),
   });
-
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
     resolver: zodResolver(FormSchema),
@@ -78,15 +71,14 @@ const AddDataToDatasetForm = ({
     try {
       const res = await addData(workspaceName, datasetId, formData);
       dispatch(
-        addFile(
-          {
-            id: res?.id,
-            name: res?.name,
-            path: res?.path,
-            createdAt: res?.createdAt,
-            createdBy: res?.createdBy,
-          }
-        ));
+        addFile({
+          id: res?.id,
+          name: res?.name,
+          path: res?.path,
+          createdAt: res?.createdAt,
+          createdBy: res?.createdBy,
+        })
+      );
       setClose();
       toast(
         CustomToast({
@@ -124,7 +116,7 @@ const AddDataToDatasetForm = ({
                       <Input
                         type="file"
                         placeholder="Upload File"
-                        accept=".pdf,.json"
+                        accept=".docx,.txt,.pdf,.pptx,.json,.doc,.ppt"
                         onChange={(e) => {
                           onChange(e.target.files);
                         }}
