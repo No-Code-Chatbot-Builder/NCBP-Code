@@ -69,8 +69,8 @@ const CreateAssistantForm = () => {
           id: res.response[2].assistantId,
           name: values.name,
           description: values.description,
-          owner: "currentuser",
-          threadId: res.response[3].threadId,
+          // owner: "currentuser",
+          // threadId: res.response[3].threadId,
         })
       );
       setClose();

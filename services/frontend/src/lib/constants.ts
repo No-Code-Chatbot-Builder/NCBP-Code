@@ -165,8 +165,8 @@ export type AssistantType = {
   id: string;
   name: string;
   description: string;
-  owner: string;
-  threadId: string;
+  // owner: string;
+  // threadId: string;
 };
 
 export type DataBucketType = {

@@ -13,11 +13,13 @@ import {
 
 import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { retrieveAssistants } from "@/lib/api/bot/service";
+import { setAssistant } from "@/providers/redux/slice/assistantSlice";
+
 
 export default function Page() {
   const [loader, setLoader] = useState(true);
@@ -25,6 +27,7 @@ export default function Page() {
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
   const currentWorkspace = useAppSelector((state) => state.workspaces.currentWorkspaceName);
+  const dispatch = useAppDispatch();
 
   const assistantSheet = (
     <CustomSheet
@@ -37,11 +40,18 @@ export default function Page() {
 
   useEffect(() => {
     const fetchAssistants = async () => {
-      const res = await retrieveAssistants(currentWorkspace);
-
+      const { response } = await retrieveAssistants(currentWorkspace);
+      console.log(response);
+      const assistants : AssistantType[] = response.assistants.map((assistant: any) => ({
+        id: assistant.assistantId,
+        name: assistant.assistantName,
+        description:  assistant.purpose,
+      }))
+      
+      dispatch(setAssistant(assistants));
     };
 
-    // fetchAssistants();
+    fetchAssistants();
     setLoader(false);
   }, [currentWorkspace]);
 
@@ -85,7 +95,7 @@ export default function Page() {
                     <CardDescription>{assistant.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-3">
-                    <p className="text-muted-foreground">@{assistant.owner}</p>
+                    <p className="text-muted-foreground">@{assistant.id}</p>
                     <Button
                       className="w-full"
                       onClick={() => {

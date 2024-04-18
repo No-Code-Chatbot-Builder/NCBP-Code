@@ -55,7 +55,7 @@ export const retrieveAssistants = async (
   workspaceName: string,
 ) => {
   try {
-    const response = await apiClient.get(`/bot/${workspaceName}/assistant`);
+    const response = await apiClient.get(`/bot/${workspaceName}`);
     return response.data;
   } catch (error) {
     console.log(error);

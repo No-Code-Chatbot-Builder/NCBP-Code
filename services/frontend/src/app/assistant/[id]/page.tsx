@@ -47,7 +47,7 @@ const customStyle = {
 
 const ChatbotMessage = ({ message }: { message: string }) => {
   const [copied, setCopied] = useState(false);
-  const hasCode = message.includes("<code>") && message.includes("</code>");
+  const hasCode = message?.includes("<code>") && message.includes("</code>");
   let chunks: string[] = [message];
 
   if (hasCode) {
@@ -122,7 +122,7 @@ const ChatbotMessage = ({ message }: { message: string }) => {
 };
 
 const AssistantIdByPage = ({ params }: Props) => {
-  const messages = useAppSelector((state) => state.chatbot.messages);
+  const messages = useAppSelector((state) => state.chatbot.threads.filter((thread: any) => thread.assistantId === params.id));
   const form = useForm();
   const workspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
@@ -131,7 +131,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `http://localhost:3004?workspaceId=${workspaceName}`;
+  const URL = `http://localhost:3004?workspaceId=${workspaceName}&assistantId=${params.id}`;
   let socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
 
   useEffect(() => {
@@ -150,15 +150,18 @@ const AssistantIdByPage = ({ params }: Props) => {
       if (data.event === "textCreated") {
         dispatch(
           addMessage({
-            role: "bot",
-            content: "",
+            assistantId: params.id,
+            message: {
+              role: "bot",
+              content: "",
+            },
           })
         );
       } else if (data.event === "textDelta") {
-        dispatch(updateMessage(data.data));
+        dispatch(updateMessage({ assistantId: params.id, message: data.data }));
       }
     });
-    return () => {
+    return () => { //cleaning function
       if (socket) {
         socket.disconnect();
       }
@@ -168,15 +171,20 @@ const AssistantIdByPage = ({ params }: Props) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const query = form.getValues("query");
+    console.log(socket);
 
     try {
       if (socket && query.trim() !== "") {
         if (typeof socket !== "undefined") {
+          console.log("emitting .....")
           socket.emit("runAssistant", JSON.stringify({ query }));
           dispatch(
             addMessage({
-              role: "user",
-              content: query,
+              assistantId: params.id,
+              message: {
+                role: "user",
+                content: query,
+              }
             })
           );
           form.setValue("query", "");
@@ -189,7 +197,7 @@ const AssistantIdByPage = ({ params }: Props) => {
 
   return (
     <div className="stretch mx-auto w-full md:w-3/4 max-w-5xl py-24">
-      {messages.map((message: ChatState, index: number) => (
+      {messages[0]?.messages?.map((message: ChatState, index: number) => (
         <div key={index} className="mb-8 whitespace-pre-wrap">
           {message.role === "user" ? (
             <UserMessage message={message.content} />

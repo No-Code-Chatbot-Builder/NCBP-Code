@@ -12,24 +12,24 @@ const initialState: AssistantState = {
       name: "NextJS Assistant",
       description:
         "Expert on Next.js and returns answers with high accuracy. Learn next.js from my Assistant",
-      owner: "ibrahimtariqsheikh",
-      threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
+      // owner: "ibrahimtariqsheikh",
+      // threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
     },
     {
       id: "asst_oz7Hv1YHZSIYHDUDoHPboiQL",
       name: "Math Assistant",
       description:
         "Trained specifically on Mathematics books for more reliable answers so you can study in peace.",
-      owner: "ibrahimtariqsheikh",
-      threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
+      // owner: "ibrahimtariqsheikh",
+      // threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
     },
     {
       id: "asst_oz7Hv1YHZSIYHDUDoHPboiQL",
       name: "IBA Entry Assistant",
       description:
         "Prepare for IBA Entry tests, ask for similar questions and get in with ease.",
-      owner: "hussainmurtaza",
-      threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
+      // owner: "hussainmurtaza",
+      // threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
     },
   ],
 };
@@ -46,6 +46,9 @@ export const AssistantSlice = createSlice({
         (assistant) => assistant.id !== action.payload
       );
     },
+    setAssistant: (state, action: PayloadAction<AssistantType[]>) => {
+      state.assistants = action.payload;
+    },
     updateAssistant: (state, action: PayloadAction<AssistantType>) => {
       const index = state.assistants.findIndex(
         (assistant) => assistant.id === action.payload.id
@@ -57,7 +60,7 @@ export const AssistantSlice = createSlice({
   },
 });
 
-export const { addAssistant, removeAssistant, updateAssistant } =
+export const { addAssistant, removeAssistant, updateAssistant,setAssistant } =
   AssistantSlice.actions;
 
 export const getAssistantById = createSelector(
