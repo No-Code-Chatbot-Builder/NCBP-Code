@@ -32,10 +32,6 @@ export default function Home() {
   const isStep3inView = useInView(step3Ref, { once: true });
   const isStep4inView = useInView(step4Ref, { once: true });
 
-  const rotate = useTransform(scrollYProgress, [1, 0], [0, 5]);
-  const scale = useTransform(scrollYProgress, [1, 0], [0.9, 1]);
-  const translate = useTransform(scrollYProgress, [1, 0], [0, -50]);
-
   const SignInHeader = () => {
     return (
       <motion.div
@@ -209,13 +205,8 @@ export default function Home() {
             </motion.button>
           </Link>
 
-          <motion.div
+          <div
             ref={previewRef}
-            style={{
-              rotateX: rotate,
-              scale,
-              translateY: translate,
-            }}
             className="hidden md:block px-4 md:p-10 mt-20 bg-card/40 rounded-2xl border border-muted backdrop-blur-2xl dark:bg-dot-white/[0.1] bg-dot-black/[0.1] mx-10"
           >
             <Image
@@ -229,7 +220,7 @@ export default function Home() {
               alt="preview image"
               className="rounded-2xl lg:max-w-[1000px] "
             />
-          </motion.div>
+          </div>
         </div>
       </section>
       {/**Features Section */}

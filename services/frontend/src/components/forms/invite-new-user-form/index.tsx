@@ -49,7 +49,7 @@ const InviteNewUserForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await inviteUser(currentWorkspaceName,"user id",values.email);
+      await inviteUser(currentWorkspaceName, "user id", values.email);
       toast(
         CustomToast({
           title: "User Invited",
@@ -97,7 +97,13 @@ const InviteNewUserForm = () => {
                 "Invite User"
               )}
             </Button>
-            <Button onClick={setClose} variant="outline">
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                setClose();
+              }}
+              variant="outline"
+            >
               Cancel
             </Button>
           </div>

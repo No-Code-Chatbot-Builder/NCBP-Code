@@ -6,32 +6,7 @@ interface AssistantState {
 }
 
 const initialState: AssistantState = {
-  assistants: [
-    {
-      id: "asst_oz7Hv1YHZSIYHDUDoHPboiQL",
-      name: "NextJS Assistant",
-      description:
-        "Expert on Next.js and returns answers with high accuracy. Learn next.js from my Assistant",
-      // owner: "ibrahimtariqsheikh",
-      // threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
-    },
-    {
-      id: "asst_oz7Hv1YHZSIYHDUDoHPboiQL",
-      name: "Math Assistant",
-      description:
-        "Trained specifically on Mathematics books for more reliable answers so you can study in peace.",
-      // owner: "ibrahimtariqsheikh",
-      // threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
-    },
-    {
-      id: "asst_oz7Hv1YHZSIYHDUDoHPboiQL",
-      name: "IBA Entry Assistant",
-      description:
-        "Prepare for IBA Entry tests, ask for similar questions and get in with ease.",
-      // owner: "hussainmurtaza",
-      // threadId: "thread_vHHlZTEeKABQtePZidU5TpPX"
-    },
-  ],
+  assistants: [],
 };
 
 export const AssistantSlice = createSlice({
@@ -60,7 +35,7 @@ export const AssistantSlice = createSlice({
   },
 });
 
-export const { addAssistant, removeAssistant, updateAssistant,setAssistant } =
+export const { addAssistant, removeAssistant, updateAssistant, setAssistant } =
   AssistantSlice.actions;
 
 export const getAssistantById = createSelector(

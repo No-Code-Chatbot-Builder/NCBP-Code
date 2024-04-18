@@ -33,6 +33,7 @@ const CreateWorkspaceForm = () => {
   const FormSchema = z.object({
     name: z
       .string()
+      .min(1, { message: "Please enter the workspace name" })
       .min(5, { message: "Name must contain at least 5 characters long" }),
   });
 
@@ -87,23 +88,7 @@ const CreateWorkspaceForm = () => {
               </FormItem>
             )}
           />
-          {/* <FormField
-            disabled={isLoading}
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel className="text-primary">Description</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter the workspace description"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600 text-xs px-1" />
-              </FormItem>
-            )}
-          /> */}
+
           <div className="flex flex-row-reverse gap-4">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
@@ -112,7 +97,13 @@ const CreateWorkspaceForm = () => {
                 "Create Workspace"
               )}
             </Button>
-            <Button variant={"outline"} onClick={() => setClose()}>
+            <Button
+              variant={"outline"}
+              onClick={(e) => {
+                e.preventDefault();
+                setClose();
+              }}
+            >
               Cancel
             </Button>
           </div>

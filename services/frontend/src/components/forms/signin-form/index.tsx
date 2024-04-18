@@ -15,7 +15,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import SocialSignInButtons from "@/components/site/auth/social-sign-in-buttons";
 import { useCustomAuth } from "@/providers/auth-provider";
@@ -45,6 +45,7 @@ const SignUpInput = () => {
 
   const isLoading = form.formState.isSubmitting;
   const watchedEmail = form.watch("email");
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     await login({ username: values.email, password: values.password });
@@ -100,12 +101,30 @@ const SignUpInput = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your password"
-                    {...field}
-                    className="border-border"
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      {...field}
+                      className="border-border pr-10"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                      <button
+                        type="button"
+                        className="text-muted-foreground"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowPassword(!showPassword);
+                        }}
+                      >
+                        {showPassword ? (
+                          <Eye className="w-4 h-4" />
+                        ) : (
+                          <EyeOff className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>

@@ -11,7 +11,7 @@ export default function Page() {
     <div className="flex flex-col gap-10">
       <div>
         <section className="mt-20 flex flex-col gap-2">
-          <h1 className="text-secondary text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">Settings</h1>
           <p className="text-md text-muted-foreground">
             Manage your account and workspace settings here
           </p>

@@ -1,3 +1,5 @@
+import { Tooltip } from "@/components/ui/tooltip";
+import { IconToolsKitchen } from "@tabler/icons-react";
 import {
   BookPlus,
   Code,
@@ -9,6 +11,8 @@ import {
   CookingPot,
   Bell,
   ShoppingBag,
+  PocketKnife,
+  AudioWaveform,
 } from "lucide-react";
 
 export type StepCard = {
@@ -44,7 +48,7 @@ export const icons = [
   {
     value: "finetune",
     label: "Fine Tune",
-    path: CookingPot,
+    path: AudioWaveform,
   },
   {
     value: "apikeys",
@@ -62,14 +66,9 @@ export const icons = [
     path: Settings,
   },
   {
-    value: "notifications",
-    label: "Notifications",
-    path: Bell,
-  },
-  {
     value: "tools",
     label: "Tools",
-    path: ShoppingBag,
+    path: PocketKnife,
   },
 ];
 
@@ -98,18 +97,18 @@ export const pricingCards = [
       "Basic AI Chatbot Builder",
       "Access to Community Models",
     ],
-    priceId: "",
+    priceId: "price_ibud78isuiuhsZJI",
   },
   {
     title: "Professional",
     description: "For teams deploying AI solutions",
-    price: "$99",
+    price: "$9.99",
     duration: "month",
     highlight: "Everything in Starter, plus",
     features: [
-      "Unlimited Workspaces",
+      "Create unlimited Workspaces",
       "Advanced AI Chatbot Customization",
-      "Priority Support",
+      "Customer Support",
       "Early Access to New Features",
     ],
     priceId: "price_1OYxkqFj9oKEERu1LmNvYzHJ",
@@ -117,7 +116,7 @@ export const pricingCards = [
   {
     title: "Enterprise",
     description: "Comprehensive AI capabilities for large organizations",
-    price: "Custom",
+    price: "$19.99",
     duration: "month",
     highlight: "All Professional features, plus",
     features: [
@@ -126,7 +125,7 @@ export const pricingCards = [
       "Enterprise-grade Security",
       "Personalized Onboarding & Support",
     ],
-    priceId: "custom",
+    priceId: "price_BID97hubx98hs0",
   },
 ];
 
@@ -145,13 +144,9 @@ export const sidebarOpt: SidebarOption[] = [
       { name: "Assistants", icon: "assistants", link: "/dashboard/assistants" },
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
       { name: "Fine Tuning", icon: "finetune", link: "/dashboard/finetune" },
-      { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
-      {
-        name: "Notifications",
-        icon: "notifications",
-        link: "/dashboard/notifications",
-      },
+
       { name: "Tools", icon: "tools", link: "/dashboard/tools" },
+      { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
     ],
   },

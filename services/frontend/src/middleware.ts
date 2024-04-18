@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 export function middleware(req: NextRequest) {
   const { pathname, host } = req.nextUrl;
 
-  const isLoggedIn = req.cookies.get('loggedUser');
+  const isLoggedIn = req.cookies.get("loggedUser");
 
-  const protectedRoutes = pathname.startsWith("/dashboard");
+  const protectedRoutes = pathname.startsWith("/dashboard/assistants");
 
   if (isLoggedIn && !protectedRoutes) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/dashboard/assistants", req.url));
   }
 
   if (
@@ -17,7 +17,6 @@ export function middleware(req: NextRequest) {
   ) {
     return NextResponse.rewrite(new URL("/site", req.url));
   }
-  
 
   return NextResponse.next();
 }
