@@ -29,12 +29,16 @@ import { toast } from "sonner";
 
 export default function Page() {
   const dispatch = useAppDispatch();
-  const [loader, setLoader] = useState(true);
+  const isDatasetLoading = useAppSelector(
+    (state) => state.datasets.isDatasetLoading
+  );
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
+
   const workspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
+
   const router = useRouter();
   const datasetSheet = (
     <CustomSheet
@@ -44,17 +48,6 @@ export default function Page() {
       <CreateDatasetForm />
     </CustomSheet>
   );
-
-  useEffect(() => {
-    setLoader(true);
-    const fetchCurrentDatasets = async () => {
-      console.log(workspaceName);
-      const res = await fetchDatasets(workspaceName);
-      dispatch(setDatasets(res?.datasets));
-    };
-
-    fetchCurrentDatasets().finally(() => setLoader(false));
-  }, [workspaceName, dispatch]);
 
   const handleDatasetDeletion = async (
     datasetId: string,
@@ -93,7 +86,7 @@ export default function Page() {
             </p>
           </div>
           {/*Desktop Create Button*/}
-          {loader && datasets.length !== 0 && (
+          {!isDatasetLoading && datasets?.length !== 0 && (
             <Button
               size={"lg"}
               className="gap-2"
@@ -110,7 +103,8 @@ export default function Page() {
         </div>
         <Separator className="mt-8" />
       </section>
-      {loader ? (
+      {isDatasetLoading ? (
+        // loader
         <div className="flex justify-center items-center w-full h-[60vh]">
           <Loader2 className="w-6 h-6 animate-spin" />
         </div>

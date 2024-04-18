@@ -8,12 +8,14 @@ export type WorkspaceType = {
 
 interface WorkspaceState {
   workspaces: WorkspaceType[];
+  isWorkspaceLoading: boolean;
   currentWorkspaceName: string | null;
 }
 
 const initialState: WorkspaceState = {
   workspaces: [],
   currentWorkspaceName: null,
+  isWorkspaceLoading: false,
 };
 
 export const fetchWorkspaces = createAsyncThunk(
@@ -53,7 +55,11 @@ export const workspaceSlice = createSlice({
     clearCurrentWorkspace: (state) => {
       state.currentWorkspaceName = null;
     },
+    setIsWorkspaceLoading: (state, action: PayloadAction<boolean>) => {
+      state.isWorkspaceLoading = action.payload;
+    },
   },
+
   extraReducers(builder) {
     builder.addCase(fetchWorkspaces.fulfilled, (state, action) => {
       // state.workspaces = action.payload;
@@ -67,6 +73,7 @@ export const {
   removeWorkspace,
   updateWorkspace,
   setCurrentWorkspace,
+  setIsWorkspaceLoading,
 } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

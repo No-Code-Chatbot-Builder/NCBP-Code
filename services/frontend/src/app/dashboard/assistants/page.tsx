@@ -10,25 +10,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { Code, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { retrieveAssistants } from "@/lib/api/bot/service";
-import { setAssistant } from "@/providers/redux/slice/assistantSlice";
 
 export default function Page() {
-  const [loader, setLoader] = useState(true);
+  const isAssistantLoading = useAppSelector(
+    (state) => state.assistants.isAssistantLoading
+  );
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
-  const currentWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
-  );
-  const dispatch = useAppDispatch();
 
   const assistantSheet = (
     <CustomSheet
@@ -39,28 +34,10 @@ export default function Page() {
     </CustomSheet>
   );
 
-  useEffect(() => {
-    const fetchAssistants = async () => {
-      const { response } = await retrieveAssistants(currentWorkspace);
-      console.log(response);
-      const assistants: AssistantType[] = response.assistants.map(
-        (assistant: any) => ({
-          id: assistant.assistantId,
-          name: assistant.assistantName,
-          description: assistant.purpose,
-        })
-      );
-
-      dispatch(setAssistant(assistants));
-    };
-
-    fetchAssistants();
-    setLoader(false);
-  }, [currentWorkspace]);
-
   const handleCreateAssistant = async () => {
     setOpen(assistantSheet);
   };
+
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -74,7 +51,7 @@ export default function Page() {
             </p>
           </div>
 
-          {loader && assistants.length !== 0 && (
+          {isAssistantLoading && assistants.length !== 0 && (
             <Button
               size={"lg"}
               className="gap-2"
@@ -89,7 +66,7 @@ export default function Page() {
         </div>
         <Separator className="mt-8" />
       </section>
-      {loader ? (
+      {isAssistantLoading ? (
         <div className="flex justify-center items-center w-full h-[65vh]">
           <Loader2 className="w-6 h-6 animate-spin" />
         </div>

@@ -3,10 +3,12 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AssistantState {
   assistants: AssistantType[];
+  isAssistantLoading: boolean;
 }
 
 const initialState: AssistantState = {
   assistants: [],
+  isAssistantLoading: true,
 };
 
 export const AssistantSlice = createSlice({
@@ -32,11 +34,19 @@ export const AssistantSlice = createSlice({
         state.assistants[index] = action.payload;
       }
     },
+    setIsAssistantLoading: (state, action: PayloadAction<boolean>) => {
+      state.isAssistantLoading = action.payload;
+    },
   },
 });
 
-export const { addAssistant, removeAssistant, updateAssistant, setAssistant } =
-  AssistantSlice.actions;
+export const {
+  addAssistant,
+  removeAssistant,
+  updateAssistant,
+  setAssistant,
+  setIsAssistantLoading,
+} = AssistantSlice.actions;
 
 export const getAssistantById = createSelector(
   [
