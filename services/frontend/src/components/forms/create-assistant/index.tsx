@@ -36,7 +36,8 @@ const CreateAssistantForm = () => {
     description: z.string().min(5, {
       message: "Description must contain atleast 5 characters long",
     }),
-    tool: z.string().min(1, { message: "Select the tool", }),
+    dataset:  z.string().min(1, { message: "Select the dataset", }),
+      tool: z.string().min(1, { message: "Select the tool", }),
     model: z.string().min(1, { message: "Select the model" }),
     //dataset: z.string().min(1, { message: "Select the dataset" }),
   });
@@ -130,8 +131,7 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-        
-        {/* 
+
           <FormField
             disabled={isLoading}
             control={form.control}
@@ -159,10 +159,7 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-        
-        
-        */}
-          
+
           <FormField
             disabled={isLoading}
             control={form.control}
