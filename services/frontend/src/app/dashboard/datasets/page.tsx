@@ -51,17 +51,6 @@ export default function Page() {
     </CustomSheet>
   );
 
-  useEffect(() => {
-    setLoader(true);
-    const fetchCurrentDatasets = async () => {
-      console.log(workspaceName);
-      const res = await fetchDatasets(workspaceName);
-      dispatch(setDatasets(res?.datasets));
-    };
-
-    fetchCurrentDatasets().finally(() => setLoader(false));
-  }, [workspaceName]);
-
   const handleDatasetDeletion = async (
     datasetId: string,
     datasetName: string
@@ -102,7 +91,7 @@ export default function Page() {
             </p>
           </div>
           {/*Desktop Create Button*/}
-          {loader && datasets.length !== 0 && (
+          {!isDatasetLoading && datasets?.length !== 0 && (
             <Button
               size={"lg"}
               className="gap-2"

@@ -114,21 +114,22 @@ const WorkspaceMenuOptions = ({
           const res = await fetchDatasets(firstWorkspaceName);
           dispatch(setDatasets(res?.datasets));
         }
-      }
-      dispatch(setIsDatasetLoading(false));
 
-      //load the assistants now
-      const res = await retrieveAssistants(currentWorkspace);
-      if (res && res.response && res.response.assistants) {
-        const assistants: AssistantType[] = res.response.assistants.map(
-          (assistant: any) => ({
-            id: assistant.assistantId,
-            name: assistant.assistantName,
-            description: assistant.purpose,
-          })
-        );
-        dispatch(setAssistant(assistants));
-        dispatch(setIsAssistantLoading(false));
+        dispatch(setIsDatasetLoading(false));
+
+        //load the assistants now
+        const res = await retrieveAssistants(currentWorkspace);
+        if (res && res.response && res.response.assistants) {
+          const assistants: AssistantType[] = res.response.assistants.map(
+            (assistant: any) => ({
+              id: assistant.assistantId,
+              name: assistant.assistantName,
+              description: assistant.purpose,
+            })
+          );
+          dispatch(setAssistant(assistants));
+          dispatch(setIsAssistantLoading(false));
+        }
       }
     };
     if (workspaces.length === 0 || assistants.length === 0) {
