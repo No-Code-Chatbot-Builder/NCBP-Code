@@ -75,7 +75,7 @@ export default function Page() {
         <section>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
             {Array.from(Array(4).keys()).map((key) => (
-              <LoadingSkeleton key={key} />
+              <LoadingSkeleton key={`loading-skeleton-${key}`} />
             ))}
           </div>
         </section>
