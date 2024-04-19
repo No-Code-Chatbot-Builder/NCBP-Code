@@ -79,6 +79,9 @@ const WorkspaceMenuOptions = ({
   const workspaces = useAppSelector(
     (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
   );
+  const assistants = useAppSelector(
+    (state: { assistants: { assistants: any } }) => state.assistants.assistants
+  );
 
   const [currentWorkspace, setCurrentWorkspaceState] = useState(() => {
     const initialWorkspace = workspaces.length > 0 ? workspaces[0].name : "";
@@ -128,7 +131,9 @@ const WorkspaceMenuOptions = ({
         dispatch(setIsAssistantLoading(false));
       }
     };
-    fetchUserData();
+    if (workspaces.length === 0 || assistants.length === 0) {
+      fetchUserData();
+    }
   }, [currentWorkspace]);
 
   const changeCurrentWorkspace = (name: string) => {
