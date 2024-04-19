@@ -21,7 +21,7 @@ import CreateFineTuneModelForm from "@/components/forms/create-finetune-model";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 
 export default function Page() {
-  const [loader, setLoader] = useState(true);
+  const loader = useAppSelector((state) => state.assistants.isAssistantLoading);
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
@@ -34,10 +34,6 @@ export default function Page() {
       <CreateFineTuneModelForm />
     </CustomSheet>
   );
-
-  useEffect(() => {
-    setLoader(false);
-  }, []);
 
   const handleCreateFinetuner = async () => {
     setOpen(finetuneSheet);

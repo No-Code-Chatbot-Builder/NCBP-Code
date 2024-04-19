@@ -28,6 +28,8 @@ import { useModal } from "@/providers/modal-provider";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { DatasetType } from "@/lib/constants";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 
 const CreateFineTuneModelForm = () => {
   const dispatch = useAppDispatch();
@@ -51,12 +53,13 @@ const CreateFineTuneModelForm = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
+      dataset: "",
+      base_model: "",
+      batch_size: "1",
+      no_epochs: "1",
+      lr: "0.1",
     },
   });
-
-  const workspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
-  );
 
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
@@ -71,26 +74,22 @@ const CreateFineTuneModelForm = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setBatchSize(event.target.value);
-    form.setValue("batch_size", event.target.value); // Update the form value
+    form.setValue("batch_size", event.target.value);
   };
 
-  const toggleBatchSizeEnabled = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setIsBatchSizeEnabled(event.target.checked);
-    if (!event.target.checked) {
-      form.setValue("batch_size", "auto");
-    }
+  const toggleBatchSizeEnabled = (checked: boolean) => {
+    setIsBatchSizeEnabled(checked);
+    form.setValue("batch_size", checked ? batchSize : "auto");
   };
 
   const handleEpochChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEpoch(event.target.value);
-    form.setValue("no_epochs", event.target.value); // Update the form value
+    form.setValue("no_epochs", event.target.value);
   };
 
-  const toggleEpochEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsEpochEnabled(event.target.checked);
-    if (!event.target.checked) {
+  const toggleEpochEnabled = (checked: boolean) => {
+    setIsEpochEnabled(checked);
+    if (!checked) {
       form.setValue("no_epochs", "auto");
     }
   };
@@ -100,9 +99,9 @@ const CreateFineTuneModelForm = () => {
     form.setValue("lr", event.target.value);
   };
 
-  const toggleLREnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsLREnabled(event.target.checked);
-    if (!event.target.checked) {
+  const toggleLREnabled = (checked: boolean) => {
+    setIsLREnabled(checked);
+    if (!checked) {
       form.setValue("lr", "auto");
     }
   };
@@ -119,7 +118,7 @@ const CreateFineTuneModelForm = () => {
             name="name"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">Name</FormLabel>
+                <FormLabel className="text-secondary">Name</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter the assistant name" {...field} />
                 </FormControl>
@@ -134,7 +133,7 @@ const CreateFineTuneModelForm = () => {
             name="dataset"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">Dataset</FormLabel>
+                <FormLabel className="text-secondary">Dataset</FormLabel>
                 <FormControl>
                   <Select
                     {...field}
@@ -164,7 +163,7 @@ const CreateFineTuneModelForm = () => {
             name="base_model"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">Base Model</FormLabel>
+                <FormLabel className="text-secondary">Base Model</FormLabel>
                 <FormControl>
                   <Select
                     {...field}
@@ -200,17 +199,16 @@ const CreateFineTuneModelForm = () => {
             name="batch_size"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">Batch Size</FormLabel>
+                <FormLabel className="text-secondary">Batch Size</FormLabel>
                 <FormControl>
                   <div>
                     <div className="flex justify-between items-center">
-                      <Input
-                        type="checkbox"
-                        className="w-6"
+                      <Checkbox
                         checked={isBatchSizeEnabled}
-                        onChange={toggleBatchSizeEnabled}
+                        onCheckedChange={toggleBatchSizeEnabled}
                         disabled={isLoading}
                       />
+
                       <Input
                         type="text"
                         className="w-16 h-8"
@@ -220,14 +218,17 @@ const CreateFineTuneModelForm = () => {
                       />
                     </div>
                     {isBatchSizeEnabled && (
-                      <Input
-                        type="range"
-                        min="1"
-                        max="32"
-                        step="1"
-                        disabled={isLoading}
-                        value={batchSize}
-                        onChange={handleBatchSizeChange}
+                      <Slider
+                        min={1}
+                        max={32}
+                        step={1}
+                        value={[parseInt(batchSize.toString(), 10)]}
+                        onValueChange={(value) =>
+                          handleBatchSizeChange({
+                            target: { value: value.toString() },
+                          } as React.ChangeEvent<HTMLInputElement>)
+                        }
+                        className="mt-4"
                       />
                     )}
                   </div>
@@ -243,17 +244,16 @@ const CreateFineTuneModelForm = () => {
             name="no_epochs"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">No. of Epochs</FormLabel>
+                <FormLabel className="text-secondary">No. of Epochs</FormLabel>
                 <FormControl>
                   <div>
                     <div className="flex justify-between items-center">
-                      <Input
-                        type="checkbox"
-                        className="w-6"
+                      <Checkbox
                         checked={isEpochEnabled}
-                        onChange={toggleEpochEnabled}
+                        onCheckedChange={toggleEpochEnabled}
                         disabled={isLoading}
                       />
+
                       <Input
                         type="text"
                         className="w-16 h-8"
@@ -263,14 +263,18 @@ const CreateFineTuneModelForm = () => {
                       />
                     </div>
                     {isEpochEnabled && (
-                      <Input
-                        type="range"
-                        min="1"
-                        max="10"
-                        step="1"
+                      <Slider
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={[parseInt(epoch.toString(), 10)]}
+                        onValueChange={(value) =>
+                          handleEpochChange({
+                            target: { value: value.toString() },
+                          } as React.ChangeEvent<HTMLInputElement>)
+                        }
                         disabled={isLoading}
-                        value={epoch}
-                        onChange={handleEpochChange}
+                        className="mt-4"
                       />
                     )}
                   </div>
@@ -286,17 +290,16 @@ const CreateFineTuneModelForm = () => {
             name="lr"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">Learning Rate</FormLabel>
+                <FormLabel className="text-secondary">Learning Rate</FormLabel>
                 <FormControl>
                   <div>
                     <div className="flex justify-between items-center">
-                      <Input
-                        type="checkbox"
-                        className="w-6"
+                      <Checkbox
                         checked={isLREnabled}
-                        onChange={toggleLREnabled}
+                        onCheckedChange={toggleLREnabled}
                         disabled={isLoading}
                       />
+
                       <Input
                         type="text"
                         className="w-16 h-8"
@@ -306,14 +309,18 @@ const CreateFineTuneModelForm = () => {
                       />
                     </div>
                     {isLREnabled && (
-                      <Input
-                        type="range"
-                        min="1"
-                        max="10"
-                        step="0.1"
+                      <Slider
+                        min={1}
+                        max={10}
+                        step={0.1}
+                        value={[parseFloat(lr)]}
+                        onValueChange={(value) =>
+                          handleLRChange({
+                            target: { value: value.toString() },
+                          } as React.ChangeEvent<HTMLInputElement>)
+                        }
                         disabled={isLoading}
-                        value={lr}
-                        onChange={handleLRChange}
+                        className="mt-4"
                       />
                     )}
                   </div>
@@ -328,7 +335,7 @@ const CreateFineTuneModelForm = () => {
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Start Fine tuning..."
+                "Start Fine Tuning"
               )}
             </Button>
             <Button
