@@ -6,27 +6,25 @@ export interface ChatState {
 }
 
 interface addPayload {
-  message: ChatState,
-  assistantId: string,
+  message: ChatState;
+  assistantId: string;
 }
 
 interface updatePayload {
-  message: string,
-  assistantId: string,
+  message: string;
+  assistantId: string;
 }
 
 interface ChatbotState {
   threads: {
-    messages: ChatState[],
-    assistantId: string,
+    messages: ChatState[];
+    assistantId: string;
   }[];
 }
 
 const initialState: ChatbotState = {
   threads: [],
 };
-
-
 
 export const chatbotSlice = createSlice({
   name: "chatbot",
@@ -35,8 +33,10 @@ export const chatbotSlice = createSlice({
     addMessage: (state, action: PayloadAction<addPayload>) => {
       const { assistantId, message } = action.payload;
 
-      if (!state.threads.some(thread => thread.assistantId === assistantId)) {
-        state.threads.push({
+      if (
+        !state.threads?.some((thread) => thread.assistantId === assistantId)
+      ) {
+        state.threads?.push({
           assistantId: assistantId,
           messages: [message],
         });
@@ -47,13 +47,13 @@ export const chatbotSlice = createSlice({
           }
         });
       }
-
     },
     updateMessage: (state, action: PayloadAction<updatePayload>) => {
       const { assistantId } = action.payload;
-      state.threads.forEach((thread) => {
+      state.threads?.forEach((thread) => {
         if (thread.assistantId === assistantId) {
-          thread.messages[thread.messages.length - 1].content += action.payload.message;
+          thread.messages[thread.messages.length - 1].content +=
+            action.payload.message;
         }
       });
     },

@@ -29,7 +29,7 @@ export const createAssistantWithThread = async (
   name: string,
   purpose: string,
   model: string,
-  tool: string,
+  tool: string
 ) => {
   console.log(workspaceName, name, purpose, model, tool);
   try {
@@ -51,9 +51,7 @@ export const createAssistantWithThread = async (
   }
 };
 
-export const retrieveAssistants = async (
-  workspaceName: string,
-) => {
+export const retrieveAssistants = async (workspaceName: string) => {
   try {
     const response = await apiClient.get(`/bot/${workspaceName}`);
     return response.data;
@@ -68,10 +66,9 @@ export const retrieveAssistants = async (
   }
 };
 
-
 export const runAssistant = async (workspaceName: string, query: string) => {
   try {
-    console.log("running...")
+    console.log("running...");
     console.log(workspaceName, query);
     const response = await apiClient.post(
       `/bot/${workspaceName}/runAssistant`,

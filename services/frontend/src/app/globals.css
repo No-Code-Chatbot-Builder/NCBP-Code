@@ -57,7 +57,7 @@ body {
   .dark {
     --gradient: linear-gradient(to top left, #007adf, #00ecbc);
 
-    --background: 244 100% 5%;
+    --background: 244 100% 9%;
     --foreground: 220 10% 97.2%;
 
     --muted: 220 80% 43%;

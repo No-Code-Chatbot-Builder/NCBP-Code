@@ -22,7 +22,7 @@ export default function Page() {
       <div>
         <section className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6">
-            <h1 className="text-secondary text-3xl font-bold">Featured</h1>
+            <h1 className="text-3xl font-bold">Featured</h1>
             <p className="text-md text-muted-foreground">
               Featured and popular assistants personalized for you according to
               your personal desciptions. Try out now.

@@ -138,7 +138,13 @@ const AddDataToDatasetForm = ({
                 "Upload File"
               )}
             </Button>
-            <Button onClick={setClose} variant="outline">
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                setClose();
+              }}
+              variant="outline"
+            >
               Cancel
             </Button>
           </div>

@@ -131,10 +131,10 @@ const WorkspaceMenuOptions = ({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="mt-2 w-64 h-fit z-50">
+        <PopoverContent className="mt-3 ml-5 w-96 h-fit z-50">
           <Card className="border-2 border-text-muted">
             <CardHeader>
-              <CardTitle className="text-xl">Change Workspace</CardTitle>
+              <CardTitle className="text-xl">Toggle Workspace</CardTitle>
               <CardDescription className="text-xs">
                 Select the workspace you want to work with
               </CardDescription>
@@ -143,7 +143,7 @@ const WorkspaceMenuOptions = ({
               <div className="space-y-4">
                 {workspaces.length === 0 ? (
                   <div className="text-muted-foreground text-sm">
-                    No New Workspaces
+                    Create a workspace to get started.
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-sm">
@@ -153,7 +153,9 @@ const WorkspaceMenuOptions = ({
                           onClick={() => changeCurrentWorkspace(workspace.name)}
                           key={workspace.name}
                           className={`${
-                            workspace.name == currentWorkspace ? "bg-primary" : "hover:bg-black/20"
+                            workspace.name == currentWorkspace
+                              ? "bg-primary"
+                              : "hover:bg-black/20"
                           } hover:cursor-pointer p-2 my-2 border-2 border-text-muted rounded-md`}
                         >
                           {workspace.name}
@@ -274,7 +276,6 @@ const ChatbotMenuOptions = () => {
               width={30}
               height={30}
             />
-
             <h1 className="text-xl font-bold text-secondary-foreground">
               NoCodeBot.ai
             </h1>

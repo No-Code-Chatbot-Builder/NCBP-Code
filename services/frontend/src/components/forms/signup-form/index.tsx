@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import {
   Popover,
@@ -43,6 +43,8 @@ export default SignUpForm;
 
 const SignUpInput = () => {
   const { signup } = useCustomAuth();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
   const FormSchema = z.object({
     email: z
       .string()
@@ -128,12 +130,29 @@ const SignUpInput = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Create a password"
-                    {...field}
-                    className="border-border"
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create a password"
+                      {...field}
+                      className="border-border"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                      <button
+                        className="text-muted-foreground"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowPassword(!showPassword);
+                        }}
+                      >
+                        {showPassword ? (
+                          <Eye className="w-4 h-4" />
+                        ) : (
+                          <EyeOff className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>

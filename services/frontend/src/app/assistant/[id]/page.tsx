@@ -122,7 +122,11 @@ const ChatbotMessage = ({ message }: { message: string }) => {
 };
 
 const AssistantIdByPage = ({ params }: Props) => {
-  const messages = useAppSelector((state) => state.chatbot.threads.filter((thread: any) => thread.assistantId === params.id));
+  const messages = useAppSelector((state) =>
+    state.chatbot.threads?.filter(
+      (thread: any) => thread.assistantId === params.id
+    )
+  );
   const form = useForm();
   const workspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
@@ -161,7 +165,8 @@ const AssistantIdByPage = ({ params }: Props) => {
         dispatch(updateMessage({ assistantId: params.id, message: data.data }));
       }
     });
-    return () => { //cleaning function
+    return () => {
+      //cleaning function
       if (socket) {
         socket.disconnect();
       }
@@ -176,7 +181,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     try {
       if (socket && query.trim() !== "") {
         if (typeof socket !== "undefined") {
-          console.log("emitting .....")
+          console.log("emitting .....");
           socket.emit("runAssistant", JSON.stringify({ query }));
           dispatch(
             addMessage({
@@ -184,7 +189,7 @@ const AssistantIdByPage = ({ params }: Props) => {
               message: {
                 role: "user",
                 content: query,
-              }
+              },
             })
           );
           form.setValue("query", "");
@@ -197,15 +202,16 @@ const AssistantIdByPage = ({ params }: Props) => {
 
   return (
     <div className="stretch mx-auto w-full md:w-3/4 max-w-5xl py-24">
-      {messages[0]?.messages?.map((message: ChatState, index: number) => (
-        <div key={index} className="mb-8 whitespace-pre-wrap">
-          {message.role === "user" ? (
-            <UserMessage message={message.content} />
-          ) : (
-            <ChatbotMessage message={message.content} />
-          )}
-        </div>
-      ))}
+      {messages &&
+        messages[0]?.messages?.map((message: ChatState, index: number) => (
+          <div key={index} className="mb-8 whitespace-pre-wrap">
+            {message.role === "user" ? (
+              <UserMessage message={message.content} />
+            ) : (
+              <ChatbotMessage message={message.content} />
+            )}
+          </div>
+        ))}
 
       {/* { messages[-1].role === 'user' &&
       <div className="mb-4">

@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export type WorkspaceType = {
-  // id: string;
   name: string;
   role: string;
 };
@@ -62,7 +61,12 @@ export const workspaceSlice = createSlice({
   },
 });
 
-export const { addWorkspace, setWorkspaces, removeWorkspace, updateWorkspace, setCurrentWorkspace } =
-  workspaceSlice.actions;
+export const {
+  addWorkspace,
+  setWorkspaces,
+  removeWorkspace,
+  updateWorkspace,
+  setCurrentWorkspace,
+} = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

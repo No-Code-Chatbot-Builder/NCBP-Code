@@ -11,7 +11,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectValue, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -37,7 +43,7 @@ const CreateAssistantForm = () => {
       message: "Description must contain atleast 5 characters long",
     }),
     dataset:  z.string().min(1, { message: "Select the dataset", }),
-      tool: z.string().min(1, { message: "Select the tool", }),
+    tool: z.string().min(1, { message: "Select the tool", }),
     model: z.string().min(1, { message: "Select the model" }),
     //dataset: z.string().min(1, { message: "Select the dataset" }),
   });
@@ -55,13 +61,17 @@ const CreateAssistantForm = () => {
     (state) => state.workspaces.currentWorkspaceName
   );
 
-  const datasets = useAppSelector(
-    (state) => state.datasets.datasets
-  );
+  const datasets = useAppSelector((state) => state.datasets.datasets);
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      const res = await createAssistantWithThread(workspaceName, values.name, values.description, values.model, values.tool);
+      const res = await createAssistantWithThread(
+        workspaceName,
+        values.name,
+        values.description,
+        values.model,
+        values.tool
+      );
       console.log(res.response);
       console.log(res.response[3]);
 
@@ -91,8 +101,6 @@ const CreateAssistantForm = () => {
       );
     }
   };
-
-
 
   const isLoading = form.formState.isSubmitting;
 
@@ -131,7 +139,8 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-
+        
+        {/* 
           <FormField
             disabled={isLoading}
             control={form.control}
@@ -159,7 +168,10 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-
+        
+        
+        */}
+          
           <FormField
             disabled={isLoading}
             control={form.control}
@@ -168,10 +180,12 @@ const CreateAssistantForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Model</FormLabel>
                 <FormControl>
-                  <Select {...field}
+                  <Select
+                    {...field}
                     onValueChange={(value: string) => field.onChange(value)}
-                    value={field.value}>
-                    <SelectTrigger >
+                    value={field.value}
+                  >
+                    <SelectTrigger>
                       <SelectValue placeholder="Select model type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -192,16 +206,19 @@ const CreateAssistantForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Tool</FormLabel>
                 <FormControl>
-                  <Select {...field}
+                  <Select
+                    {...field}
                     onValueChange={(value: string) => field.onChange(value)}
                     value={field.value}
                   >
-                    <SelectTrigger >
+                    <SelectTrigger>
                       <SelectValue placeholder="Select tool" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="retrieval">Retrieval</SelectItem>
-                      <SelectItem value="code_interpreter">Code Interpreter</SelectItem>
+                      <SelectItem value="code_interpreter">
+                        Code Interpreter
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -217,13 +234,19 @@ const CreateAssistantForm = () => {
                 "Create Assistant"
               )}
             </Button>
-            <Button variant={"outline"} onClick={() => setClose()}>
+            <Button
+              variant={"outline"}
+              onClick={(e) => {
+                e.preventDefault();
+                setClose();
+              }}
+            >
               Cancel
             </Button>
           </div>
         </form>
       </Form>
-    </main >
+    </main>
   );
 };
 
