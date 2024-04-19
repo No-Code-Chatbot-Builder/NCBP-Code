@@ -3,7 +3,7 @@ import ManageWorkspaceCard from "@/components/forms/manage-workspace-form";
 import PricingCards from "@/components/pricing/pricing-cards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Delete } from "lucide-react";
+import { Delete, Settings } from "lucide-react";
 import DeleteWorkspaceCard from "@/components/forms/delete-workspace-form";
 
 export default function Page() {
@@ -11,7 +11,10 @@ export default function Page() {
     <div className="flex flex-col gap-10">
       <div>
         <section className="mt-20 flex flex-col gap-2">
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <div className="flex gap-2 items-center">
+            <Settings className="w-7 h-7" />
+            <h1 className="text-3xl font-bold">Settings</h1>
+          </div>
           <p className="text-md text-muted-foreground">
             Manage your account and workspace settings here
           </p>

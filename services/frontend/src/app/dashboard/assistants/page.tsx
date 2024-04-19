@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { Code, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import LoadingSkeleton from "@/components/ui/loading-skeleton";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -43,7 +44,10 @@ export default function Page() {
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
-            <h1 className="text-3xl font-bold">Assistants</h1>
+            <div className="flex gap-2 items-center">
+              <Code className="w-7 h-7" />
+              <h1 className="text-3xl font-bold">Assistants</h1>
+            </div>
             <p className="text-md text-muted-foreground hidden sm:block">
               Assistants help you through your daily workflow tasks. Create
               custom assistants according to your personal needs and
@@ -51,7 +55,7 @@ export default function Page() {
             </p>
           </div>
 
-          {isAssistantLoading && assistants.length !== 0 && (
+          {!isAssistantLoading && assistants.length !== 0 && (
             <Button
               size={"lg"}
               className="gap-2"
@@ -67,13 +71,18 @@ export default function Page() {
         <Separator className="mt-8" />
       </section>
       {isAssistantLoading ? (
-        <div className="flex justify-center items-center w-full h-[65vh]">
-          <Loader2 className="w-6 h-6 animate-spin" />
-        </div>
+        // loading skeleton
+        <section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            {Array.from(Array(4).keys()).map((key) => (
+              <LoadingSkeleton key={key} />
+            ))}
+          </div>
+        </section>
       ) : (
         <section>
           {assistants.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
               {assistants.map((assistant: AssistantType) => (
                 <Card key={assistant.id}>
                   <CardHeader>
@@ -81,7 +90,7 @@ export default function Page() {
                     <CardDescription>{assistant.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="grid gap-3">
-                    <p className="text-muted-foreground">@{assistant.id}</p>
+                    {/* <p className="text-muted-foreground">@{assistant.id}</p> */}
                     <Button
                       className="w-full"
                       onClick={() => {

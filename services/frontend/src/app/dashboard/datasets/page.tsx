@@ -26,12 +26,14 @@ import { Database, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import LoadingSkeleton from "@/components/ui/loading-skeleton";
 
 export default function Page() {
   const dispatch = useAppDispatch();
   const isDatasetLoading = useAppSelector(
     (state) => state.datasets.isDatasetLoading
   );
+  // const isDatasetLoading = true;
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
@@ -78,7 +80,10 @@ export default function Page() {
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
-            <h1 className="text-3xl font-bold">Datasets</h1>
+            <div className="flex gap-2 items-center">
+              <Database className="w-7 h-7" />
+              <h1 className="text-3xl font-bold">Datasets</h1>
+            </div>
             <p className="text-md text-muted-foreground hidden md:block">
               Datasets help you manage your data which you can use to configure
               your workspace. Create your personal dataset and start using it
@@ -103,15 +108,20 @@ export default function Page() {
         </div>
         <Separator className="mt-8" />
       </section>
+
       {isDatasetLoading ? (
-        // loader
-        <div className="flex justify-center items-center w-full h-[60vh]">
-          <Loader2 className="w-6 h-6 animate-spin" />
-        </div>
+        // loading skeleton
+        <section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            {Array.from(Array(4).keys()).map((key) => (
+              <LoadingSkeleton key={key} />
+            ))}
+          </div>
+        </section>
       ) : (
         <section>
           {datasets?.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
               {datasets.map((dataset: DatasetType) => (
                 <Card key={dataset.id}>
                   <CardHeader>
