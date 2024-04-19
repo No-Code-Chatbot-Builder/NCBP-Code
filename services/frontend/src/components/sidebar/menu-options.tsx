@@ -82,44 +82,40 @@ const WorkspaceMenuOptions = ({
   const assistants = useAppSelector(
     (state: { assistants: { assistants: any } }) => state.assistants.assistants
   );
-
-  const [currentWorkspace, setCurrentWorkspaceState] = useState(() => {
-    const initialWorkspace = workspaces.length > 0 ? workspaces[0].name : "";
-    return initialWorkspace;
-  });
+  const currentReduxWorkspace = useAppSelector(
+    (state: { workspaces: { currentWorkspaceName: string } }) =>
+      state.workspaces.currentWorkspaceName
+  );
 
   useEffect(() => {
+    let isMounted = true; // flag to check if component is mounted
+
     const fetchUserData = async () => {
+      if (!isMounted) return; // exit if component is not mounted
+
       //initialize the loading states
       dispatch(setIsDatasetLoading(true));
       dispatch(setIsWorkspaceLoading(true));
       dispatch(setIsAssistantLoading(true));
+
       //load the workspaces
       const workspaces = await fetchWorkspaces();
-      if (workspaces) {
+      if (workspaces && isMounted) {
         const formattedWorkspaces: WorkspaceType[] = Object.entries(
           workspaces
         ).map(([key, value]: [string, unknown]) => ({
           name: key,
           role: value as string,
         }));
+        if (currentReduxWorkspace === null) {
+          setReduxCurrentWorkspace(formattedWorkspaces[0].name);
+        }
         dispatch(setWorkspaces(formattedWorkspaces));
         dispatch(setIsWorkspaceLoading(false));
 
-        //load the datasets according to workspace
-        if (formattedWorkspaces.length > 0) {
-          const firstWorkspaceName = formattedWorkspaces[0].name;
-          setCurrentWorkspaceState(firstWorkspaceName);
-          dispatch(setReduxCurrentWorkspace(firstWorkspaceName));
-          const res = await fetchDatasets(firstWorkspaceName);
-          dispatch(setDatasets(res?.datasets));
-        }
-
-        dispatch(setIsDatasetLoading(false));
-
-        //load the assistants now
-        const res = await retrieveAssistants(currentWorkspace);
-        if (res && res.response && res.response.assistants) {
+        const res = await retrieveAssistants(currentReduxWorkspace);
+        if (res && res.response && res.response.assistants && isMounted) {
+          // check if component is still mounted
           const assistants: AssistantType[] = res.response.assistants.map(
             (assistant: any) => ({
               id: assistant.assistantId,
@@ -130,15 +126,25 @@ const WorkspaceMenuOptions = ({
           dispatch(setAssistant(assistants));
           dispatch(setIsAssistantLoading(false));
         }
+
+        if (formattedWorkspaces.length > 0 && isMounted) {
+          dispatch(setReduxCurrentWorkspace(currentReduxWorkspace));
+          const res = await fetchDatasets(currentReduxWorkspace);
+          dispatch(setDatasets(res?.datasets));
+        }
+
+        dispatch(setIsDatasetLoading(false));
       }
     };
-    if (workspaces.length === 0 || assistants.length === 0) {
-      fetchUserData();
-    }
-  }, [currentWorkspace]);
+
+    fetchUserData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentReduxWorkspace, dispatch]);
 
   const changeCurrentWorkspace = (name: string) => {
-    setCurrentWorkspaceState(name);
     dispatch(setReduxCurrentWorkspace(name));
   };
 
@@ -168,7 +174,7 @@ const WorkspaceMenuOptions = ({
                     NoCodeBot.ai
                   </h1>
                   <p className="text-muted-foreground text-sm font-normal">
-                    {currentWorkspace}
+                    {currentReduxWorkspace}
                   </p>
                 </div>
               </div>
@@ -198,7 +204,7 @@ const WorkspaceMenuOptions = ({
                           onClick={() => changeCurrentWorkspace(workspace.name)}
                           key={workspace.name}
                           className={`${
-                            workspace.name == currentWorkspace
+                            workspace.name == currentReduxWorkspace
                               ? "bg-primary/50"
                               : "hover:bg-primary/30"
                           } hover:cursor-pointer p-2 my-2 border-2 border-text-muted rounded-md`}

@@ -17,14 +17,10 @@ import { Separator } from "@/components/ui/separator";
 import { deleteDataset, fetchDatasets } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import {
-  removeDataset,
-  setDatasets,
-} from "@/providers/redux/slice/datasetSlice";
+import { removeDataset } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Database, Loader2, Plus, Trash } from "lucide-react";
+import { Database, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 
@@ -64,128 +60,128 @@ export default function Page() {
           description: `${datasetName} has been deleted successfully.`,
         })
       );
-} catch (error) {
-  toast(
-    CustomToast({
-      title: "Error During Deletion",
-      description:
-        "An error occurred while deleting the dataset. Please try again.",
-    })
-  );
-  console.error(error);
-}
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the dataset. Please try again.",
+        })
+      );
+      console.error(error);
+    }
   };
-return (
-  <div className="flex flex-col gap-10">
-    <section>
-      <div className="flex flex-row justify-between mt-20 items-center">
-        <div className="flex flex-col gap-4 w-5/6 mr-10">
-          <div className="flex gap-2 items-center">
-            <Database className="w-7 h-7" />
-            <h1 className="text-3xl font-bold">Datasets</h1>
-          </div>
-          <p className="text-md text-muted-foreground hidden md:block">
-            Datasets help you manage your data which you can use to configure
-            your workspace. Create your personal dataset and start using it
-            now.
-          </p>
-        </div>
-        {/* {/Desktop Create Button/} */}
-        {!isDatasetLoading && datasets?.length !== 0 && (
-          <Button
-            size={"lg"}
-            className="gap-2"
-            onClick={() => {
-              setOpen(datasetSheet);
-            }}
-          >
-            <Plus className="w-5 h-5" />
-            <p className="flex">
-              Create <span className="hidden lg:block">&nbsp;Dataset</span>
+  return (
+    <div className="flex flex-col gap-10">
+      <section>
+        <div className="flex flex-row justify-between mt-20 items-center">
+          <div className="flex flex-col gap-4 w-5/6 mr-10">
+            <div className="flex gap-2 items-center">
+              <Database className="w-7 h-7" />
+              <h1 className="text-3xl font-bold">Datasets</h1>
+            </div>
+            <p className="text-md text-muted-foreground hidden md:block">
+              Datasets help you manage your data which you can use to configure
+              your workspace. Create your personal dataset and start using it
+              now.
             </p>
-          </Button>
-        )}
-      </div>
-      <Separator className="mt-8" />
-    </section>
-
-    {isDatasetLoading ? (
-      // loading skeleton
-      <section>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
-          {Array.from(Array(4).keys()).map((key) => (
-            <LoadingSkeleton key={key} />
-          ))}
+          </div>
+          {/* {/Desktop Create Button/} */}
+          {!isDatasetLoading && datasets?.length !== 0 && (
+            <Button
+              size={"lg"}
+              className="gap-2"
+              onClick={() => {
+                setOpen(datasetSheet);
+              }}
+            >
+              <Plus className="w-5 h-5" />
+              <p className="flex">
+                Create <span className="hidden lg:block">&nbsp;Dataset</span>
+              </p>
+            </Button>
+          )}
         </div>
+        <Separator className="mt-8" />
       </section>
-    ) : (
-      <section>
-        {datasets?.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
-            {datasets.map((dataset: DatasetType) => (
-              <Card key={dataset.id}>
-                <CardHeader>
-                  <div className="flex justify-between">
-                    <div className="flex flex-col gap-1">
-                      <CardTitle>{dataset.name}</CardTitle>
-                      <CardDescription>{dataset.description}</CardDescription>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant={"destructive"}
-                      onClick={() => {
-                        handleDatasetDeletion(dataset.id, dataset.name);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
 
-                <div className="flex gap-4 px-4">
-                  <PdfIcon className="w-12" />
-                  <JsonIcon className="w-12" />
-                </div>
-                <CardContent>
-                  <Button
-                    className="w-full gap-2"
-                    onClick={() => {
-                      router.push(`/dashboard/datasets/${dataset.id}`);
-                    }}
-                  >
-                    Manage Files
-                  </Button>
-                </CardContent>
-              </Card>
+      {isDatasetLoading ? (
+        // loading skeleton
+        <section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            {Array.from(Array(4).keys()).map((key) => (
+              <LoadingSkeleton key={key} />
             ))}
           </div>
-        ) : (
-          <div className="w-full h-[65vh] flex items-center justify-center">
-            <div className="flex items-center justify-center">
-              <div className="bg-card border border-primary p-16 rounded-lg flex flex-col gap-2">
-                <h2 className="text-2xl font-bold text-center">
-                  No Datasets Available
-                </h2>
+        </section>
+      ) : (
+        <section>
+          {datasets?.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+              {datasets.map((dataset: DatasetType) => (
+                <Card key={dataset.id}>
+                  <CardHeader>
+                    <div className="flex justify-between">
+                      <div className="flex flex-col gap-1">
+                        <CardTitle>{dataset.name}</CardTitle>
+                        <CardDescription>{dataset.description}</CardDescription>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant={"destructive"}
+                        onClick={() => {
+                          handleDatasetDeletion(dataset.id, dataset.name);
+                        }}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
 
-                <p className="text-muted-foreground text-center mt-2">
-                  Create a dataset to get started.
-                </p>
+                  <div className="flex gap-4 px-4">
+                    <PdfIcon className="w-12" />
+                    <JsonIcon className="w-12" />
+                  </div>
+                  <CardContent>
+                    <Button
+                      className="w-full gap-2"
+                      onClick={() => {
+                        router.push(`/dashboard/datasets/${dataset.id}`);
+                      }}
+                    >
+                      Manage Files
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="w-full h-[65vh] flex items-center justify-center">
+              <div className="flex items-center justify-center">
+                <div className="bg-card border border-primary p-16 rounded-lg flex flex-col gap-2">
+                  <h2 className="text-2xl font-bold text-center">
+                    No Datasets Available
+                  </h2>
 
-                <Button
-                  className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
-                  onClick={() => {
-                    setOpen(datasetSheet);
-                  }}
-                >
-                  <Database className="w-4 h-4" />
-                  <p className="text-md font-semibold">Create Dataset</p>
-                </Button>
+                  <p className="text-muted-foreground text-center mt-2">
+                    Create a dataset to get started.
+                  </p>
+
+                  <Button
+                    className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
+                    onClick={() => {
+                      setOpen(datasetSheet);
+                    }}
+                  >
+                    <Database className="w-4 h-4" />
+                    <p className="text-md font-semibold">Create Dataset</p>
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </section>
-    )}
-  </div>
-);
+          )}
+        </section>
+      )}
+    </div>
+  );
 }
