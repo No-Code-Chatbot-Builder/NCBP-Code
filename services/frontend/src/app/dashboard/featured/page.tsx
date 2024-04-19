@@ -10,6 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { FeaturedAssistant } from "@/lib/constants";
 import { useAppSelector } from "@/lib/hooks";
+import { Star, StarIcon } from "lucide-react";
 
 import Image from "next/image";
 
@@ -22,7 +23,10 @@ export default function Page() {
       <div>
         <section className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6">
-            <h1 className="text-3xl font-bold">Featured</h1>
+            <div className="flex gap-2 items-center">
+              <Star className="w-7 h-7" />
+              <h1 className="text-3xl font-bold">Featured</h1>
+            </div>
             <p className="text-md text-muted-foreground">
               Featured and popular assistants personalized for you according to
               your personal desciptions. Try out now.

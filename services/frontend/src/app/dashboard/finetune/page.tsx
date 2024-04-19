@@ -18,9 +18,10 @@ import { useModal } from "@/providers/modal-provider";
 import { AudioWaveform, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CreateFineTuneModelForm from "@/components/forms/create-finetune-model";
+import LoadingSkeleton from "@/components/ui/loading-skeleton";
 
 export default function Page() {
-  const [loader, setLoader] = useState(true);
+  const loader = useAppSelector((state) => state.assistants.isAssistantLoading);
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
@@ -34,10 +35,6 @@ export default function Page() {
     </CustomSheet>
   );
 
-  useEffect(() => {
-    setLoader(false);
-  }, []);
-
   const handleCreateFinetuner = async () => {
     setOpen(finetuneSheet);
   };
@@ -46,7 +43,10 @@ export default function Page() {
       <section>
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
-            <h1 className="text-3xl font-bold">Fine Tuning</h1>
+            <div className="flex gap-2 items-center">
+              <AudioWaveform className="w-7 h-7" />
+              <h1 className="text-3xl font-bold">Fine Tuning</h1>
+            </div>
             <p className="text-md text-muted-foreground hidden sm:block">
               Fine tune your models to get the most out of them. Create a new
               model or fine tune an existing one.
@@ -71,13 +71,18 @@ export default function Page() {
         <Separator className="mt-8" />
       </section>
       {loader ? (
-        <div className="flex justify-center items-center w-full">
-          <Loader2 className="w-20 h-20 animate-spin" />
-        </div>
+        // loading skeleton
+        <section>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            {Array.from(Array(4).keys()).map((key) => (
+              <LoadingSkeleton key={`loading-skeleton-${key}`} />
+            ))}
+          </div>
+        </section>
       ) : (
         <section>
           {assistants.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
               {assistants.map((assistant: AssistantType) => (
                 <Card key={assistant.id}>
                   <CardHeader>

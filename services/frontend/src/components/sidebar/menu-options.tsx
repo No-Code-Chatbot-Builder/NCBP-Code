@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import {
@@ -27,7 +27,7 @@ import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 
 import PersonalDetails from "./personal-details";
-import { dummyChatThreads, icons } from "@/lib/constants";
+import { AssistantType, dummyChatThreads, icons } from "@/lib/constants";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
@@ -45,9 +45,20 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   WorkspaceType,
   setWorkspaces,
-  setCurrentWorkspace,
+  setCurrentWorkspace as setReduxCurrentWorkspace,
+  setIsWorkspaceLoading,
 } from "@/providers/redux/slice/workspaceSlice";
 import { fetchWorkspaces } from "@/lib/api/workspace/service";
+import { fetchDatasets } from "@/lib/api/dataset/service";
+import {
+  setDatasets,
+  setIsDatasetLoading,
+} from "@/providers/redux/slice/datasetSlice";
+import {
+  setAssistant,
+  setIsAssistantLoading,
+} from "@/providers/redux/slice/assistantSlice";
+import { retrieveAssistants } from "@/lib/api/bot/service";
 
 type Props = {
   defaultOpen?: boolean;
@@ -68,14 +79,23 @@ const WorkspaceMenuOptions = ({
   const workspaces = useAppSelector(
     (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
   );
-  const currentWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const assistants = useAppSelector(
+    (state: { assistants: { assistants: any } }) => state.assistants.assistants
   );
 
+  const [currentWorkspace, setCurrentWorkspaceState] = useState(() => {
+    const initialWorkspace = workspaces.length > 0 ? workspaces[0].name : "";
+    return initialWorkspace;
+  });
+
   useEffect(() => {
-    const fetch = async () => {
+    const fetchUserData = async () => {
+      //initialize the loading states
+      dispatch(setIsDatasetLoading(true));
+      dispatch(setIsWorkspaceLoading(true));
+      dispatch(setIsAssistantLoading(true));
+      //load the workspaces
       const workspaces = await fetchWorkspaces();
-      console.log(workspaces);
       if (workspaces) {
         const formattedWorkspaces: WorkspaceType[] = Object.entries(
           workspaces
@@ -83,18 +103,42 @@ const WorkspaceMenuOptions = ({
           name: key,
           role: value as string,
         }));
-
-        console.log(formattedWorkspaces);
-
         dispatch(setWorkspaces(formattedWorkspaces));
-        dispatch(setCurrentWorkspace(formattedWorkspaces[0].name));
+        dispatch(setIsWorkspaceLoading(false));
+
+        //load the datasets according to workspace
+        if (formattedWorkspaces.length > 0) {
+          const firstWorkspaceName = formattedWorkspaces[0].name;
+          setCurrentWorkspaceState(firstWorkspaceName);
+          dispatch(setReduxCurrentWorkspace(firstWorkspaceName));
+          const res = await fetchDatasets(firstWorkspaceName);
+          dispatch(setDatasets(res?.datasets));
+        }
+      }
+      dispatch(setIsDatasetLoading(false));
+
+      //load the assistants now
+      const res = await retrieveAssistants(currentWorkspace);
+      if (res && res.response && res.response.assistants) {
+        const assistants: AssistantType[] = res.response.assistants.map(
+          (assistant: any) => ({
+            id: assistant.assistantId,
+            name: assistant.assistantName,
+            description: assistant.purpose,
+          })
+        );
+        dispatch(setAssistant(assistants));
+        dispatch(setIsAssistantLoading(false));
       }
     };
-    fetch();
-  }, [dispatch]);
+    if (workspaces.length === 0 || assistants.length === 0) {
+      fetchUserData();
+    }
+  }, [currentWorkspace]);
 
   const changeCurrentWorkspace = (name: string) => {
-    dispatch(setCurrentWorkspace(name));
+    setCurrentWorkspaceState(name);
+    dispatch(setReduxCurrentWorkspace(name));
   };
 
   return (
@@ -154,8 +198,8 @@ const WorkspaceMenuOptions = ({
                           key={workspace.name}
                           className={`${
                             workspace.name == currentWorkspace
-                              ? "bg-primary"
-                              : "hover:bg-black/20"
+                              ? "bg-primary/50"
+                              : "hover:bg-primary/30"
                           } hover:cursor-pointer p-2 my-2 border-2 border-text-muted rounded-md`}
                         >
                           {workspace.name}

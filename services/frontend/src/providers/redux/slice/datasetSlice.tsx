@@ -3,10 +3,12 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DatasetState {
   datasets: DatasetType[];
+  isDatasetLoading: boolean;
 }
 
 const initialState: DatasetState = {
   datasets: [],
+  isDatasetLoading: true,
 };
 
 export const datasetSlice = createSlice({
@@ -45,6 +47,9 @@ export const datasetSlice = createSlice({
         state.datasets[index] = action.payload;
       }
     },
+    setIsDatasetLoading: (state, action: PayloadAction<boolean>) => {
+      state.isDatasetLoading = action.payload;
+    },
   },
 });
 
@@ -54,6 +59,7 @@ export const {
   addFile,
   removeDataset,
   updateDataset,
+  setIsDatasetLoading,
 } = datasetSlice.actions;
 
 export const getDatasetById = createSelector(

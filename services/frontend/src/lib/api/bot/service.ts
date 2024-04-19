@@ -59,8 +59,8 @@ export const retrieveAssistants = async (workspaceName: string) => {
     console.log(error);
     toast(
       CustomToast({
-        title: "Error",
-        description: "Error creating Assistant.",
+        title: "Error Fetching assistants",
+        description: "Error fetching assistants.",
       })
     );
   }

@@ -58,7 +58,10 @@ export default function Page() {
         <section className="mt-20 flex flex-col">
           <div className="flex items-center justify-center">
             <div className="w-5/6 mr-10 flex flex-col gap-2">
-              <h1 className="text-3xl font-bold">API Keys</h1>
+              <div className="flex gap-2 items-center">
+                <Key className="w-7 h-7" />
+                <h1 className="text-3xl font-bold">API Keys</h1>
+              </div>
               <p className="text-md text-muted-foreground hidden sm:block">
                 Your secret API keys are listed below. Please note that we do
                 not display your secret API keys again after you generate them.{" "}

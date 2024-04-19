@@ -2,9 +2,18 @@
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getAssistantById } from "@/providers/redux/slice/assistantSlice";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { Send, User } from "lucide-react";
+import {
+  ArrowUp,
+  CopyIcon,
+  Pause,
+  PauseCircle,
+  Send,
+  ThumbsDown,
+  ThumbsUp,
+  User,
+} from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { Socket, io } from "socket.io-client";
@@ -20,6 +29,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { IoIosCopy, IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   params: {
@@ -30,18 +40,17 @@ type Props = {
 const UserMessage = ({ message }: { message: string }) => (
   <div>
     <div className="flex items-center gap-2">
-      <User className="w-4 h-4" />
-      <p className="text-lg font-bold">You</p>
+      <Image src="/assets/ncbai.svg" alt="Chatbot" width={35} height={35} />
+      <p className="text-muted-foreground font-medium">{message}</p>
     </div>
-    <p>{message}</p>
   </div>
 );
 
 const customStyle = {
   lineHeight: "1.5",
-  fontSize: "1rem",
+  fontSize: "1.2rem",
   borderRadius: "5px",
-  backgroundColor: "#000000",
+  backgroundColor: "#020024",
   padding: "20px",
 };
 
@@ -70,58 +79,64 @@ const ChatbotMessage = ({ message }: { message: string }) => {
     );
   };
   return (
-    <div className="mb-4">
-      <div className="flex items-center gap-2">
-        <Image
-          src="/assets/ncbai.svg"
-          alt="Chatbot"
-          width={40}
-          height={40}
-          className="w-4 h-4"
-        />
-        <p className="text-lg font-bold">Bot</p>
+    <div>
+      <div className="mb-4 bg-card p-6 py-8 rounded-xl text-muted-foreground font-medium tracking-wide leading-snug border border-primary">
+        {chunks.map((chunk, index) => {
+          if (
+            hasCode &&
+            chunk.startsWith("<code>") &&
+            chunk.endsWith("</code>")
+          ) {
+            const codeContent = chunk.slice(7, -8);
+            return (
+              <>
+                <div className="relative">
+                  <Button
+                    className="absolute top-4 right-2 p-2"
+                    size={"icon"}
+                    variant={"outline"}
+                  >
+                    <CopyToClipboard text={codeContent} onCopy={() => notify()}>
+                      {copied ? (
+                        <IoIosCheckmarkCircleOutline className="text-lg m-1 text-green-500 w-4 h-4" />
+                      ) : (
+                        <CopyIcon className="text-lg m-1  w-4 h-4 hover:text-white" />
+                      )}
+                    </CopyToClipboard>
+                  </Button>
+                </div>
+                <SyntaxHighlighter
+                  key={index}
+                  language="javascript"
+                  style={vscDarkPlus}
+                  customStyle={customStyle}
+                  showLineNumbers
+                >
+                  {codeContent}
+                </SyntaxHighlighter>
+              </>
+            );
+          } else {
+            return (
+              <p key={index} className="text-base font-medium">
+                {chunk}
+              </p>
+            );
+          }
+        })}
       </div>
-      {chunks.map((chunk, index) => {
-        if (
-          hasCode &&
-          chunk.startsWith("<code>") &&
-          chunk.endsWith("</code>")
-        ) {
-          const codeContent = chunk.slice(7, -8);
-          return (
-            <>
-              <div className="relative">
-                <button className="absolute top-0 right-0 p-2">
-                  <span className="m-1 pb-1 basis-3/4 text-xs">javascript</span>
-                  <CopyToClipboard text={codeContent} onCopy={() => notify()}>
-                    {copied ? (
-                      <IoIosCheckmarkCircleOutline className="text-lg m-1 text-green-500 basis-1/4" />
-                    ) : (
-                      <IoIosCopy className="text-lg m-1 basis-1/4 hover:text-white" />
-                    )}
-                  </CopyToClipboard>
-                </button>
-              </div>
-              <SyntaxHighlighter
-                key={index}
-                language="javascript"
-                style={vscDarkPlus}
-                customStyle={customStyle}
-                showLineNumbers
-              >
-                {codeContent}
-              </SyntaxHighlighter>
-            </>
-          );
-        } else {
-          return <p key={index}>{chunk}</p>;
-        }
-      })}
+      <div className="flex gap-2 text-muted-foreground flex-row-reverse mr-4">
+        <CopyIcon className="w-4 h-4" />
+        <ThumbsDown className="w-4 h-4" />
+        <ThumbsUp className="w-4 h-4" />
+      </div>
     </div>
   );
 };
 
 const AssistantIdByPage = ({ params }: Props) => {
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const messages = useAppSelector((state) =>
     state.chatbot.threads?.filter(
       (thread: any) => thread.assistantId === params.id
@@ -136,20 +151,25 @@ const AssistantIdByPage = ({ params }: Props) => {
   );
   const dispatch = useAppDispatch();
   const URL = `http://localhost:3004?workspaceId=${workspaceName}&assistantId=${params.id}`;
-  let socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
+  const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
+    null
+  );
+  const [isInputDisabled, setInputDisabled] = useState(true);
 
   useEffect(() => {
-    socket = io(URL, { transports: ["websocket"] });
+    socketRef.current = io(URL, { transports: ["websocket"] });
 
-    socket.on("connect", () => {
+    socketRef.current.on("connect", () => {
       console.log("Connected to socket server");
+      setInputDisabled(false);
     });
 
-    socket.on("disconnect", () => {
+    socketRef.current.on("disconnect", () => {
       console.log("Disconnected from socket server");
+      setInputDisabled(true);
     });
 
-    socket.on("gptResponse", (data: any) => {
+    socketRef.current.on("gptResponse", (data: any) => {
       console.log("Received data from server:", data);
       if (data.event === "textCreated") {
         dispatch(
@@ -163,84 +183,97 @@ const AssistantIdByPage = ({ params }: Props) => {
         );
       } else if (data.event === "textDelta") {
         dispatch(updateMessage({ assistantId: params.id, message: data.data }));
+        setInputDisabled(false);
       }
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     });
     return () => {
       //cleaning function
-      if (socket) {
-        socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
       }
     };
-  }, [URL]);
+  }, [URL, dispatch, params.id]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const query = form.getValues("query");
-    console.log(socket);
+    if (query.trim() === "") {
+      console.error("Query cannot be empty.");
+      return;
+    }
 
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+
+    setInputDisabled(true);
     try {
-      if (socket && query.trim() !== "") {
-        if (typeof socket !== "undefined") {
-          console.log("emitting .....");
-          socket.emit("runAssistant", JSON.stringify({ query }));
-          dispatch(
-            addMessage({
-              assistantId: params.id,
-              message: {
-                role: "user",
-                content: query,
-              },
-            })
-          );
-          form.setValue("query", "");
-        }
+      if (socketRef.current) {
+        console.log("emitting .....");
+        socketRef.current.emit("runAssistant", JSON.stringify({ query }));
+        dispatch(
+          addMessage({
+            assistantId: params.id,
+            message: {
+              role: "user",
+              content: query,
+            },
+          })
+        );
+        form.setValue("query", "");
       }
     } catch (error) {
       console.error("Error running assistant: ", error);
+      setInputDisabled(false);
     }
   };
 
   return (
-    <div className="stretch mx-auto w-full md:w-3/4 max-w-5xl py-24">
+    <div className="stretch mx-auto w-full md:w-3/4 max-w-5xl pt-24 pb-40">
       {messages &&
         messages[0]?.messages?.map((message: ChatState, index: number) => (
           <div key={index} className="mb-8 whitespace-pre-wrap">
             {message.role === "user" ? (
-              <UserMessage message={message.content} />
+              <>
+                <UserMessage message={message.content} />
+                <div ref={messagesEndRef} />
+              </>
             ) : (
-              <ChatbotMessage message={message.content} />
+              <>
+                <ChatbotMessage message={message.content} />
+                <div ref={messagesEndRef} />
+              </>
             )}
           </div>
         ))}
 
-      {/* { messages[-1].role === 'user' &&
-      <div className="mb-4">
-        <div className="flex items-center gap-2">
-          <Image
-            src="/assets/ncbai.svg"
-            alt="Chatbot"
-            width={40}
-            height={40}
-            className="w-4 h-4"
-          />
-          <p className="text-lg font-bold">Bot</p>
-        </div>
-     } */}
-
       <div className="flex flex-col items-center justify-center">
         <div className="bg-background fixed bottom-0 w-full md:w-2/3 max-w-7xl px-10 pb-10">
-          <div className="relative ">
+          <div className="relative">
             <form onSubmit={handleSubmit}>
               <Input
                 {...form.register("query")}
                 type="text"
                 placeholder="Ask Anything"
-                className="mt-4 border-secondary/30 bg-card rounded-lg text-muted-foreground p-6 shadow-xl"
+                className="mt-4 border-secondary/30 bg-card rounded-lg text-muted-foreground px-6 py-7 shadow-xl"
+                disabled={isInputDisabled}
               />
-              <Send
+              <Button
                 type="submit"
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer w-5 h-5 text-muted-foreground"
-              />
+                variant={
+                  form.watch("query") && form.watch("query").trim().length > 0
+                    ? "default"
+                    : "ghost"
+                }
+                size={"icon"}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:bg-primary"
+                disabled={isInputDisabled}
+              >
+                {isInputDisabled ? (
+                  <PauseCircle className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <ArrowUp className="w-5 h-5 text-muted-foreground" />
+                )}
+              </Button>
             </form>
           </div>
 
