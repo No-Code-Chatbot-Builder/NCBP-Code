@@ -29,7 +29,8 @@ export const createAssistantWithThread = async (
   name: string,
   purpose: string,
   model: string,
-  tool: string
+  tool: string,
+  datasetId: string
 ) => {
   console.log(workspaceName, name, purpose, model, tool);
   try {
@@ -38,6 +39,7 @@ export const createAssistantWithThread = async (
       assistantName: name,
       tool: tool,
       models: model,
+      dataSetId : datasetId,
     });
     return response.data;
   } catch (error) {
