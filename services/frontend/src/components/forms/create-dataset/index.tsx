@@ -134,13 +134,7 @@ const CreateDatasetForm = () => {
                 "Create Dataset"
               )}
             </Button>
-            <Button
-              variant="outline"
-              onClick={(e) => {
-                e.preventDefault();
-                setClose();
-              }}
-            >
+            <Button variant="outline" onClick={() => setClose()}>
               Cancel
             </Button>
           </div>

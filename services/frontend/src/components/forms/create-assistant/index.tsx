@@ -73,11 +73,11 @@ const CreateAssistantForm = () => {
         values.dataset
       );
       console.log(res.response);
-      console.log(res.response[3]);
+      console.log(res.response[2].split(": ")[1].trim());
 
       dispatch(
         addAssistant({
-          id: res.response[2].assistantId,
+          id: res.response[2].split(": ")[1].trim(),
           name: values.name,
           description: values.description,
           // owner: "currentuser",

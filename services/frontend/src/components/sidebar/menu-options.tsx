@@ -88,12 +88,11 @@ const WorkspaceMenuOptions = ({
   );
 
   useEffect(() => {
-    let isMounted = true; // flag to check if component is mounted
+    let isMounted = true; 
 
     const fetchUserData = async () => {
-      if (!isMounted) return; // exit if component is not mounted
+      if (!isMounted) return;
 
-      //initialize the loading states
       dispatch(setIsDatasetLoading(true));
       dispatch(setIsWorkspaceLoading(true));
       dispatch(setIsAssistantLoading(true));

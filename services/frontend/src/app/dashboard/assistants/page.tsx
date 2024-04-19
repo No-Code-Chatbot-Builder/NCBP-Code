@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Code, Loader2, Plus } from "lucide-react";
+import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 
@@ -38,6 +38,10 @@ export default function Page() {
   const handleCreateAssistant = async () => {
     setOpen(assistantSheet);
   };
+
+  const handleAssistantDeletion = async (assistant_id : string) => {
+
+  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -88,7 +92,17 @@ export default function Page() {
                   <CardHeader>
                     <CardTitle>{assistant.name}</CardTitle>
                     <CardDescription>{assistant.description}</CardDescription>
+                    <Button
+                      size="icon"
+                      variant={"destructive"}
+                      onClick={() => {
+                        handleAssistantDeletion(assistant.id);
+                      }}
+                    >
+                      <Trash className="w-4 h-4" />
+                    </Button>
                   </CardHeader>
+
                   <CardContent className="grid gap-3">
                     {/* <p className="text-muted-foreground">@{assistant.id}</p> */}
                     <Button
