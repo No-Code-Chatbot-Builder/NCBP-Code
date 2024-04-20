@@ -13,13 +13,15 @@ export const createWorkspace = async (workspaceName: string) => {
         description: `Workspace ${workspaceName} created successfully.`,
       })
     );
+    console.log(response);
   } catch (error: any) {
     console.log(error);
     toast(
       CustomToast({
         title: "Error",
-        description: `Error creating workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error creating workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -48,8 +50,9 @@ export const editWorkspace = async (
     toast(
       CustomToast({
         title: "Error",
-        description: `Error updating workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error updating workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -72,8 +75,9 @@ export const deleteWorkspace = async (workspaceName: string) => {
     toast(
       CustomToast({
         title: "Error",
-        description: `Error deleting workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error deleting workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -96,8 +100,9 @@ export const fetchWorkspace = async (workspaceName: string) => {
     toast(
       CustomToast({
         title: "Error",
-        description: `Error fetching workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error fetching workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -118,8 +123,9 @@ export const fetchWorkspaces = async () => {
     toast(
       CustomToast({
         title: "Error",
-        description: `Error fetching workspaces. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error fetching workspaces. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -128,9 +134,12 @@ export const fetchWorkspaces = async () => {
 //connection remaining
 export const removeUserFromWorkspace = async (workspaceName: string) => {
   try {
-    const response = await apiClient.put("/workspace-service/workspaces/remove", {
-      workspaceName,
-    });
+    const response = await apiClient.put(
+      "/workspace-service/workspaces/remove",
+      {
+        workspaceName,
+      }
+    );
     toast(
       CustomToast({
         title: "Success",
@@ -142,8 +151,9 @@ export const removeUserFromWorkspace = async (workspaceName: string) => {
     toast(
       CustomToast({
         title: "Error",
-        description: `Error removing user from workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error removing user from workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -155,10 +165,13 @@ export const inviteUser = async (
   userEmail: string
 ) => {
   try {
-    const response = await apiClient.post("/workspace-service/workspaces/invite", {
-      workspaceName,
-      userEmail,
-    });
+    const response = await apiClient.post(
+      "/workspace-service/workspaces/invite",
+      {
+        workspaceName,
+        userEmail,
+      }
+    );
     toast(
       CustomToast({
         title: "Success",
@@ -170,8 +183,9 @@ export const inviteUser = async (
     toast(
       CustomToast({
         title: "Error",
-        description: `Error inviting user: ${userEmail} to workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error inviting user: ${userEmail} to workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }
@@ -183,11 +197,14 @@ export const respondInvite = async (
   userResponse: string
 ) => {
   try {
-    const response = await apiClient.post("/workspace-service/workspaces/respond", {
-      userId,
-      workspaceName,
-      userResponse,
-    });
+    const response = await apiClient.post(
+      "/workspace-service/workspaces/respond",
+      {
+        userId,
+        workspaceName,
+        userResponse,
+      }
+    );
     toast(
       CustomToast({
         title: "Success",
@@ -199,8 +216,9 @@ export const respondInvite = async (
     toast(
       CustomToast({
         title: "Error",
-        description: `Error responding to invitation for workspace: ${workspaceName}. ${error.response?.data?.message || error.message
-          }`,
+        description: `Error responding to invitation for workspace: ${workspaceName}. ${
+          error.response?.data?.message || error.message
+        }`,
       })
     );
   }

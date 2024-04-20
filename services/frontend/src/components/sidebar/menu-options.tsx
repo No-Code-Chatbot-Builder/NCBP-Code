@@ -83,12 +83,12 @@ const WorkspaceMenuOptions = ({
     (state: { assistants: { assistants: any } }) => state.assistants.assistants
   );
   const currentReduxWorkspace = useAppSelector(
-    (state: { workspaces: { currentWorkspaceName: string } }) =>
+    (state: { workspaces: { currentWorkspaceName: string | null } }) =>
       state.workspaces.currentWorkspaceName
   );
 
   useEffect(() => {
-    let isMounted = true; 
+    let isMounted = true;
 
     const fetchUserData = async () => {
       if (!isMounted) return;
@@ -112,7 +112,9 @@ const WorkspaceMenuOptions = ({
         dispatch(setWorkspaces(formattedWorkspaces));
         dispatch(setIsWorkspaceLoading(false));
 
-        const res = await retrieveAssistants(currentReduxWorkspace);
+        const res = currentReduxWorkspace
+          ? await retrieveAssistants(currentReduxWorkspace)
+          : null;
         if (res && res.response && res.response.assistants && isMounted) {
           // check if component is still mounted
           const assistants: AssistantType[] = res.response.assistants.map(
@@ -127,8 +129,10 @@ const WorkspaceMenuOptions = ({
         }
 
         if (formattedWorkspaces.length > 0 && isMounted) {
-          dispatch(setReduxCurrentWorkspace(currentReduxWorkspace));
-          const res = await fetchDatasets(currentReduxWorkspace);
+          const workspaceName =
+            currentReduxWorkspace || formattedWorkspaces[0].name;
+          dispatch(setReduxCurrentWorkspace(workspaceName));
+          const res = await fetchDatasets(workspaceName);
           dispatch(setDatasets(res?.datasets));
         }
 
@@ -141,7 +145,7 @@ const WorkspaceMenuOptions = ({
     return () => {
       isMounted = false;
     };
-  }, [currentReduxWorkspace, dispatch]);
+  }, []);
 
   const changeCurrentWorkspace = (name: string) => {
     dispatch(setReduxCurrentWorkspace(name));
@@ -181,10 +185,10 @@ const WorkspaceMenuOptions = ({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="mt-3 ml-5 w-96 h-fit z-50">
+        <PopoverContent className="mt-3 ml-5 w-full h-fit z-50">
           <Card className="border-2 border-text-muted">
             <CardHeader>
-              <CardTitle className="text-xl">Toggle Workspace</CardTitle>
+              <CardTitle className="text-xl">Create Workspace</CardTitle>
               <CardDescription className="text-xs">
                 Select the workspace you want to work with
               </CardDescription>
