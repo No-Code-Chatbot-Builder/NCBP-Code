@@ -118,7 +118,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(userAttributes);
           const newToken = session.tokens?.idToken?.toString() || "";
           setToken(newToken);
-          localStorage.setItem("token", newToken);
+          sessionStorage.setItem("token", newToken);
         } else {
           setIsLoggedIn(false);
         }
@@ -126,7 +126,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoggedIn(false);
         setUser(null);
         setToken("");
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
       }
     };
 
@@ -215,6 +215,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         router.push("/dashboard");
       } else setIsVerificationStep(true);
     } catch (error: any) {
+      if (error.name === "UnexpectedLambdaException") {
+        router.push("/sign-in");
+      }
+
       toast(
         <CustomToast title="Error Signing Up" description={error.toString()} />
       );
@@ -234,8 +238,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setIsVerificationStep(true);
           }
         }
-      }
-      if (user?.isSignedIn) {
+      } else if (user?.isSignedIn) {
         setIsVerificationStep(false);
         toast(
           <CustomToast
@@ -244,17 +247,40 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           />
         );
       }
-      setUser({
-        ...user,
-        email: username,
-        preferred_username: username.split("@")[0],
-      });
+      const userAttributes = await fetchUserAttributes();
+      setUser(userAttributes);
+      const session = await fetchAuthSession();
+      const newToken = session.tokens?.idToken?.toString() || "";
+      setToken(newToken);
+      sessionStorage.setItem("token", newToken);
       setIsLoggedIn(true);
-      router.push("/dashboard");
+      router.push("/dashboard/featured");
     } catch (error: any) {
-      toast(
-        <CustomToast title="Error signing in" description={error.toString()} />
-      );
+      if (error.name === "UnexpectedSignInInterruptionException") {
+        toast(
+          <CustomToast
+            title="Error signing in"
+            description="Unable to get user session following successful sign-in."
+          />
+        );
+      } else {
+        if (error.name === "UserAlreadyAuthenticatedException") {
+          router.push("/dashboard/featured");
+          toast(
+            <CustomToast
+              title="Error signing in"
+              description="Unable to get user session following successful sign-in."
+            />
+          );
+        }
+
+        toast(
+          <CustomToast
+            title="Error signing in"
+            description={error.toString()}
+          />
+        );
+      }
     }
   };
 
@@ -343,6 +369,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         />
       );
       setIsLoggedIn(false);
+      setUser(null);
+      setToken("");
+      sessionStorage.removeItem("token");
       router.push("/");
     } catch (error: any) {
       toast(

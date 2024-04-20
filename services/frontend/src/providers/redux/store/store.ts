@@ -1,20 +1,21 @@
-import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import datasetReducer from "@/providers/redux/slice/datasetSlice";
 import featuredReducer from "@/providers/redux/slice/featuredSlice";
 import assistantReducer from "@/providers/redux/slice/assistantSlice";
 import workspaceReducer from "@/providers/redux/slice/workspaceSlice";
 import chatbotReducer from "@/providers/redux/slice/chatbotSlice";
 
-const rootReducer = combineReducers({
-  featured: featuredReducer,
-  datasets: datasetReducer,
-  assistants: assistantReducer,
-  workspaces: workspaceReducer,
-  chatbot: chatbotReducer,
+export const store = configureStore({
+  reducer: {
+    featured: featuredReducer,
+    datasets: datasetReducer,
+    assistants: assistantReducer,
+    workspaces: workspaceReducer,
+    chatbot: chatbotReducer,
+  },
 });
 
+<<<<<<< HEAD
 const persistConfig = {
   key: "root",
   storage,
@@ -43,3 +44,7 @@ export const makeStore = () => {
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];
+=======
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+>>>>>>> 8173deb279e81c88256174682beca7ce7ac4ae41
