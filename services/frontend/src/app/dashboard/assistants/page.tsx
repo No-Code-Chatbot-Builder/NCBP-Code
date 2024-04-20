@@ -17,6 +17,7 @@ import { useModal } from "@/providers/modal-provider";
 import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { deleteAssistant } from "@/lib/api/bot/service";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -24,6 +25,8 @@ export default function Page() {
   );
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
+  const workspaceName = useAppSelector((state) => state.workspaces.currentWorkspaceName);
+
   const router = useRouter();
 
   const assistantSheet = (
@@ -39,8 +42,8 @@ export default function Page() {
     setOpen(assistantSheet);
   };
 
-  const handleAssistantDeletion = async (assistant_id : string) => {
-
+  const handleAssistantDeletion = async (assistant_id: string) => {
+    const res = await deleteAssistant(workspaceName, assistant_id);
   }
 
   return (
@@ -90,17 +93,24 @@ export default function Page() {
               {assistants.map((assistant: AssistantType) => (
                 <Card key={assistant.id}>
                   <CardHeader>
-                    <CardTitle>{assistant.name}</CardTitle>
-                    <CardDescription>{assistant.description}</CardDescription>
-                    <Button
-                      size="icon"
-                      variant={"destructive"}
-                      onClick={() => {
-                        handleAssistantDeletion(assistant.id);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
+                    <div className="flex justify-between">
+                      <div>
+                        <CardTitle>{assistant.name}</CardTitle>
+                        <CardDescription>{assistant.description}</CardDescription>
+                      </div>
+                      <div>
+                        <Button
+                          size="icon"
+                          variant={"destructive"}
+                          onClick={() => {
+                            handleAssistantDeletion(assistant.id);
+                          }}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
                   </CardHeader>
 
                   <CardContent className="grid gap-3">

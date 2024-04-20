@@ -18,7 +18,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["workspaces", "assistants", "datasets", "chatbot", "featured"],
+  // whitelist: ["workspaces", "assistants", "datasets", "chatbot", "featured"],
 };
 
 const makeConfiguredStore = () =>

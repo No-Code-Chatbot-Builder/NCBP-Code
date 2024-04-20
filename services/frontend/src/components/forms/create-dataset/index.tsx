@@ -60,17 +60,17 @@ const CreateDatasetForm = () => {
         values.description
       );
 
-      //updating state, showing toast, closing model
-      dispatch(
-        addDataset({
-          id: res.datasetDetails.datasetId,
-          name: res.datasetDetails.name,
-          description: res.datasetDetails.description,
-          createdAt: new Date().toISOString(),
-          createdBy: user?.sub,
-          data: [],
-        })
-      );
+      res &&
+        dispatch(
+          addDataset({
+            id: res.datasetDetails.datasetId,
+            name: res.datasetDetails.name,
+            description: res.datasetDetails.description,
+            createdAt: new Date().toISOString(),
+            createdBy: user?.sub,
+            data: [],
+          })
+        );
 
       setClose();
       toast(

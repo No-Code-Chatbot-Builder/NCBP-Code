@@ -39,7 +39,7 @@ export const createAssistantWithThread = async (
       assistantName: name,
       tool: tool,
       models: model,
-      dataSetId : datasetId,
+      dataSetId: datasetId,
     });
     return response.data;
   } catch (error) {
@@ -48,6 +48,26 @@ export const createAssistantWithThread = async (
       CustomToast({
         title: "Error",
         description: "Error creating Assistant.",
+      })
+    );
+  }
+};
+
+export const deleteAssistant = async (
+  workspaceName: string,
+  assistantId: string
+) => {
+  try {
+    const response = await apiClient.delete(`/bot/${workspaceName}?${assistantId}`, {
+      // assistantId: assistantId,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: "Error deleting Assistant.",
       })
     );
   }
