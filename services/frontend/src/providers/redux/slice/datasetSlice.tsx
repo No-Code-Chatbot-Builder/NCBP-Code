@@ -28,10 +28,10 @@ export const datasetSlice = createSlice({
     },
     addFile: (state, action: PayloadAction<DataBucketType>) => {
       const index = state.datasets.findIndex(
-        (dataset) => dataset.id === action.payload.id
+        (dataset) => dataset.id === action.payload.datasetId
       );
       if (index !== -1) {
-        state.datasets[index].data.push(action.payload);
+        state.datasets[index].data.push(action.payload.data as any);
       }
       console.log(state.datasets[index].data);
     },

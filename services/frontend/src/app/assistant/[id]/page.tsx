@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import {
   ArrowUp,
   CopyIcon,
+  Loader2,
   Pause,
   PauseCircle,
   Send,
@@ -125,10 +126,16 @@ const ChatbotMessage = ({ message }: { message: string }) => {
           }
         })}
       </div>
-      <div className="flex gap-2 text-muted-foreground flex-row-reverse mr-4">
-        <CopyIcon className="w-4 h-4" />
-        <ThumbsDown className="w-4 h-4" />
-        <ThumbsUp className="w-4 h-4" />
+      <div className="flex text-muted-foreground flex-row-reverse mr-4">
+        <button className="p-1 hover:text-white">
+          <CopyIcon className="w-4 h-4" />
+        </button>
+        <button className="p-1 hover:text-white">
+          <ThumbsUp className="w-4 h-4" />
+        </button>
+        <button className="p-1 hover:text-white">
+          <ThumbsDown className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
@@ -269,7 +276,7 @@ const AssistantIdByPage = ({ params }: Props) => {
                 disabled={isInputDisabled}
               >
                 {isInputDisabled ? (
-                  <PauseCircle className="w-5 h-5 text-muted-foreground" />
+                  <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
                 ) : (
                   <ArrowUp className="w-5 h-5 text-muted-foreground" />
                 )}
@@ -277,7 +284,7 @@ const AssistantIdByPage = ({ params }: Props) => {
             </form>
           </div>
 
-          <p className="text-secondary font-semibold text-sm mt-2">
+          <p className="text-secondary font-medium text-xs mt-2">
             Model: {assistant ? assistant.name : ""}. Generated Content may be
             incorrect or false.
           </p>

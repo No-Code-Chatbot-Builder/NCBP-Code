@@ -55,7 +55,7 @@ const CreateDatasetForm = () => {
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       const res = await createDataset(
-        currentWorkspaceName,
+        currentWorkspaceName!,
         values.name,
         values.description
       );

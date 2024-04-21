@@ -12,7 +12,7 @@ export default function Page() {
       <div>
         <section className="mt-20 flex flex-col gap-2">
           <div className="flex gap-2 items-center">
-            <Settings className="w-7 h-7" />
+            <Settings className="w-5 h-5" />
             <h1 className="text-3xl font-bold">Settings</h1>
           </div>
           <p className="text-md text-muted-foreground">
@@ -24,10 +24,9 @@ export default function Page() {
 
       <div className="">
         <Tabs defaultValue="workspace" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-10">
+          <TabsList className="grid w-full grid-cols-2 mb-10">
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
 
-            <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
           </TabsList>
           <TabsContent value="workspace">
@@ -35,9 +34,7 @@ export default function Page() {
             <ManageUsersCard />
             <DeleteWorkspaceCard />
           </TabsContent>
-          <TabsContent value="account">
-            <div>Account Settings</div>
-          </TabsContent>
+
           <TabsContent value="subscriptions">
             <PricingCards />
           </TabsContent>

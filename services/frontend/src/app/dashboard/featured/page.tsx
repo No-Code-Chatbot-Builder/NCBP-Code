@@ -16,7 +16,6 @@ import Image from "next/image";
 
 export default function Page() {
   const featured = useAppSelector((state) => state.featured.featured);
-  console.log(featured);
 
   return (
     <div className="flex flex-col gap-10">
@@ -24,7 +23,7 @@ export default function Page() {
         <section className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6">
             <div className="flex gap-2 items-center">
-              <Star className="w-7 h-7" />
+              <Star className="w-5 h-5" />
               <h1 className="text-3xl font-bold">Featured</h1>
             </div>
             <p className="text-md text-muted-foreground">

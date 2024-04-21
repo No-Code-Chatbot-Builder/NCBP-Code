@@ -9,11 +9,10 @@ export const createWorkspace = async (workspaceName: string) => {
     });
     toast(
       CustomToast({
-        title: "Success",
+        title: "Workspace created",
         description: `Workspace ${workspaceName} created successfully.`,
       })
     );
-    console.log(response);
   } catch (error: any) {
     console.log(error);
     toast(
@@ -83,51 +82,23 @@ export const deleteWorkspace = async (workspaceName: string) => {
   }
 };
 
-//connection remaining
 export const fetchWorkspace = async (workspaceName: string) => {
   try {
     const response = await apiClient.get("/workspace-service/workspaces/", {
       data: { workspaceName },
     });
-    toast(
-      CustomToast({
-        title: "Success",
-        description: `Workspace ${workspaceName} fetched successfully.`,
-      })
-    );
   } catch (error: any) {
     console.log(error);
-    toast(
-      CustomToast({
-        title: "Error",
-        description: `Error fetching workspace: ${workspaceName}. ${
-          error.response?.data?.message || error.message
-        }`,
-      })
-    );
   }
 };
 
 export const fetchWorkspaces = async () => {
   try {
     const response = await apiClient.get("/user-service/users/");
-    toast(
-      CustomToast({
-        title: "Success",
-        description: "Workspaces fetched successfully.",
-      })
-    );
+
     return response.data.workspaces;
   } catch (error: any) {
     console.log(error);
-    toast(
-      CustomToast({
-        title: "Error",
-        description: `Error fetching workspaces. ${
-          error.response?.data?.message || error.message
-        }`,
-      })
-    );
   }
 };
 

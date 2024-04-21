@@ -11,7 +11,7 @@ const LoadingSkeleton = ({ children, className }: Props) => {
     <div
       role="status"
       className={cn(
-        "flex items-center justify-center h-64 w-full max-w-sm bg-card rounded-lg animate-pulse",
+        "flex items-center justify-center h-64 w-full bg-card rounded-lg animate-pulse",
         children ? "h-fit" : "h-64",
         className
       )}
