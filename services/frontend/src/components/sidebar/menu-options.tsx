@@ -147,10 +147,10 @@ const WorkspaceMenuOptions = ({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="mt-3 ml-5 w-full h-fit z-50">
+        <PopoverContent className="mt-3 ml-5 w-[25rem] h-fit z-50">
           <Card className="border-2 border-text-muted">
             <CardHeader>
-              <CardTitle className="text-xl">Create Workspace</CardTitle>
+              <CardTitle className="text-xl">Toggle Workspace</CardTitle>
               <CardDescription className="text-xs">
                 Select the workspace you want to work with
               </CardDescription>
@@ -163,16 +163,16 @@ const WorkspaceMenuOptions = ({
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-sm">
-                    <div className="overflow-y-auto max-h-44 md:max-h-96">
+                    <div className="max-h-44 md:max-h-96 overflow-y-auto">
                       {workspaces?.map((workspace: WorkspaceType) => (
                         <div
                           onClick={() => changeCurrentWorkspace(workspace.name)}
                           key={workspace.name}
                           className={`${
                             workspace.name == currentReduxWorkspace
-                              ? "bg-primary/50"
+                              ? "bg-primary/30"
                               : "hover:bg-primary/30"
-                          } hover:cursor-pointer p-2 my-2 border-2 border-text-muted rounded-md`}
+                          } hover:cursor-pointer px-2 py-3 my-2 border border-primary rounded-lg text-md font-medium text-center`}
                         >
                           {workspace.name}
                         </div>
