@@ -66,19 +66,36 @@ const AddDataToDatasetForm = ({
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     const file = values.file[0];
+    console.log(file.name);
     const formData = new FormData();
     formData.append("file", file);
+
     try {
       const res = await addData(workspaceName, datasetId, formData);
-      dispatch(
-        addFile({
-          id: res?.id,
-          name: res?.name,
-          path: res?.path,
-          createdAt: res?.createdAt,
-          createdBy: res?.createdBy,
-        })
-      );
+      console.log(res);
+      if (
+        res.responseForAddingData.success &&
+        res.responseForAddingFileNameUUID.success
+      ) {
+        const addFilePayload = {
+          datasetId: datasetId,
+          data: {
+            id: res.responseForAddingFileNameUUID.fileId,
+            name: file.name,
+            path: res.responseForAddingData.dataDetails.path,
+            createdAt: new Date().toISOString(),
+            createdBy: "User",
+          },
+        };
+        console.log(addFilePayload);
+        dispatch(addFile(addFilePayload));
+      } else {
+        console.error(
+          "Error adding data:",
+          res?.responseForAddingData?.message,
+          res?.responseForAddingFileNameUUID?.message
+        );
+      }
       setClose();
       toast(
         CustomToast({

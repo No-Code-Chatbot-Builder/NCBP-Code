@@ -12,7 +12,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     console.log(token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -32,15 +32,19 @@ export const createAssistantWithThread = async (
   tool: string,
   datasetId: string
 ) => {
-  console.log(workspaceName, name, purpose, model, tool);
   try {
-    const response = await apiClient.post(`/bot/${workspaceName}/assistant`, {
+    const body = {
       purpose: purpose,
       assistantName: name,
       tool: tool,
       models: model,
-      dataSetId : datasetId,
-    });
+      dataSetId: datasetId,
+    };
+    console.log(body);
+    const response = await apiClient.post(
+      `/bot/${workspaceName}/assistant`,
+      body
+    );
     return response.data;
   } catch (error) {
     console.log(error);
@@ -53,18 +57,12 @@ export const createAssistantWithThread = async (
   }
 };
 
-export const retrieveAssistants = async (workspaceName: string) => {
+export const getAssistants = async (workspaceName: string) => {
   try {
     const response = await apiClient.get(`/bot/${workspaceName}`);
     return response.data;
   } catch (error) {
     console.log(error);
-    toast(
-      CustomToast({
-        title: "Error Fetching assistants",
-        description: "Error fetching assistants.",
-      })
-    );
   }
 };
 

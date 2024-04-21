@@ -165,11 +165,14 @@ export type AssistantType = {
 };
 
 export type DataBucketType = {
-  id: string;
-  name: string;
-  path: string;
-  createdBy: string;
-  createdAt: string;
+  datasetId: string;
+  data: {
+    id: string;
+    name: string;
+    path: string;
+    createdBy: string;
+    createdAt: string;
+  };
 };
 
 export type DatasetType = {

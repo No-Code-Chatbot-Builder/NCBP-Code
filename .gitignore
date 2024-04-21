@@ -1,6 +1,5 @@
 node_modules
 
-./services/frontend/.env
-./services/frontend/.gitignore
+services/frontend/.env
 
 

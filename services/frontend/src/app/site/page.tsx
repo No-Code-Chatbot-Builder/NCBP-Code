@@ -174,7 +174,7 @@ export default function Home() {
         </div>
       </section>
       {/**Header Section */}
-      <section className="relative z-10 mx-10">
+      <section className="relative z-10 mx-10 mt-28">
         <div className="flex flex-col gap-y-6 mt-10 p-0 lg:p-10 text-center items-center z-20 bg-clip-text">
           <MovingButton
             borderRadius="1.75rem"
@@ -184,7 +184,7 @@ export default function Home() {
           </MovingButton>
 
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
-            <h1 className="text-6xl lg:text-8xl font-bold text-center">
+            <h1 className="text-5xl lg:text-7xl font-bold text-center">
               Make Custom AI Assistants
             </h1>
           </div>

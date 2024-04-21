@@ -59,7 +59,7 @@ export default function Page() {
           <div className="flex items-center justify-center">
             <div className="w-5/6 mr-10 flex flex-col gap-2">
               <div className="flex gap-2 items-center">
-                <Key className="w-7 h-7" />
+                <Key className="w-5 h-5" />
                 <h1 className="text-3xl font-bold">API Keys</h1>
               </div>
               <p className="text-md text-muted-foreground hidden sm:block">

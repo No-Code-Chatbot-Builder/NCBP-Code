@@ -23,12 +23,14 @@ import { useAppDispatch } from "@/lib/hooks";
 
 import { useCustomAuth } from "@/providers/auth-provider";
 import { createWorkspace } from "@/lib/api/workspace/service";
+import {
+  WorkspaceType,
+  addWorkspace,
+} from "@/providers/redux/slice/workspaceSlice";
 
 const CreateWorkspaceForm = () => {
   const { toast } = useToast();
   const { setClose } = useModal();
-
-  const { user, token } = useCustomAuth();
 
   const FormSchema = z.object({
     name: z
@@ -45,9 +47,16 @@ const CreateWorkspaceForm = () => {
     },
   });
 
+  const dispatch = useAppDispatch();
+
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       await createWorkspace(values.name);
+      const workspace: WorkspaceType = {
+        name: values.name,
+        role: "owner",
+      };
+      dispatch(addWorkspace(workspace));
       setClose();
       toast(
         CustomToast({

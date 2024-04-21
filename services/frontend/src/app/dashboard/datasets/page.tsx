@@ -14,28 +14,68 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { deleteDataset, fetchDatasets } from "@/lib/api/dataset/service";
+import { deleteDataset, getDatasets } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { removeDataset } from "@/providers/redux/slice/datasetSlice";
+import {
+  removeDataset,
+  setDatasets,
+  setIsDatasetLoading,
+} from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
 import { Database, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { useEffect } from "react";
 
 export default function Page() {
   const dispatch = useAppDispatch();
   const isDatasetLoading = useAppSelector(
     (state) => state.datasets.isDatasetLoading
   );
-  // const isDatasetLoading = true;
+
   const { setOpen } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
-  const workspaceName = useAppSelector(
+  const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
+
+  useEffect(() => {
+    const fetchDataset = async () => {
+      if (!currentReduxWorkspace) return;
+
+      toast(
+        CustomToast({
+          title: "Loading Datasets",
+          description: `Loading datasets for workspace ${currentReduxWorkspace}`,
+        })
+      );
+
+      const res = await getDatasets(currentReduxWorkspace);
+      if (!res?.datasets) return;
+
+      const filteredDatasets = res.datasets.filter(
+        (dataset: DatasetType) => dataset.name
+      );
+      const currentDatasetNames = datasets
+        .map((dataset: DatasetType) => dataset.name)
+        .sort();
+      const newDatasetNames = filteredDatasets
+        .map((dataset: DatasetType) => dataset.name)
+        .sort();
+      const datasetsChanged =
+        JSON.stringify(currentDatasetNames) !== JSON.stringify(newDatasetNames);
+
+      if (datasetsChanged || !filteredDatasets.length) {
+        dispatch(setDatasets(filteredDatasets));
+      }
+      dispatch(setIsDatasetLoading(false));
+    };
+
+    fetchDataset();
+  }, [currentReduxWorkspace]);
 
   const router = useRouter();
   const datasetSheet = (
@@ -52,7 +92,7 @@ export default function Page() {
     datasetName: string
   ) => {
     try {
-      await deleteDataset(workspaceName, datasetId);
+      await deleteDataset("", datasetId);
       dispatch(removeDataset(datasetId));
       toast(
         CustomToast({
@@ -77,7 +117,7 @@ export default function Page() {
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
             <div className="flex gap-2 items-center">
-              <Database className="w-7 h-7" />
+              <Database className="w-5 h-5" />
               <h1 className="text-3xl font-bold">Datasets</h1>
             </div>
             <p className="text-md text-muted-foreground hidden md:block">

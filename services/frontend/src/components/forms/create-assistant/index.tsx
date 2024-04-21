@@ -42,8 +42,8 @@ const CreateAssistantForm = () => {
     description: z.string().min(5, {
       message: "Description must contain atleast 5 characters long",
     }),
-    dataset:  z.string().min(1, { message: "Select the dataset", }),
-    tool: z.string().min(1, { message: "Select the tool", }),
+    dataset: z.string().min(1, { message: "Select the dataset" }),
+    tool: z.string().min(1, { message: "Select the tool" }),
     model: z.string().min(1, { message: "Select the model" }),
   });
 
@@ -56,7 +56,7 @@ const CreateAssistantForm = () => {
     },
   });
 
-  const workspaceName = useAppSelector(
+  const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
 
@@ -64,8 +64,9 @@ const CreateAssistantForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
+      console.log(values);
       const res = await createAssistantWithThread(
-        workspaceName,
+        currentWorkspaceName!,
         values.name,
         values.description,
         values.model,
@@ -93,6 +94,7 @@ const CreateAssistantForm = () => {
       );
     } catch (error: any) {
       //throwing error if any
+      console.log(error);
       toast(
         CustomToast({
           title: "Error Creating Assistant",
@@ -139,8 +141,7 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-        
-        
+
           <FormField
             disabled={isLoading}
             control={form.control}
@@ -159,7 +160,9 @@ const CreateAssistantForm = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {datasets.map((dataset: DatasetType) => (
-                        <SelectItem value={dataset.id}>{dataset.name}</SelectItem>
+                        <SelectItem key={dataset.id} value={dataset.id}>
+                          {dataset.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -168,10 +171,7 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-        
-        
-       
-          
+
           <FormField
             disabled={isLoading}
             control={form.control}

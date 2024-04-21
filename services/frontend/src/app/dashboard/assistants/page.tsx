@@ -17,6 +17,13 @@ import { useModal } from "@/providers/modal-provider";
 import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { getAssistants } from "@/lib/api/bot/service";
+import {
+  setAssistant,
+  setIsAssistantLoading,
+} from "@/providers/redux/slice/assistantSlice";
+import { toast } from "sonner";
+import CustomToast from "@/components/global/custom-toast";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -25,6 +32,57 @@ export default function Page() {
   const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const currentReduxWorkspace = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
+
+  useEffect(() => {
+    const fetchAssistants = async () => {
+      if (!currentReduxWorkspace) return;
+
+      toast(
+        CustomToast({
+          title: "Loading Assistants",
+          description: `Fetching assistants for ${currentReduxWorkspace}`,
+        })
+      );
+
+      try {
+        const res = await getAssistants(currentReduxWorkspace);
+        if (res.response && res.response.assistants) {
+          const formattedAssistants: AssistantType[] =
+            res.response.assistants.map((assistant: any) => ({
+              id: assistant.assistantId,
+              name: assistant.assistantName,
+              description: assistant.purpose,
+            }));
+
+          const filteredAssistants = formattedAssistants.filter(
+            (assistant: AssistantType) => assistant.name
+          );
+          const currentAssistantNames = assistants
+            .map((assistant: AssistantType) => assistant.name)
+            .sort();
+          const newAssistantNames = filteredAssistants
+            .map((assistant: AssistantType) => assistant.name)
+            .sort();
+          const assistantsChanged =
+            JSON.stringify(currentAssistantNames) !==
+            JSON.stringify(newAssistantNames);
+
+          if (assistantsChanged || !filteredAssistants.length) {
+            dispatch(setAssistant(filteredAssistants));
+          }
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch assistants:", error);
+      } finally {
+        dispatch(setIsAssistantLoading(false));
+      }
+    };
+    fetchAssistants();
+  }, [currentReduxWorkspace]);
 
   const assistantSheet = (
     <CustomSheet
@@ -39,9 +97,7 @@ export default function Page() {
     setOpen(assistantSheet);
   };
 
-  const handleAssistantDeletion = async (assistant_id : string) => {
-
-  }
+  const handleAssistantDeletion = async (assistant_id: string) => {};
 
   return (
     <div className="flex flex-col gap-10">
@@ -49,7 +105,7 @@ export default function Page() {
         <div className="flex flex-row justify-between mt-20 items-center">
           <div className="flex flex-col gap-4 w-5/6 mr-10">
             <div className="flex gap-2 items-center">
-              <Code className="w-7 h-7" />
+              <Code className="w-5 h-5" />
               <h1 className="text-3xl font-bold">Assistants</h1>
             </div>
             <p className="text-md text-muted-foreground hidden sm:block">
@@ -90,17 +146,23 @@ export default function Page() {
               {assistants.map((assistant: AssistantType) => (
                 <Card key={assistant.id}>
                   <CardHeader>
-                    <CardTitle>{assistant.name}</CardTitle>
-                    <CardDescription>{assistant.description}</CardDescription>
-                    <Button
-                      size="icon"
-                      variant={"destructive"}
-                      onClick={() => {
-                        handleAssistantDeletion(assistant.id);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
+                    <div className="flex flex-row justify-between">
+                      <div className="flex flex-col gap-2">
+                        <CardTitle>{assistant.name}</CardTitle>
+                        <CardDescription>
+                          {assistant.description}
+                        </CardDescription>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant={"destructive"}
+                        onClick={() => {
+                          handleAssistantDeletion(assistant.id);
+                        }}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </CardHeader>
 
                   <CardContent className="grid gap-3">

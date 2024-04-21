@@ -49,16 +49,8 @@ import {
   setIsWorkspaceLoading,
 } from "@/providers/redux/slice/workspaceSlice";
 import { fetchWorkspaces } from "@/lib/api/workspace/service";
-import { fetchDatasets } from "@/lib/api/dataset/service";
-import {
-  setDatasets,
-  setIsDatasetLoading,
-} from "@/providers/redux/slice/datasetSlice";
-import {
-  setAssistant,
-  setIsAssistantLoading,
-} from "@/providers/redux/slice/assistantSlice";
-import { retrieveAssistants } from "@/lib/api/bot/service";
+import { toast } from "sonner";
+import CustomToast from "../global/custom-toast";
 
 type Props = {
   defaultOpen?: boolean;
@@ -79,25 +71,23 @@ const WorkspaceMenuOptions = ({
   const workspaces = useAppSelector(
     (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
   );
-  const assistants = useAppSelector(
-    (state: { assistants: { assistants: any } }) => state.assistants.assistants
-  );
+
   const currentReduxWorkspace = useAppSelector(
-    (state: { workspaces: { currentWorkspaceName: string | null } }) =>
-      state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspaceName
   );
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchUserData = async () => {
+    const fetchUserWorkspaces = async () => {
       if (!isMounted) return;
-
-      dispatch(setIsDatasetLoading(true));
       dispatch(setIsWorkspaceLoading(true));
-      dispatch(setIsAssistantLoading(true));
-
-      //load the workspaces
+      toast(
+        CustomToast({
+          title: "Loading Workspaces",
+          description: "Loading all your workspaces...",
+        })
+      );
       const workspaces = await fetchWorkspaces();
       if (workspaces && isMounted) {
         const formattedWorkspaces: WorkspaceType[] = Object.entries(
@@ -107,41 +97,13 @@ const WorkspaceMenuOptions = ({
           role: value as string,
         }));
         if (currentReduxWorkspace === null) {
-          setReduxCurrentWorkspace(formattedWorkspaces[0].name);
+          dispatch(setReduxCurrentWorkspace(formattedWorkspaces[0].name));
         }
         dispatch(setWorkspaces(formattedWorkspaces));
         dispatch(setIsWorkspaceLoading(false));
-
-        const res = currentReduxWorkspace
-          ? await retrieveAssistants(currentReduxWorkspace)
-          : null;
-        if (res && res.response && res.response.assistants && isMounted) {
-          // check if component is still mounted
-          const assistants: AssistantType[] = res.response.assistants.map(
-            (assistant: any) => ({
-              id: assistant.assistantId,
-              name: assistant.assistantName,
-              description: assistant.purpose,
-            })
-          );
-          dispatch(setAssistant(assistants));
-          dispatch(setIsAssistantLoading(false));
-        }
-
-        if (formattedWorkspaces.length > 0 && isMounted) {
-          const workspaceName =
-            currentReduxWorkspace || formattedWorkspaces[0].name;
-          dispatch(setReduxCurrentWorkspace(workspaceName));
-          const res = await fetchDatasets(workspaceName);
-          dispatch(setDatasets(res?.datasets));
-        }
-
-        dispatch(setIsDatasetLoading(false));
       }
     };
-
-    fetchUserData();
-
+    fetchUserWorkspaces();
     return () => {
       isMounted = false;
     };

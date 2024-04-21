@@ -12,7 +12,7 @@ export default function Page() {
       <div>
         <section className="mt-20 flex flex-col gap-2">
           <div className="flex gap-2 items-center">
-            <Settings className="w-7 h-7" />
+            <Settings className="w-5 h-5" />
             <h1 className="text-3xl font-bold">Settings</h1>
           </div>
           <p className="text-md text-muted-foreground">
