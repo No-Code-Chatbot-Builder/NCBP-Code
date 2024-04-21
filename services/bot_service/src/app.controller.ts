@@ -12,12 +12,39 @@ export class AppController {
 
   //Creating Assistant and Thread only. It also adds into dynamoDB
   @Post('/bot/:workspaceId/assistant')
-  async createAssistantAndThread (@Param('workspaceId') workspaceId: string, @Req() req: Request, @Body() requestBody: { purpose: string, assistantName: string, tool: any, models: string}) {
-    const {purpose, assistantName, tool, models} = requestBody;
+  async createAssistantAndThread (@Param('workspaceId') workspaceId: string, @Req() req: Request, @Body() requestBody: { purpose: string, assistantName: string, tool: any, models: string, dataSetId: string}) {
+    const {purpose, assistantName, tool, models, dataSetId} = requestBody;
     const userId = req['user'].id;
-    const response = await this.botService.createAssistant(purpose, workspaceId, userId, assistantName, tool, models);
+    const response = await this.botService.createAssistant(purpose, workspaceId, userId, assistantName, tool, models, dataSetId);
     return { response };
   }
+  //Connection check
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+  
+  @Get('/bot/health')
+  getHealth(): string {
+    return "Bot Service is working";
+  }
+
+
+    //Creating Assistant and Thread only. It also adds into dynamoDB
+    @Delete('/bot/:workspaceId')
+    async DeleteOfBot (@Param('workspaceId') workspaceId: string, @Body() requestBody: {assistantId: string}) {
+      const {assistantId} = requestBody;
+      const response = await this.botService.softDeleteOfBot(workspaceId, assistantId);
+      return { response };
+    }
+
+    @Get('/bot/:workspaceId')
+    async getAllAssistant (@Param('workspaceId') workspaceId: string) {
+      //const {assistantId} = requestBody;
+      const response = await this.botService.getAllAssistants(workspaceId);
+      return { response };
+    }
+
 
    //Sending workspace id to dynamoDb so that it fetches AssitantId and ThreadId to create msg and run
   //  @Post('/bot/:workspaceId/runAssistant')
@@ -26,17 +53,6 @@ export class AppController {
   //    const response = await this.botService.initiateResponseProcess(workspaceId, query);
   //    return { response };
   //  }
-
-  //Connection check
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @Get('/bot/health')
-  getHealth(): string {
-    return "Bot Service is working";
-  }
 
   // //Demo
   // @Post('/gpt')

@@ -1,0 +1,25 @@
+pipeline {
+    agent any // This specifies that the pipeline can run on any available agent
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm // This command checks out the source code from the source control management system that Jenkins is integrated with (e.g., Git)
+            }
+        }
+        stage('Build') {
+            steps {
+                // Replace the following command with the command that builds your project
+                echo 'Building..'
+                sh 'echo "Build command goes here"'
+            }
+        }
+        stage('Test') {
+            steps {
+                // Replace the following command with the command that tests your project
+                echo 'Testing..'
+                sh 'echo "Test command goes here"'
+            }
+        }
+    }
+}
