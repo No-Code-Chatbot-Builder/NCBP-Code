@@ -11,14 +11,14 @@ pipeline {
             steps {
                 // Replace the following command with the command that builds your project
                 echo 'Building..'
-                sh 'echo "Build command goes here"'
+                
             }
         }
         stage('Test') {
             steps {
                 // Replace the following command with the command that tests your project
                 echo 'Testing..'
-                sh 'echo "Test command goes here"'
+                
             }
         }
     }
