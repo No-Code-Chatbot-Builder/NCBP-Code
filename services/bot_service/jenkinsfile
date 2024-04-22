@@ -1,25 +1,108 @@
 pipeline {
     agent any // This specifies that the pipeline can run on any available agent
 
-    stages {
+    environment {
+        // Define the ECR-related environment variables
+        ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
+        IMAGE_REPO_NAME = 'dataset-service'
+        IMAGE_TAG = 'latest'
+
+        // Define ECS-related environment variables
+        ECS_CLUSTER_NAME = 'test-cluster'
+        ECS_SERVICE_NAME = 'test-service'
+        ECS_TASK_FAMILY_NAME = 'test-family'
+        ECS_TASK_DEFINITION_FILE = 'container-definition.json' // Path relative to the repo root
+
+        // Define AWS environment variables
+        AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_CREDENTIALS_ID = 'AWS_ACCESS_SECRET_KEYS' // Assuming you have this setup in Jenkins credentials
+    
+          // ECS Service Configuration
+        ECS_DESIRED_COUNT = '1'
+        ECS_LAUNCH_TYPE = 'FARGATE'
+
+        // Network Configuration for ECS Service
+        ECS_SUBNET_ID = 'subnet-083edf7355995a61f' 
+        ECS_SECURITY_GROUP_ID = 'sg-0f5339fdde1858d77' 
+    }
+    
+
+   stages {
         stage('Checkout') {
             steps {
-                checkout scm // This command checks out the source code from the source control management system that Jenkins is integrated with (e.g., Git)
+                checkout scm
             }
         }
-        stage('Build') {
+
+        stage('Build and Tag Image') {
             steps {
-                // Replace the following command with the command that builds your project
-                echo 'Building..'
-                
+                dir('services/dataset-services') {
+                    bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
+                    bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
             }
         }
+
+        stage('Push to ECR') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
+                    bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    bat "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        
+        stage('Deploy to ECS') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId:'AWS_ACCESS_SECRET_KEYS']]) {
+                    bat script: """
+                aws ecs create-service --cluster ${ECS_CLUSTER_NAME} \
+                --service-name ${ECS_SERVICE_NAME} \
+                --task-definition ${ECS_TASK_FAMILY_NAME} \
+                --desired-count ${ECS_DESIRED_COUNT} \
+                        --launch-type ${ECS_LAUNCH_TYPE} \
+                        --network-configuration "awsvpcConfiguration={subnets=[${ECS_SUBNET_ID}],securityGroups=[${ECS_SECURITY_GROUP_ID}],assignPublicIp=ENABLED}" \
+                        --region ${AWS_DEFAULT_REGION}
+            """
+                }
+            }
+        }
+
         stage('Test') {
             steps {
-                // Replace the following command with the command that tests your project
-                echo 'Testing..'
-                
+                bat 'echo Running tests...'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                bat 'echo Deploying application...'
             }
         }
     }
+
+    post {
+        always {
+            echo 'This will always run regardless of the result.'
+        }
+        success {
+            echo 'Build was successful!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
 }
+
+
+
+      
+        // stage('Test') {
+        //     steps {
+        //         // Replace the following command with the command that tests your project
+        //         echo 'Testing..'
+                
+        //     }
+        // }
+ 
