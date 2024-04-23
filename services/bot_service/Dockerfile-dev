@@ -14,7 +14,7 @@ COPY package*.json ./
 # Installing all dependencies specified in package.json.
 # This includes both runtime dependencies and 'devDependencies',
 # the latter are required for TypeScript compilation.
-RUN npm install 
+RUN npm install --legacy-peer-deps
 
 # Copying the entire application source code from the host to the container.
 # This includes all files and directories in the current directory on the host.
