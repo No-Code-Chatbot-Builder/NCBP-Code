@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import { useEffect } from "react";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 
 export default function Page() {
   const dispatch = useAppDispatch();
@@ -41,22 +42,28 @@ export default function Page() {
   const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
+  const { data: res, error } = useAxiosSWR(
+    `/dataset-service/datasets/${currentReduxWorkspace}/`
+  );
 
   useEffect(() => {
     const fetchDataset = async () => {
-      if (!currentReduxWorkspace) return;
+      if (!currentReduxWorkspace || error) return;
 
-      toast(
-        CustomToast({
-          title: "Loading Datasets",
-          description: `Loading datasets for workspace ${currentReduxWorkspace}`,
-        })
-      );
+      if (error) {
+        console.error(error);
+        toast(
+          CustomToast({
+            title: "Error",
+            description: "Failed to load datasets.",
+          })
+        );
+        return;
+      }
 
-      const res = await getDatasets(currentReduxWorkspace);
-      if (!res?.datasets) return;
+      if (!res?.data?.datasets) return;
 
-      const filteredDatasets = res.datasets.filter(
+      const filteredDatasets = res.data.datasets.filter(
         (dataset: DatasetType) => dataset.name
       );
       const currentDatasetNames = datasets
@@ -75,8 +82,7 @@ export default function Page() {
     };
 
     fetchDataset();
-  }, [currentReduxWorkspace]);
-
+  }, [currentReduxWorkspace, res]);
   const router = useRouter();
   const datasetSheet = (
     <CustomSheet

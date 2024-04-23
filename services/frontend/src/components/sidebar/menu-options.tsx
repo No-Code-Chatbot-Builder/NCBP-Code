@@ -51,6 +51,10 @@ import {
 import { fetchWorkspaces } from "@/lib/api/workspace/service";
 import { toast } from "sonner";
 import CustomToast from "../global/custom-toast";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import { set } from "date-fns";
+import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
+import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
 
 type Props = {
   defaultOpen?: boolean;
@@ -75,41 +79,35 @@ const WorkspaceMenuOptions = ({
   const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
+  const { data: res, error, isLoading } = useAxiosSWR("/user-service/users/");
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchUserWorkspaces = async () => {
-      if (!isMounted) return;
+    const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
+    if (!isLoading && !error && res.data.workspaces) {
       dispatch(setIsWorkspaceLoading(true));
-      toast(
-        CustomToast({
-          title: "Loading Workspaces",
-          description: "Loading all your workspaces...",
-        })
-      );
-      const workspaces = await fetchWorkspaces();
-      if (workspaces && isMounted) {
-        const formattedWorkspaces: WorkspaceType[] = Object.entries(
-          workspaces
-        ).map(([key, value]: [string, unknown]) => ({
-          name: key,
-          role: value as string,
-        }));
-        if (currentReduxWorkspace === null) {
-          dispatch(setReduxCurrentWorkspace(formattedWorkspaces[0].name));
-        }
-        dispatch(setWorkspaces(formattedWorkspaces));
-        dispatch(setIsWorkspaceLoading(false));
+      const formattedWorkspaces: WorkspaceType[] = Object.entries(
+        res.data.workspaces
+      ).map(([key, value]: [string, unknown]) => ({
+        name: key,
+        role: value as string,
+      }));
+      if (localCurrentWorkspace === null) {
+        localStorage.setItem("currentWorkspace", formattedWorkspaces[0].name);
+        dispatch(setReduxCurrentWorkspace(formattedWorkspaces[0].name));
+      } else {
+        dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
       }
-    };
-    fetchUserWorkspaces();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      dispatch(setWorkspaces(formattedWorkspaces));
+      dispatch(setIsWorkspaceLoading(false));
+    } else if (localCurrentWorkspace && !isLoading) {
+      dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
+    }
+  }, [dispatch, currentReduxWorkspace, res, isLoading, error]);
 
   const changeCurrentWorkspace = (name: string) => {
+    localStorage.setItem("currentWorkspace", name);
+    dispatch(setIsDatasetLoading(true));
+    dispatch(setIsAssistantLoading(true));
     dispatch(setReduxCurrentWorkspace(name));
   };
 
@@ -139,7 +137,8 @@ const WorkspaceMenuOptions = ({
                     NoCodeBot.ai
                   </h1>
                   <p className="text-muted-foreground text-sm font-normal">
-                    {currentReduxWorkspace}
+                    {localStorage.getItem("currentWorkspace") ||
+                      currentReduxWorkspace}
                   </p>
                 </div>
               </div>

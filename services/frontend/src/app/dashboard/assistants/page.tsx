@@ -17,13 +17,15 @@ import { useModal } from "@/providers/modal-provider";
 import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { getAssistants } from "@/lib/api/bot/service";
 import {
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
+import useSWR from "swr";
+import { apiClient } from "@/lib/api/apiService";
+import { botApiClient } from "@/lib/api/bot/service";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -37,20 +39,21 @@ export default function Page() {
     (state) => state.workspaces.currentWorkspaceName
   );
 
+  const fetcher = (url: string) =>
+    botApiClient.get(url).then((res) => res.data);
+
+  const { data: res, error } = useSWR<any>(
+    `bot/${currentReduxWorkspace}`,
+    fetcher
+  );
+  console.log(res);
+
   useEffect(() => {
     const fetchAssistants = async () => {
-      if (!currentReduxWorkspace) return;
-
-      toast(
-        CustomToast({
-          title: "Loading Assistants",
-          description: `Fetching assistants for ${currentReduxWorkspace}`,
-        })
-      );
+      if (!currentReduxWorkspace || error) return;
 
       try {
-        const res = await getAssistants(currentReduxWorkspace);
-        if (res.response && res.response.assistants) {
+        if (res && res.response && res.response.assistants) {
           const formattedAssistants: AssistantType[] =
             res.response.assistants.map((assistant: any) => ({
               id: assistant.assistantId,
@@ -73,16 +76,15 @@ export default function Page() {
 
           if (assistantsChanged || !filteredAssistants.length) {
             dispatch(setAssistant(filteredAssistants));
+            dispatch(setIsAssistantLoading(false));
           }
         }
       } catch (error: any) {
         console.error("Failed to fetch assistants:", error);
-      } finally {
-        dispatch(setIsAssistantLoading(false));
       }
     };
     fetchAssistants();
-  }, [currentReduxWorkspace]);
+  }, [currentReduxWorkspace, res]);
 
   const assistantSheet = (
     <CustomSheet

@@ -5,12 +5,12 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:3004";
 
-const apiClient = axios.create({
+export const botApiClient = axios.create({
   baseURL: BASE_URL,
   // timeout : 10000,
 });
 
-apiClient.interceptors.request.use(
+botApiClient.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem("token");
     console.log(token);
@@ -41,7 +41,7 @@ export const createAssistantWithThread = async (
       dataSetId: datasetId,
     };
     console.log(body);
-    const response = await apiClient.post(
+    const response = await botApiClient.post(
       `/bot/${workspaceName}/assistant`,
       body
     );
@@ -57,20 +57,11 @@ export const createAssistantWithThread = async (
   }
 };
 
-export const getAssistants = async (workspaceName: string) => {
-  try {
-    const response = await apiClient.get(`/bot/${workspaceName}`);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 export const runAssistant = async (workspaceName: string, query: string) => {
   try {
     console.log("running...");
     console.log(workspaceName, query);
-    const response = await apiClient.post(
+    const response = await botApiClient.post(
       `/bot/${workspaceName}/runAssistant`,
       { query: query }
     );

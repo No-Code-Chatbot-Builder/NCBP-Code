@@ -1,6 +1,7 @@
 import { apiClient } from "../apiService";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
+import useSWR from "swr";
 
 export const createWorkspace = async (workspaceName: string) => {
   try {
