@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Define the ECR-related environment variables
-        ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
+        ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com/bot-service'
         IMAGE_REPO_NAME = 'bot_service'
         IMAGE_TAG = 'latest'
 
