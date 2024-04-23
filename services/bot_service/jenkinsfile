@@ -7,6 +7,7 @@ pipeline {
         IMAGE_REPO_NAME = 'bot-service'
         IMAGE_TAG = 'latest'
 
+
         // Define ECS-related environment variables
         ECS_CLUSTER_NAME = 'test-cluster'
         ECS_SERVICE_NAME = 'test-service'
@@ -47,25 +48,14 @@ stage('Build and Tag Image') {
 }
 
 
-
-      stage('Push to ECR') {
-    steps {
-        withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding', 
-            credentialsId: 'AWS_ACCESS_SECRET_KEYS', 
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-        ]]) {
-            script {
-                // Ensure the AWS region is set
-                env.AWS_DEFAULT_REGION = 'us-east-1' // Change this to your region
-                // Set up Docker login using the AWS ECR credential helper or directly via the CLI
-                bat "aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%"
-                bat "docker push %ECR_REGISTRY%/%IMAGE_REPO_NAME%:%IMAGE_TAG%"
+        stage('Push to ECR') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
+                    bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    bat "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
             }
         }
-    }
-}
 
 
         
