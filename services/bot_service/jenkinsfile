@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Define the ECR-related environment variables
         ECR_REGISTRY = '637423235266.dkr.ecr.us-east-1.amazonaws.com'
-        IMAGE_REPO_NAME = 'dataset-service'
+        IMAGE_REPO_NAME = 'bot_service'
         IMAGE_TAG = 'latest'
 
         // Define ECS-related environment variables
@@ -36,7 +36,7 @@ pipeline {
 
         stage('Build and Tag Image') {
             steps {
-                dir('services/dataset-services') {
+                dir('services/bot_services') {
                     bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
                     bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
                 }
@@ -82,17 +82,6 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo 'This will always run regardless of the result.'
-        }
-        success {
-            echo 'Build was successful!'
-        }
-        failure {
-            echo 'Build failed!'
-        }
-    }
 }
 
 
