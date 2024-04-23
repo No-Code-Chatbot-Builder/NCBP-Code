@@ -27,7 +27,7 @@ import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 
 import PersonalDetails from "./personal-details";
-import { AssistantType, dummyChatThreads, icons } from "@/lib/constants";
+import { dummyChatThreads, icons } from "@/lib/constants";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
@@ -51,6 +51,8 @@ import {
 import { fetchWorkspaces } from "@/lib/api/workspace/service";
 import { toast } from "sonner";
 import CustomToast from "../global/custom-toast";
+import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
+import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
 
 type Props = {
   defaultOpen?: boolean;
@@ -111,6 +113,12 @@ const WorkspaceMenuOptions = ({
 
   const changeCurrentWorkspace = (name: string) => {
     dispatch(setReduxCurrentWorkspace(name));
+    dispatch(
+      setIsAssistantLoading(true)
+    );
+    dispatch(
+      setIsDatasetLoading(true)
+    );
   };
 
   return (
@@ -168,11 +176,10 @@ const WorkspaceMenuOptions = ({
                         <div
                           onClick={() => changeCurrentWorkspace(workspace.name)}
                           key={workspace.name}
-                          className={`${
-                            workspace.name == currentReduxWorkspace
+                          className={`${workspace.name == currentReduxWorkspace
                               ? "bg-primary/30"
                               : "hover:bg-primary/30"
-                          } hover:cursor-pointer px-2 py-3 my-2 border border-primary rounded-lg text-md font-medium text-center`}
+                            } hover:cursor-pointer px-2 py-3 my-2 border border-primary rounded-lg text-md font-medium text-center`}
                         >
                           {workspace.name}
                         </div>
