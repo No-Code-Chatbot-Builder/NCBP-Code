@@ -43,6 +43,11 @@ stage('Build and Tag Image') {
             bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
             bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
         }
+
+        steps {
+        bat "dir" // or sh 'ls -la' on Unix-like systems
+        bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile-dev ."
+    }
     }
 }
 
