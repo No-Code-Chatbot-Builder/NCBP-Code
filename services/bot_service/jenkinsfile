@@ -47,31 +47,14 @@ stage('Build and Tag Image') {
     }
 }
 
-stage('Push to ECR') {
-    steps {
-        // Debug statements to confirm environment variables are being passed correctly
-        bat "echo AWS_DEFAULT_REGION: %AWS_DEFAULT_REGION%"
-        bat "echo ECR_REGISTRY: %ECR_REGISTRY%"
-        bat "echo IMAGE_REPO_NAME: %IMAGE_REPO_NAME%"
-        bat "echo IMAGE_TAG: %IMAGE_TAG%"
-
-        // Ensuring all AWS commands are within the credential scope
-        withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding', 
-            credentialsId: 'AWS_ACCESS_SECRET_KEYS', 
-            accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
-            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-        ]]) {
-            // Login to Docker with AWS ECR credentials
-            bat "aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%"
-            // Confirm the Docker images available before pushing
-            bat "docker images"
-            // Push the Docker image to the registry
-            bat "docker push %ECR_REGISTRY%/%IMAGE_REPO_NAME%:%IMAGE_TAG%"
+        stage('Push to ECR') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
+                    bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
+                    bat "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                }
+            }
         }
-    }
-}
-
 
 
 
