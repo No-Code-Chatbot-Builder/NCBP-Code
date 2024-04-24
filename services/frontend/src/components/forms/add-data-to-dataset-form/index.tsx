@@ -12,14 +12,17 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
-import { addFile } from "@/providers/redux/slice/datasetSlice";
+import {
+  addFile,
+  setIsDatasetFilesEmpty,
+} from "@/providers/redux/slice/datasetSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/providers/modal-provider";
 import CustomToast from "@/components/global/custom-toast";
 import { addData } from "@/lib/api/dataset/service";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 interface AddDataToDatasetFormProps {
   workspaceName: string;
@@ -89,6 +92,7 @@ const AddDataToDatasetForm = ({
         };
         console.log(addFilePayload);
         dispatch(addFile(addFilePayload));
+        dispatch(setIsDatasetFilesEmpty(false));
       } else {
         console.error(
           "Error adding data:",

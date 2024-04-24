@@ -49,7 +49,7 @@ const DeleteWorkspaceCard = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     console.log(values);
-    await deleteWorkspace(currentWorkspaceName);
+    await deleteWorkspace(currentWorkspaceName ?? "");
   };
   const isLoading = form.formState.isSubmitting;
 
