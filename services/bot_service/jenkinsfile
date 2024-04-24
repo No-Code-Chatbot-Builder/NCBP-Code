@@ -47,14 +47,39 @@ stage('Build and Tag Image') {
     }
 }
 
-        stage('Push to ECR') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_SECRET_KEYS']]) {
-                    bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
-                    bat "docker push ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+stage('Push to ECR') {
+    steps {
+        // Using withCredentials to securely handle AWS credentials
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding', 
+            credentialsId: 'AWS_ACCESS_SECRET_KEYS', 
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+            script {
+                try {
+                    // Attempt to log into AWS ECR with provided credentials
+                    echo "Logging into AWS ECR..."
+                    bat script: "aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%", returnStdout: true
+                    echo "AWS ECR login successful."
+
+                    // Listing available Docker images for verification
+                    echo "Listing available Docker images..."
+                    bat "docker images"
+
+                    // Pushing the Docker image to AWS ECR
+                    echo "Pushing Docker image to ECR..."
+                    bat "docker push %ECR_REGISTRY%/%IMAGE_REPO_NAME%:%IMAGE_TAG%"
+                    echo "Docker image pushed successfully."
+                } catch (Exception e) {
+                    // Catching and logging any errors that occur during the process
+                    echo "Error encountered during AWS ECR operations: ${e.getMessage()}"
+                    error "Failed to execute AWS ECR operations."
                 }
             }
         }
+    }
+}
 
 
 
