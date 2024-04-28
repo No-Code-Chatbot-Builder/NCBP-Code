@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+//import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from "openai";
 import { DynamoDbService } from 'src/dynamo-db/dynamo-db.service';
@@ -9,14 +9,11 @@ import { Server, Socket  } from 'socket.io';
 
 
 @WebSocketGateway()
-export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
+export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private clientWorkspaceMap: Map<string, { workspaceId: string, assistantId: string }> = new Map(); // Map to associate client IDs with workspaceIds
   
-    
-    constructor(private dynamoDbService: DynamoDbService, private configService: ConfigService, private httpService: HttpService,) 
-    {}
-
+    constructor(private dynamoDbService: DynamoDbService, private configService: ConfigService, private httpService: HttpService) {}
 
     async demo() {
         const openai = new OpenAI();
@@ -29,7 +26,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
 
     async createMessage (threadId: string, assistantId: string, query: string) {
       const openai = new OpenAI();
-      const myMessage = await openai.beta.threads.messages.create(threadId, {
+      await openai.beta.threads.messages.create(threadId, {
         role: "user",
         content: query,
       });
@@ -72,8 +69,8 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
   
   async getRaggedTextFromPineCone (query: number[], workspaceId: string, dataSetId: string) {
     const apiKey: string = this.configService.get<string>('PINECONE_API_KEY');
-    const pc: Pinecone = new Pinecone({ apiKey: apiKey });
-    const index = pc.index("test");
+    const pineCone: Pinecone = new Pinecone({ apiKey: apiKey });
+    const index = pineCone.index("test");
 
     const queryResponse: QueryResponse = await index.query({
         vector: query,
@@ -84,8 +81,8 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
           dataSetId: dataSetId
         }
     });
-    //console.log("query response", queryResponse.matches[0].metadata.text);
-    const response =  queryResponse.matches[0].metadata.text 
+
+    const response =  queryResponse?.matches[0]?.metadata?.text
       if (!response) {
         return '';
       } else {
@@ -110,14 +107,13 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
       console.error('Error sending text to server:', error);
     }
 
-
     if (!context || context.trim() === '') {
-      prompt = "The following text is the query:\n" + query + ". If you are asked for code of anything, please give it inside the tags <code> and </code>";
+      prompt = "The following text is the query:\n" + query + ". If your answer includes code, please enclose it inside the tags <code> and </code>";
     }
     else { 
-    prompt = "The following text is the query:\n" + query  + "\n\nPlease answer while staying in the following context:\n" + context + ". If you are asked for code of anything, please give it inside the tags <code> and </code>";
+    prompt = "The following text is the query:\n" + query  + "\n\nPlease answer while staying in the following context:\n" + context + ". If your answer includes code, please enclose it inside the tags <code> and </code>";
     }
-    console.log("prompt:", prompt)
+    //console.log("prompt:", prompt)
     return(this.createMessage(data.datasets[0].threadId, data.datasets[0].assistantId, prompt));
   }
 
@@ -125,23 +121,21 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
   //Only Assistant with Thread
   async createAssistant(instruction: string, workspace: string, userId: string, assistantName: string, tool: any, models: string, dataSetId:string) {
     const openai = new OpenAI();
-    const myAssistant = await openai.beta.assistants.create({
+    const Assistant = await openai.beta.assistants.create({
       instructions: instruction,
       name: assistantName,
       tools: [{ type: tool }], // Now 'tool' is of type 'ToolType'
       model: models,
     });
 
-  
-    const threadId = await this.createThreadForAssistant(myAssistant.id, workspace, userId, instruction, dataSetId, assistantName);
-
-    return ["success: True","message: Assistant and thread created successfully", "assistantId: " + myAssistant.id, "threadId: " + threadId];
+    const threadId = await this.createThread(Assistant.id, workspace, userId, instruction, dataSetId, assistantName);
+    return ["success: True", "message: Assistant and thread created successfully", "assistantId: " + Assistant.id, "threadId: " + threadId];
   } catch (error) {
-    throw new Error(`Error creating assistant: ${error.message}`);
+    throw new Error(`Error while creating assistant: ${error.message}`);
   }
 
   //Only Thread with Assistant
-  async createThreadForAssistant (assistantId: string, workspace: string, userId: string, instruction: string, dataSetId: string, assistantName:string) {
+  async createThread (assistantId: string, workspace: string, userId: string, instruction: string, dataSetId: string, assistantName:string) {
     try {
       const createdAt = new Date().toISOString();
       const openai = new OpenAI();
@@ -150,12 +144,13 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
     
       console.log(myThread);
       return myThread.id;
-    } catch (error) {
-      throw new Error(`Error creating thread for assistant: ${error.message}`);
+    }  catch (error) {
+      console.error(`Error while creating assistant: ${error.message}`);
+      return ["success: False", "message: Error creating assistant"];
     }
   }
+
   async softDeleteOfBot(workspaceId: string, assistantId: string): Promise<any> {
-    // First, retrieve the current data to see if it's already marked as deleted.
     let currentData;
     try {
       const getResult = await this.dynamoDbService.getAssistantRecord2(workspaceId, assistantId);
@@ -187,7 +182,6 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
 
   async getAllAssistants (workspaceId: string): Promise<any> {
     return await this.dynamoDbService.getAllAssistant(workspaceId);
-
   }
   
 
@@ -207,7 +201,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
   }
 
   @SubscribeMessage('runAssistant')
-  async handleGptRequest(@ConnectedSocket() client: Socket, @MessageBody() rawData: any) {
+  async handleUserRequest(@ConnectedSocket() client: Socket, @MessageBody() rawData: any) {
     try {
       const data = JSON.parse(rawData);
       const query = data.query;

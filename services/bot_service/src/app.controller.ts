@@ -4,11 +4,7 @@ import { BotService } from './bot/bot.service';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly botService: BotService,
-
-  ) {}
+  constructor(private readonly appService: AppService, private readonly botService: BotService,) {}
 
   //Creating Assistant and Thread only. It also adds into dynamoDB
   @Post('/bot/:workspaceId/assistant')
@@ -18,6 +14,7 @@ export class AppController {
     const response = await this.botService.createAssistant(purpose, workspaceId, userId, assistantName, tool, models, dataSetId);
     return { response };
   }
+
   //Connection check
   @Get()
   getHello(): string {
@@ -29,18 +26,16 @@ export class AppController {
     return "Bot Service is working";
   }
 
-
-    //Creating Assistant and Thread only. It also adds into dynamoDB
-    @Delete('/bot/:workspaceId')
-    async DeleteOfBot (@Param('workspaceId') workspaceId: string, @Body() requestBody: {assistantId: string}) {
-      const {assistantId} = requestBody;
-      const response = await this.botService.softDeleteOfBot(workspaceId, assistantId);
-      return { response };
-    }
+  //Creating Assistant and Thread only. It also adds into dynamoDB
+  @Delete('/bot/:workspaceId')
+  async DeletionOfBot (@Param('workspaceId') workspaceId: string, @Body() requestBody: {assistantId: string}) {
+  const {assistantId} = requestBody;
+  const response = await this.botService.softDeleteOfBot(workspaceId, assistantId);
+  return { response };
+  }
 
     @Get('/bot/:workspaceId')
     async getAllAssistant (@Param('workspaceId') workspaceId: string) {
-      //const {assistantId} = requestBody;
       const response = await this.botService.getAllAssistants(workspaceId);
       return { response };
     }

@@ -47,6 +47,7 @@ stage('Build and Tag Image') {
     }
 }
 
+
 stage('Push to ECR') {
     steps {
         // Using withCredentials to securely handle AWS credentials
@@ -60,6 +61,7 @@ stage('Push to ECR') {
                 try {
                     // Attempt to log into AWS ECR with provided credentials
                     echo "Logging into AWS ECR..."
+
                     bat script: "aws ecr get-login-password --region %AWS_DEFAULT_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%", returnStdout: true
                     echo "AWS ECR login successful."
 
@@ -84,21 +86,17 @@ stage('Push to ECR') {
 
 
         
-        stage('Deploy to ECS') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId:'AWS_ACCESS_SECRET_KEYS']]) {
-                    bat script: """
-                aws ecs create-service --cluster ${ECS_CLUSTER_NAME} \
-                --service-name ${ECS_SERVICE_NAME} \
-                --task-definition ${ECS_TASK_FAMILY_NAME} \
-                --desired-count ${ECS_DESIRED_COUNT} \
-                        --launch-type ${ECS_LAUNCH_TYPE} \
-                        --network-configuration "awsvpcConfiguration={subnets=[${ECS_SUBNET_ID}],securityGroups=[${ECS_SECURITY_GROUP_ID}],assignPublicIp=ENABLED}" \
-                        --region ${AWS_DEFAULT_REGION}
-            """
-                }
+stage('Deploy to ECS') {
+    steps {
+        script {
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: AWS_CREDENTIALS_ID]]) {
+                // Deploy the Docker image to ECS service
+                bat "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count ${ECS_DESIRED_COUNT} --launch-type ${ECS_LAUNCH_TYPE} --network-configuration \"awsvpcConfiguration={subnets=[${ECS_SUBNET_ID}],securityGroups=[${ECS_SECURITY_GROUP_ID}],assignPublicIp=ENABLED}\" --region ${AWS_DEFAULT_REGION}"
             }
         }
+    }
+}
+
 
         stage('Test') {
             steps {
