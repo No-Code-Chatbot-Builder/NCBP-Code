@@ -91,7 +91,7 @@ stage('Deploy to ECS') {
         script {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: AWS_CREDENTIALS_ID]]) {
                 // Deploy the Docker image to ECS service
-                bat "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count ${ECS_DESIRED_COUNT} --launch-type ${ECS_LAUNCH_TYPE} --network-configuration \"awsvpcConfiguration={subnets=[${ECS_SUBNET_ID}],securityGroups=[${ECS_SECURITY_GROUP_ID}],assignPublicIp=ENABLED}\" --region ${AWS_DEFAULT_REGION}"
+                bat "aws ecs update-service --cluster ${ECS_CLUSTER_NAME} --service ${ECS_SERVICE_NAME} --task-definition ${ECS_TASK_FAMILY_NAME} --desired-count ${ECS_DESIRED_COUNT} --network-configuration \"awsvpcConfiguration={subnets=[${ECS_SUBNET_ID}],securityGroups=[${ECS_SECURITY_GROUP_ID}],assignPublicIp=ENABLED}\" --region ${AWS_DEFAULT_REGION}"
             }
         }
     }
