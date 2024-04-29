@@ -20,7 +20,7 @@ export class LangchainDocLoaderService {
     private pineconeService: PineconeService
   ) {}
 
-  async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string) {
+  async dataProcessor(data: File | string, userId: string, workspaceId: string, datasetId: string, dataId: string){
     this.data = data;
 
     let document: any;
@@ -43,7 +43,7 @@ export class LangchainDocLoaderService {
         })
         .toPromise(); // Convert Observable to Promise
 
-      this.pineconeService.upsertRecords(response.data, userId, workspaceId, datasetId);
+      this.pineconeService.upsertRecords(response.data, userId, workspaceId, datasetId, dataId);
     } catch (error) {
       console.error('Error sending text to server:', error);
     }

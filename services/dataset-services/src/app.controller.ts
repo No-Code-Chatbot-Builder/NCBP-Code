@@ -121,4 +121,10 @@ export class AppController {
     return response;
   }
 
+  @Delete('datasets/:workspaceId/:datasetId/data/:dataId')
+  async softDeleteDataItems(@Param('datasetId') datasetId: string): Promise<any> {
+    const response = await this.dynamoDbService.softDeleteDataItems(datasetId);
+    return response;
+  }
+
 }

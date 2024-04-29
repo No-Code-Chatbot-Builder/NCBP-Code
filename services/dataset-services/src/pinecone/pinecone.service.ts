@@ -42,7 +42,7 @@ export class PineconeService {
     return response;
   }
 
-  async upsertRecords(records: dataForUpsert, userId: string, workspaceId: string, datasetId: string) {
+  async upsertRecords(records: dataForUpsert, userId: string, workspaceId: string, datasetId: string, dataId: string) {
     // Upsert the data into your index
     const indexName = this.configService.get<string>('PINECONE_INDEX_NAME');
 
@@ -62,5 +62,28 @@ export class PineconeService {
         }
       ]);
     }
+  }
+
+  async deleteVector(dataId: string)
+  {
+    const indexName = this.configService.get<string>('PINECONE_INDEX_NAME');
+
+    try {
+      await this.pineconeClient.index(indexName).deleteMany({
+        //datasetId : {$eq: datasetId},
+        //workspaceId : {$eq: workspaceId},
+        dataId : {$eq: dataId} 
+      
+      });
+
+      console.log("succesfuly deleted vectors");
+      return "succesfuly deleted vectors";
+    } catch (error) {
+      console.log(error);
+    }
+    
+      
+    
+
   }
 }
