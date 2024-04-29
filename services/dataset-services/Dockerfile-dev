@@ -42,7 +42,7 @@ WORKDIR /usr/src/app
 # Copying package.json and package-lock.json again in the production stage.
 COPY package*.json ./
 
-COPY .env /usr/src/app/.env
+#COPY .env /usr/src/app/.env
 # Installing only the production dependencies.
 # The --only=production flag tells npm to omit 'devDependencies'.
 RUN npm install --only=production
