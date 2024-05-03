@@ -41,7 +41,7 @@ stage('Build and Tag Image') {
         dir('services/workspace-service') { // This changes the current directory to 'services/workspace-service'
             echo "Listing the contents of the current directory:"
             bat "dir"
-            bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f ./services/workspace-service/Dockerfile ."
+            bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
             bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
         }
     }
