@@ -1,3 +1,11 @@
+const defaultDomain = {
+    workspaceId: 'defaultWorkspaceId',
+    botId: 'defaultBotId',
+    allowedDomains: ['defaultDomain'],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+}
+
 const defaultUser = {
     username: 'default',
     email: 'default',
@@ -27,4 +35,5 @@ enum HttpStatusCode {
 }
 
 export { HttpStatusCode }
+export const DEFAULT_DOMAIN = defaultDomain
 export const DEFAULT_USER = defaultUser

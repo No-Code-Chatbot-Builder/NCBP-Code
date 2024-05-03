@@ -1,20 +1,18 @@
-interface CreateKeyRequest {
-    accessMode: AccessMode;
-    userId: string;
+interface AddDomainRequest {
+  workspaceId: string;
+  botId: string;
+  domain: string;
 }
 
-interface DeleteKeyRequest {
-    clientId: string;
-    userId: string;
+interface DeleteDomainRequest {
+  workspaceId: string;
+  botId: string;
+  domain: string;
 }
 
-interface GetKeysRequest {
-    userId: string;
+interface GetDomainsRequest {
+  workspaceId: string;
+  botId: string;
 }
 
-enum AccessMode {
-    READ = 'READ',
-    WRITE = 'WRITE',
-}
-
-export { CreateKeyRequest, DeleteKeyRequest, GetKeysRequest, AccessMode };
+export { AddDomainRequest, DeleteDomainRequest, GetDomainsRequest };
