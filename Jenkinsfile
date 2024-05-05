@@ -44,7 +44,7 @@ stage('Build and Tag Image') {
             dir('services/workspace-service') {
                 echo "Copying the environment file for the build process..."
                 bat "copy %ENV_FILE_PATH% .env"
-                bat "cat .env" //to check if it was imported correctly
+                bat "type .env" //to check if it was imported correctly
                 // Build the Docker image while ensuring the environment variables are respected
                 bat "docker build --env-file .env -t  ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
                 bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
