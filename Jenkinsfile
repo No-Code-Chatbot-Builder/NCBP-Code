@@ -9,10 +9,10 @@ pipeline {
 
 
         // Define ECS-related environment variables
-        ECS_CLUSTER_NAME = 'FargateServiceStack-FargateServiceStackCluster15109166-SBB3QVgLzqfj'
-        ECS_SERVICE_NAME = 'FargateServiceStack-WorkspaceServiceFargateServiceEC86F408-VNfFcJpKQ8eZ'
+        ECS_CLUSTER_NAME = 'FargateServiceStack-FargateServiceStackCluster15109166-uPTHRsRRreZC'
+        ECS_SERVICE_NAME = 'FargateServiceStack-WorkspaceServiceFargateServiceEC86F408-qZQ1y1P5tIv3'
         ECS_TASK_FAMILY_NAME = 'FargateServiceStackWorkspaceServiceTaskDefinition943E1AD3'
-        ECS_TASK_DEFINITION_FILE = 'FargateServiceStackWorkspaceServiceTaskDefinition943E1AD3-revision5.json' // Path relative to the repo root
+        ECS_TASK_DEFINITION_FILE = 'FargateServiceStackWorkspaceServiceTaskDefinition943E1AD3-revision7.json' // Path relative to the repo root
 
         // Define AWS environment variables
         AWS_DEFAULT_REGION = 'us-east-1'
@@ -23,8 +23,8 @@ pipeline {
         ECS_LAUNCH_TYPE = 'FARGATE'
 
         // Network Configuration for ECS Service
-        ECS_SUBNET_ID = 'subnet-04f6b36607ec850d3, subnet-006b454fb64cc2588'
-        ECS_SECURITY_GROUP_ID = 'sg-03755d0953d4470fa' 
+        ECS_SUBNET_ID = 'subnet-0a5e64aa9ee3ebd7f, subnet-048488bb7a93cb1ec'
+        ECS_SECURITY_GROUP_ID = 'sg-0c09aa54ec055c147' 
     }
     
 
@@ -38,12 +38,19 @@ pipeline {
 
 stage('Build and Tag Image') {
     steps {
-        dir('services/workspace-service') { // This changes the current directory to 'services/workspace-service'
-            echo "Listing the contents of the current directory:"
-            bat "dir"
-            bat "docker build -t ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
-            bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+        // Load the secret environment file from Jenkins credentials
+        withCredentials([file(credentialsId: 'workspace-env', variable: 'ENV_FILE_PATH')]) {
+            // Copy the environment file to the service directory or reference it during the build
+            dir('services/workspace-service') {
+                echo "Copying the environment file for the build process..."
+                bat "copy %ENV_FILE_PATH% .env"
+
+                // Build the Docker image while ensuring the environment variables are respected
+                bat "docker build --env-file .env -t  ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
+                bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+            }
         }
+        
     }
 }
 
