@@ -38,19 +38,13 @@ pipeline {
 
 stage('Build and Tag Image') {
     steps {
-        // Load the secret environment file from Jenkins credentials
-        withCredentials([file(credentialsId: 'workspace-env', variable: 'ENV_FILE_PATH')]) {
-            // Copy the environment file to the service directory or reference it during the build
             dir('services/workspace-service') {
                 echo "Copying the environment file for the build process..."
-                bat "copy %ENV_FILE_PATH% .env"
-                bat "type .env" //to check if it was imported correctly
                 // Build the Docker image while ensuring the environment variables are respected
-                bat "docker build --env-file .env -t  ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
+                bat "docker build -t  ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
                 bat "docker tag ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
             }
-        }
-        
+        } 
     }
 }
 
