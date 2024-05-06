@@ -3,11 +3,14 @@ import cors from 'cors';
 import workspaceRouter from './routers/workspace';
 import 'dotenv/config';
 import { authenticate } from './middlewares/authentication.middleware';
+import { setEnviromentVariables } from './utils/helpers';
 
 const app = express();
 const port = process.env.PORT || 80
 app.use(cors())
 app.use(express.json());
+
+setEnviromentVariables();
 
 app.get('/workspaces/health', (req, res) => {
   res.send('<h1>Workspace Service is running</h1>');
