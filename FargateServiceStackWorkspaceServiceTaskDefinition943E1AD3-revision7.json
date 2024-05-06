@@ -1,0 +1,98 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:637423235266:task-definition/FargateServiceStackWorkspaceServiceTaskDefinition943E1AD3:7",
+    "containerDefinitions": [
+        {
+            "name": "WorkspaceServiceContainer",
+            "image": "637423235266.dkr.ecr.us-east-1.amazonaws.com/workspace-service:latest",
+            "cpu": 512,
+            "memory": 2048,
+            "links": [],
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [],
+            "command": [],
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [],
+            "dnsServers": [],
+            "dnsSearchDomains": [],
+            "extraHosts": [],
+            "dockerSecurityOptions": [],
+            "dockerLabels": {},
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "FargateServiceStack-WorkspaceServiceTaskDefinitionWorkspaceServiceContainerLogGroupD0C3655D-Wtca2Xmh2sC4",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "WorkspaceService"
+                },
+                "secretOptions": []
+            },
+            "systemControls": [],
+            "credentialSpecs": []
+        }
+    ],
+    "family": "FargateServiceStackWorkspaceServiceTaskDefinition943E1AD3",
+    "taskRoleArn": "arn:aws:iam::637423235266:role/WorkspaceServiceTaskRole",
+    "executionRoleArn": "arn:aws:iam::637423235266:role/FargateServiceStack-WorkspaceServiceTaskDefinitionE-RKWZeHZuOrpm",
+    "networkMode": "awsvpc",
+    "revision": 7,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "4096",
+    "memory": "30720",
+    "registeredAt": "2024-05-05T08:25:52.192Z",
+    "registeredBy": "arn:aws:sts::637423235266:assumed-role/cdk-hnb659fds-cfn-exec-role-637423235266-us-east-1/AWSCloudFormation",
+    "tags": [
+        {
+            "key": "WorkspaceService",
+            "value": "starter-app"
+        }
+    ]
+}
