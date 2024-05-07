@@ -22,8 +22,8 @@ pipeline {
         ECS_LAUNCH_TYPE = 'FARGATE'
 
         // Network Configuration for ECS Service
-        ECS_SUBNET_ID = 'subnet-0a5e64aa9ee3ebd7f, subnet-048488bb7a93cb1ec'
-        ECS_SECURITY_GROUP_ID = 'sg-0c09aa54ec055c147' 
+        ECS_SUBNET_ID = 'subnet-066edb027abd52cdc, subnet-0e0e120d294395286'
+        ECS_SECURITY_GROUP_ID = 'sg-02552242448b8ea64' 
     }
     
 
