@@ -9,7 +9,7 @@ pipeline {
 
 
         // Define ECS-related environment variables
-        ECS_CLUSTER_NAME = 'FargateServiceStack-FargateServiceStackCluster15109166-uPTHRsRRreZC'
+        ECS_CLUSTER_NAME = 'FargateServiceStack-FargateServiceStackCluster15109166-Ju6RGOqQbpxS'
         ECS_SERVICE_NAME = 'FargateServiceStack-DatasetServiceFargateService438DC76C-A7CgnHx4OCNY'
         ECS_TASK_FAMILY_NAME = 'FargateServiceStackDatasetServiceTaskDefinition71027E7F'
         
