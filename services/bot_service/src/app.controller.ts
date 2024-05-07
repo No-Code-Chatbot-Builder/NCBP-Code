@@ -34,11 +34,18 @@ export class AppController {
   return { response };
   }
 
-    @Get('/bot/:workspaceId')
-    async getAllAssistant (@Param('workspaceId') workspaceId: string) {
-      const response = await this.botService.getAllAssistants(workspaceId);
-      return { response };
-    }
+  @Get('/bot/:workspaceId')
+  async getAllAssistant (@Param('workspaceId') workspaceId: string) {
+    const response = await this.botService.getAllAssistants(workspaceId);
+    return { response };
+  }
+
+      //Creating Assistant and Thread only. It also adds into dynamoDB
+  @Get('/bot/:workspaceId/:assistantId')
+  async getAllMessages (@Param('workspaceId') workspaceId: string, @Param('assistantId') assistantId: string,) {
+    const response = await this.botService.gettingThreadIdForMessages( workspaceId, assistantId);
+    return { response };
+  }
 
 
    //Sending workspace id to dynamoDb so that it fetches AssitantId and ThreadId to create msg and run

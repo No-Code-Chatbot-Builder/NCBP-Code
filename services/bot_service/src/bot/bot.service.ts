@@ -180,6 +180,22 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
   }
   }
 
+  async gettingThreadIdForMessages (workspaceId: string, assistantId: string): Promise<any> {
+    const result = await this.dynamoDbService.getAssistantRecord2 (workspaceId, assistantId)
+    this.getAllMessages(result.threadId)
+  }
+
+  async getAllMessages (threadId: string): Promise<any> {
+    const openai = new OpenAI();
+    const threadMessages = await openai.beta.threads.messages.list(
+      threadId
+    );
+
+  console.log(threadMessages.data);
+}
+
+
+
   async getAllAssistants (workspaceId: string): Promise<any> {
     return await this.dynamoDbService.getAllAssistant(workspaceId);
   }
