@@ -10,7 +10,7 @@ pipeline {
 
         // Define ECS-related environment variables
         ECS_CLUSTER_NAME = 'FargateServiceStack-FargateServiceStackCluster15109166-uPTHRsRRreZC'
-        ECS_SERVICE_NAME = 'FargateServiceStack-WorkspaceServiceFargateServiceEC86F408-qZQ1y1P5tIv3'
+        ECS_SERVICE_NAME = 'FargateServiceStack-DatasetServiceFargateService438DC76C-A7CgnHx4OCNY'
         ECS_TASK_FAMILY_NAME = 'FargateServiceStackDatasetServiceTaskDefinition71027E7F'
         
         // Define AWS environment variables
@@ -38,7 +38,7 @@ pipeline {
 stage('Build and Tag Image') {
     steps {
             // Copy the environment file to the service directory or reference it during the build
-            dir('services/workspace-service') {
+            dir('services/dataset-service') {
                 echo "Copying the environment file for the build process..."
                 // Build the Docker image while ensuring the environment variables are respected
                 bat "docker build -t  ${ECR_REGISTRY}/${IMAGE_REPO_NAME}:${IMAGE_TAG} -f Dockerfile ."
