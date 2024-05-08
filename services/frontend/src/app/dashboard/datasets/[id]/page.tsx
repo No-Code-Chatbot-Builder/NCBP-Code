@@ -36,6 +36,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 
 type Props = {
   params: {
@@ -50,43 +51,60 @@ const DatasetByIdPage = ({ params }: Props) => {
     (set: any) => set.id === params.id
   );
   const { setOpen } = useModal();
+  const [isDatasetFilesEmpty, setIsDatasetFilesEmpty] = useState(false);
+  const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(false);
 
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
-  const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(false);
+
+  const { data: res } = useAxiosSWR(
+    `/dataset-service/datasets/${currentWorkspaceName}/${params.id}`
+  );
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!dataset || currentWorkspaceName === null) return;
-      setIsDatasetFilesLoading(true);
-      const res = await fetchFiles(currentWorkspaceName as string, params.id);
-      console.log(res);
-      if (!res?.data?.length) return;
-      const updatedFileArray = res?.data?.map((item: any) => ({
-        id: item.dataId,
-        name: item.name,
-        path: item.path,
-        createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
-        createdBy: item.createdBy,
-      }));
-      console.log(res.datasetDetails);
-      dispatch(
-        updateDataset({
-          id: res.datasetDetails.datasetId,
-          name: res.datasetDetails.name,
-          description: res.datasetDetails.description,
-          createdAt: format(new Date(res.datasetDetails.createdAt), "MM-dd-yy"),
-          createdBy: res.datasetDetails.createdBy,
-          data: updatedFileArray,
-        })
-      );
+      if (!dataset || currentWorkspaceName === null) {
+        setIsDatasetFilesLoading(true);
+        return;
+      }
 
-      setIsDatasetFilesLoading(false);
+      try {
+        if (!res?.data?.data.length) {
+          setIsDatasetFilesEmpty(true);
+        } else {
+          const updatedFileArray = res?.data?.data.map((item: any) => ({
+            id: item.dataId,
+            name: item.name,
+            path: item.path,
+            createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
+            createdBy: item.createdBy,
+          }));
+          console.log(res.datasetDetails);
+          dispatch(
+            updateDataset({
+              id: res.data.datasetDetails.datasetId,
+              name: res.data.datasetDetails.name,
+              description: res.data.datasetDetails.description,
+              createdAt: format(
+                new Date(res.data.datasetDetails.createdAt),
+                "MM-dd-yy"
+              ),
+              createdBy: res.data.datasetDetails.createdBy,
+              data: updatedFileArray,
+            })
+          );
+          setIsDatasetFilesEmpty(false);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsDatasetFilesLoading(false);
+      }
     };
 
     fetchData();
-  }, [currentWorkspaceName]);
+  }, [currentWorkspaceName, res, dataset]);
 
   const handleDataDeletion = async (dataId: string, datasetName: string) => {
     try {
@@ -161,108 +179,134 @@ const DatasetByIdPage = ({ params }: Props) => {
               {new Date(dataset.createdAt).toLocaleDateString()}
             </p>
           </div>
-          <Button
-            size={"lg"}
-            variant={"outline"}
-            className="gap-2"
-            onClick={() => {
-              setOpen(addDataSheet);
-            }}
-          >
-            <Plus className="w-5 h-5" />
-            <p className="flex">Add Data</p>
-          </Button>
+          {!isDatasetFilesEmpty && (
+            <Button
+              size={"lg"}
+              variant={"outline"}
+              className="gap-2"
+              onClick={() => {
+                setOpen(addDataSheet);
+              }}
+            >
+              <Plus className="w-5 h-5" />
+              <p className="flex">Add Data</p>
+            </Button>
+          )}
         </div>
         <Separator className="mt-8" />
       </section>
-      <section>
-        <div className="grid gap-8">
-          <h1 className="text-2xl font-bold">Quick Access</h1>
+      {isDatasetFilesEmpty ? (
+        <div className="w-full h-[60vh] flex items-center justify-center ">
+          <div className="bg-card border border-dashed border-primary p-16 rounded-lg flex flex-col gap-2">
+            <h2 className="text-2xl font-bold text-center">No Data Found</h2>
+            <p className="text-muted-foreground text-center mt-2">
+              Add Data to your dataset to get started.
+            </p>
+            <Button
+              className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
+              onClick={() => {
+                setOpen(addDataSheet);
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              <p className="text-md font-semibold">Add Data</p>
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <section>
+            <div className="grid gap-8">
+              <h1 className="text-2xl font-bold">Quick Access</h1>
 
-          {isDatasetFilesLoading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {Array.from({ length: 3 }, (_, index) => (
-                <LoadingSkeleton key={index} className="h-40" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {dataset.data?.map((qa: any) => (
-                <Card key={qa.id}>
-                  <div className="flex justify-between items-center mr-4">
-                    <CardHeader>
-                      <CardTitle>{qa.name}</CardTitle>
-                      <CardDescription>Description</CardDescription>
-                    </CardHeader>
-                    <Button
-                      size="icon"
-                      variant={"destructive"}
-                      onClick={() => {
-                        handleDataDeletion(dataset.id, dataset.name);
-                      }}
-                    >
-                      <Trash className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <CardContent>
-                    <Button className="w-full">
-                      <div className="flex flex-row justify-center items-center gap-2">
-                        <File className="w-4 h-4" />
-                        <p>Open File</p>
+              {isDatasetFilesLoading ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <LoadingSkeleton key={index} className="h-40" />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {dataset.data?.map((qa: any) => (
+                    <Card key={qa.id}>
+                      <div className="flex justify-between items-center mr-4">
+                        <CardHeader>
+                          <CardTitle>{qa.name}</CardTitle>
+                          <CardDescription>Description</CardDescription>
+                        </CardHeader>
+                        <Button
+                          size="icon"
+                          variant={"destructive"}
+                          onClick={() => {
+                            handleDataDeletion(dataset.id, dataset.name);
+                          }}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
                       </div>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <CardContent>
+                        <Button className="w-full">
+                          <div className="flex flex-row justify-center items-center gap-2">
+                            <File className="w-4 h-4" />
+                            <p>Open File</p>
+                          </div>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </section>
-      <section>
-        <div className="grid gap-8">
-          <h1 className="text-2xl font-semibold">Recently Added</h1>
-          {isDatasetFilesLoading ? (
-            <div className="grid grid-cols-1">
-              <LoadingSkeleton className="pt-4" />
+          </section>
+          <section>
+            <div className="grid gap-8">
+              <h1 className="text-2xl font-semibold">Recently Added</h1>
+              {isDatasetFilesLoading ? (
+                <div className="grid grid-cols-1">
+                  <LoadingSkeleton className="pt-4" />
+                </div>
+              ) : (
+                <div>
+                  <Card className="pt-4">
+                    <CardContent>
+                      <Table>
+                        <TableCaption>
+                          Recently added files in {dataset.name}
+                        </TableCaption>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="font-semibold">
+                              File
+                            </TableHead>
+                            <TableHead className="font-semibold">
+                              Added by
+                            </TableHead>
+                            <TableHead className="font-semibold">
+                              Date added
+                            </TableHead>
+                            <TableHead className="font-semibold"></TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {dataset.data?.map((file: any, index: number) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium">
+                                {file.name}
+                              </TableCell>
+                              <TableCell>{file.createdBy}</TableCell>
+                              <TableCell>{file.createdAt}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
-          ) : (
-            <div>
-              <Card className="pt-4">
-                <CardContent>
-                  <Table>
-                    <TableCaption>
-                      Recently added files in {dataset.name}
-                    </TableCaption>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="font-semibold">File</TableHead>
-                        <TableHead className="font-semibold">
-                          Added by
-                        </TableHead>
-                        <TableHead className="font-semibold">
-                          Date added
-                        </TableHead>
-                        <TableHead className="font-semibold"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {dataset.data?.map((file: any, index: number) => (
-                        <TableRow key={index}>
-                          <TableCell className="font-medium">
-                            {file.name}
-                          </TableCell>
-                          <TableCell>{file.createdBy}</TableCell>
-                          <TableCell>{file.createdAt}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </div>
-      </section>
+          </section>
+        </>
+      )}
     </main>
   );
 };

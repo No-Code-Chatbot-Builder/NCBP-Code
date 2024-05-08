@@ -17,13 +17,15 @@ import { useModal } from "@/providers/modal-provider";
 import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { deleteAssistant, getAssistants } from "@/lib/api/bot/service";
 import {
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
+import useSWR from "swr";
+import { apiClient } from "@/lib/api/apiService";
+import { botApiClient } from "@/lib/api/bot/service";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -37,52 +39,52 @@ export default function Page() {
     (state) => state.workspaces.currentWorkspaceName!
   );
 
+  const fetcher = (url: string) =>
+    botApiClient.get(url).then((res) => res.data);
+
+  const { data: res, error } = useSWR<any>(
+    `bot/${currentReduxWorkspace}`,
+    fetcher
+  );
+  console.log(res);
+
   useEffect(() => {
     const fetchAssistants = async () => {
-      if (!currentReduxWorkspace) return;
+      if (!currentReduxWorkspace || error) return;
 
-      toast(
-        CustomToast({
-          title: "Loading Assistants",
-          description: `Fetching assistants for ${currentReduxWorkspace}`,
-        })
-      );
-     
-  try {
-    const res = await getAssistants(currentReduxWorkspace);
-    if (res.response && res.response.assistants) {
-      const formattedAssistants: AssistantType[] =
-        res.response.assistants.map((assistant: any) => ({
-          id: assistant.assistantId,
-          name: assistant.assistantName,
-          description: assistant.purpose,
-        }));
+      try {
+        if (res && res.response && res.response.assistants) {
+          const formattedAssistants: AssistantType[] =
+            res.response.assistants.map((assistant: any) => ({
+              id: assistant.assistantId,
+              name: assistant.assistantName,
+              description: assistant.purpose,
+            }));
 
-      const filteredAssistants = formattedAssistants.filter(
-        (assistant: AssistantType) => assistant.name
-      );
-      const currentAssistantNames = assistants
-        .map((assistant: AssistantType) => assistant.name)
-        .sort();
-      const newAssistantNames = filteredAssistants
-        .map((assistant: AssistantType) => assistant.name)
-        .sort();
-      const assistantsChanged =
-        JSON.stringify(currentAssistantNames) !==
-        JSON.stringify(newAssistantNames);
+          const filteredAssistants = formattedAssistants.filter(
+            (assistant: AssistantType) => assistant.name
+          );
+          const currentAssistantNames = assistants
+            .map((assistant: AssistantType) => assistant.name)
+            .sort();
+          const newAssistantNames = filteredAssistants
+            .map((assistant: AssistantType) => assistant.name)
+            .sort();
+          const assistantsChanged =
+            JSON.stringify(currentAssistantNames) !==
+            JSON.stringify(newAssistantNames);
 
-      if (assistantsChanged || !filteredAssistants.length) {
-        dispatch(setAssistant(filteredAssistants));
+          if (assistantsChanged || !filteredAssistants.length) {
+            dispatch(setAssistant(filteredAssistants));
+            dispatch(setIsAssistantLoading(false));
+          }
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch assistants:", error);
       }
-    }
-  } catch (error: any) {
-    console.error("Failed to fetch assistants:", error);
-  } finally {
-    dispatch(setIsAssistantLoading(false));
-  }
-};
-fetchAssistants();
-  }, [currentReduxWorkspace]);
+    };
+    fetchAssistants();
+  }, [currentReduxWorkspace, res]);
 
 const assistantSheet = (
   <CustomSheet
@@ -98,7 +100,7 @@ const handleCreateAssistant = async () => {
 };
 
 const handleAssistantDeletion = async (assistant_id: string) => {
-  const res = await deleteAssistant(currentReduxWorkspace, assistant_id);
+  // const res = await deleteAssistant(currentReduxWorkspace, assistant_id);
 }
 
 return (
