@@ -216,27 +216,27 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect{
     this.clientWorkspaceMap.delete(client.id);
   }
 
-  // @SubscribeMessage('runAssistant')
-  // async handleUserRequest(@ConnectedSocket() client: Socket, @MessageBody() rawData: any) {
-  //   try {
-  //     const data = JSON.parse(rawData);
-  //     const query = data.query;
-  //     const  { workspaceId, assistantId } = this.clientWorkspaceMap.get(client.id); 
+  @SubscribeMessage('runAssistant')
+  async handleUserRequest(@ConnectedSocket() client: Socket, @MessageBody() rawData: any) {
+    try {
+      const data = JSON.parse(rawData);
+      const query = data.query;
+      const  { workspaceId, assistantId } = this.clientWorkspaceMap.get(client.id); 
 
-  //     if (!workspaceId || !assistantId || !query) {
-  //       console.error('Workspace ID, assistant ID, or query is undefined!');
-  //       this.server.to(client.id).emit('error', 'Workspace ID, assistant ID, or query is undefined!');
-  //       return;
-  //     }
+      if (!workspaceId || !assistantId || !query) {
+        console.error('Workspace ID, assistant ID, or query is undefined!');
+        this.server.to(client.id).emit('error', 'Workspace ID, assistant ID, or query is undefined!');
+        return;
+      }
       
    
-  //     await this.initiateResponseProcess(workspaceId, assistantId, query);
-  //   } catch (error) {
-  //     console.error('Error parsing data:', error);
-  //     this.server.to(client.id).emit('error', `Error parsing data: ${error}`);
-  //   }
+      await this.initiateResponseProcess(workspaceId, assistantId, query);
+    } catch (error) {
+      console.error('Error parsing data:', error);
+      this.server.to(client.id).emit('error', `Error parsing data: ${error}`);
+    }
   
-  // }
+  }
 }
 
 
