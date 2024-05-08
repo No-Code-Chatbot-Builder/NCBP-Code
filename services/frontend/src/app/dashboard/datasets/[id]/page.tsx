@@ -26,6 +26,7 @@ import { DataBucketType } from "@/lib/constants";
 import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import {
+  setIsDatasetFilesEmpty,
   setIsDatasetLoading,
   updateDataset,
 } from "@/providers/redux/slice/datasetSlice";
@@ -50,9 +51,12 @@ const DatasetByIdPage = ({ params }: Props) => {
   const dataset = datasetState.datasets.find(
     (set: any) => set.id === params.id
   );
+  const isDatasetFilesEmpty = useAppSelector(
+    (state) => state.datasets.isDatasetFilesEmpty
+  );
   const { setOpen } = useModal();
-  const [isDatasetFilesEmpty, setIsDatasetFilesEmpty] = useState(false);
-  const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(false);
+
+  const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(true);
 
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
@@ -69,9 +73,11 @@ const DatasetByIdPage = ({ params }: Props) => {
         return;
       }
 
+      if (!res) return;
       try {
-        if (!res?.data?.data.length) {
-          setIsDatasetFilesEmpty(true);
+        if (!res.data?.data.length) {
+          dispatch(setIsDatasetFilesEmpty(true));
+          setIsDatasetFilesLoading(false);
         } else {
           const updatedFileArray = res?.data?.data.map((item: any) => ({
             id: item.dataId,
@@ -80,7 +86,6 @@ const DatasetByIdPage = ({ params }: Props) => {
             createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
             createdBy: item.createdBy,
           }));
-          console.log(res.datasetDetails);
           dispatch(
             updateDataset({
               id: res.data.datasetDetails.datasetId,
@@ -94,23 +99,20 @@ const DatasetByIdPage = ({ params }: Props) => {
               data: updatedFileArray,
             })
           );
-          setIsDatasetFilesEmpty(false);
+          setIsDatasetFilesLoading(false);
+          dispatch(setIsDatasetFilesEmpty(updatedFileArray.length === 0));
         }
       } catch (error) {
         console.error(error);
-      } finally {
         setIsDatasetFilesLoading(false);
+        dispatch(setIsDatasetFilesEmpty(true));
       }
     };
 
     fetchData();
-  }, [currentWorkspaceName, res, dataset]);
-
+  }, [currentWorkspaceName, res]);
   const handleDataDeletion = async (dataId: string, datasetName: string) => {
     try {
-      // Placeholder for actual deletion logic
-      // await deleteDataset(workspaceName,datasetId);
-      // dispatch(removeDataset(datasetId));
       toast(
         CustomToast({
           title: `${datasetName} Deleted`,
@@ -195,116 +197,132 @@ const DatasetByIdPage = ({ params }: Props) => {
         </div>
         <Separator className="mt-8" />
       </section>
-      {isDatasetFilesEmpty ? (
-        <div className="w-full h-[60vh] flex items-center justify-center ">
-          <div className="bg-card border border-dashed border-primary p-16 rounded-lg flex flex-col gap-2">
-            <h2 className="text-2xl font-bold text-center">No Data Found</h2>
-            <p className="text-muted-foreground text-center mt-2">
-              Add Data to your dataset to get started.
-            </p>
-            <Button
-              className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
-              onClick={() => {
-                setOpen(addDataSheet);
-              }}
-            >
-              <Plus className="w-4 h-4" />
-              <p className="text-md font-semibold">Add Data</p>
-            </Button>
+      {isDatasetFilesLoading ? (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }, (_, index) => (
+              <LoadingSkeleton key={index} className="h-40" />
+            ))}
           </div>
-        </div>
+        </>
       ) : (
         <>
-          <section>
-            <div className="grid gap-8">
-              <h1 className="text-2xl font-bold">Quick Access</h1>
+          {isDatasetFilesEmpty ? (
+            <>
+              <div className="w-full h-[60vh] flex items-center justify-center ">
+                <div className="bg-card border border-dashed border-primary p-16 rounded-lg flex flex-col gap-2">
+                  <h2 className="text-2xl font-bold text-center">
+                    No Data Found
+                  </h2>
+                  <p className="text-muted-foreground text-center mt-2">
+                    Add Data to your dataset to get started.
+                  </p>
+                  <Button
+                    className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
+                    onClick={() => {
+                      setOpen(addDataSheet);
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <p className="text-md font-semibold">Add Data</p>
+                  </Button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <section>
+                <div className="grid gap-8">
+                  <h1 className="text-2xl font-bold">Quick Access</h1>
 
-              {isDatasetFilesLoading ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {Array.from({ length: 3 }, (_, index) => (
-                    <LoadingSkeleton key={index} className="h-40" />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {dataset.data?.map((qa: any) => (
-                    <Card key={qa.id}>
-                      <div className="flex justify-between items-center mr-4">
-                        <CardHeader>
-                          <CardTitle>{qa.name}</CardTitle>
-                          <CardDescription>Description</CardDescription>
-                        </CardHeader>
-                        <Button
-                          size="icon"
-                          variant={"destructive"}
-                          onClick={() => {
-                            handleDataDeletion(dataset.id, dataset.name);
-                          }}
-                        >
-                          <Trash className="w-4 h-4" />
-                        </Button>
-                      </div>
-                      <CardContent>
-                        <Button className="w-full">
-                          <div className="flex flex-row justify-center items-center gap-2">
-                            <File className="w-4 h-4" />
-                            <p>Open File</p>
+                  {isDatasetFilesLoading ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {Array.from({ length: 3 }, (_, index) => (
+                        <LoadingSkeleton key={index} className="h-40" />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {dataset.data?.map((qa: any) => (
+                        <Card key={qa.id}>
+                          <div className="flex justify-between items-center mr-4">
+                            <CardHeader>
+                              <CardTitle>{qa.name}</CardTitle>
+                              <CardDescription>Description</CardDescription>
+                            </CardHeader>
+                            <Button
+                              size="icon"
+                              variant={"destructive"}
+                              onClick={() => {
+                                handleDataDeletion(dataset.id, dataset.name);
+                              }}
+                            >
+                              <Trash className="w-4 h-4" />
+                            </Button>
                           </div>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          <CardContent>
+                            <Button className="w-full">
+                              <div className="flex flex-row justify-center items-center gap-2">
+                                <File className="w-4 h-4" />
+                                <p>Open File</p>
+                              </div>
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </section>
-          <section>
-            <div className="grid gap-8">
-              <h1 className="text-2xl font-semibold">Recently Added</h1>
-              {isDatasetFilesLoading ? (
-                <div className="grid grid-cols-1">
-                  <LoadingSkeleton className="pt-4" />
+              </section>
+              <section>
+                <div className="grid gap-8">
+                  <h1 className="text-2xl font-semibold">Recently Added</h1>
+                  {isDatasetFilesLoading ? (
+                    <div className="grid grid-cols-1">
+                      <LoadingSkeleton className="pt-4" />
+                    </div>
+                  ) : (
+                    <div>
+                      <Card className="pt-4">
+                        <CardContent>
+                          <Table>
+                            <TableCaption>
+                              Recently added files in {dataset.name}
+                            </TableCaption>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead className="font-semibold">
+                                  File
+                                </TableHead>
+                                <TableHead className="font-semibold">
+                                  Added by
+                                </TableHead>
+                                <TableHead className="font-semibold">
+                                  Date added
+                                </TableHead>
+                                <TableHead className="font-semibold"></TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {dataset.data?.map((file: any, index: number) => (
+                                <TableRow key={index}>
+                                  <TableCell className="font-medium">
+                                    {file.name}
+                                  </TableCell>
+                                  <TableCell>{file.createdBy}</TableCell>
+                                  <TableCell>{file.createdAt}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div>
-                  <Card className="pt-4">
-                    <CardContent>
-                      <Table>
-                        <TableCaption>
-                          Recently added files in {dataset.name}
-                        </TableCaption>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="font-semibold">
-                              File
-                            </TableHead>
-                            <TableHead className="font-semibold">
-                              Added by
-                            </TableHead>
-                            <TableHead className="font-semibold">
-                              Date added
-                            </TableHead>
-                            <TableHead className="font-semibold"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {dataset.data?.map((file: any, index: number) => (
-                            <TableRow key={index}>
-                              <TableCell className="font-medium">
-                                {file.name}
-                              </TableCell>
-                              <TableCell>{file.createdBy}</TableCell>
-                              <TableCell>{file.createdAt}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-            </div>
-          </section>
+              </section>
+            </>
+          )}
         </>
       )}
     </main>
