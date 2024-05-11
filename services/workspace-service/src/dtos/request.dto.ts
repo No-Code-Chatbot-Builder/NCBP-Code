@@ -19,7 +19,6 @@ interface GetWorkspaceRequest {
 }
 
 interface AddUserToWorkspaceRequest {
-    userId: string;
     workspaceName: string;
     userEmail: string;
 }

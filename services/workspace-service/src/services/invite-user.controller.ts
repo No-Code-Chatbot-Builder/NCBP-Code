@@ -3,10 +3,21 @@ import { inviteUser } from '../data/inviteUser';
 import { Membership } from '../entities/membership';
 import { Role } from '../dtos/workspace.dto';
 import { sendEmail } from '../utils/helpers';
+import { getUserByEmail } from '../data/getUserByEmail';
+import { HttpStatusCode } from '../utils/constants';
 
 export const inviteUserHandler = async (input: AddUserToWorkspaceRequest) => {
+  const { user, error: err } = await getUserByEmail(input.userEmail);
+
+  if (!user || err) {
+    return {
+      statusCode: HttpStatusCode.NOT_FOUND,
+      body: JSON.stringify({ error: err }),
+    };
+  }
+
   const queryMembership = new Membership({
-    userId: input.userId,
+    userId: user.userId,
     userEmail: input.userEmail,
     workspaceName: input.workspaceName,
     role: Role.PENDING,

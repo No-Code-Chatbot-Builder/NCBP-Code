@@ -27,7 +27,6 @@ const validateGetWorkspace = (req: Request, res: Response, next: NextFunction) =
 };
 
 const validateAddUserToWorkspace = (req: Request, res: Response, next: NextFunction) => {
-  body('userId').notEmpty().isString();
   body('workspaceName').notEmpty().isString();
   body('userEmail').notEmpty().isEmail();
 
