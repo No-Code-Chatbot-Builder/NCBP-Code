@@ -31,7 +31,7 @@ import { createAssistantWithThread } from "@/lib/api/bot/service";
 import { DatasetType } from "@/lib/constants";
 import { Loader2, Trash } from "lucide-react";
 
-const CreateAssistantForm = () => {
+const EditAssistantForm = () => {
   const dispatch = useAppDispatch();
   const { setClose } = useModal();
 
@@ -76,7 +76,7 @@ const CreateAssistantForm = () => {
         values.model,
         values.tool,
         values.dataset,
-        // values.site,
+        // siteList,
       );
       console.log(res.response);
       console.log(res.response[2].split(": ")[1].trim());
@@ -303,4 +303,4 @@ const CreateAssistantForm = () => {
   );
 };
 
-export default CreateAssistantForm;
+export default EditAssistantForm;

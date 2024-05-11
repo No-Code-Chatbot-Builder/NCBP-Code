@@ -14,17 +14,14 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Code, Loader2, Plus, Trash } from "lucide-react";
+import { Code, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
-import { toast } from "sonner";
-import CustomToast from "@/components/global/custom-toast";
 import useSWR from "swr";
-import { apiClient } from "@/lib/api/apiService";
 import { botApiClient } from "@/lib/api/bot/service";
 
 export default function Page() {
@@ -95,8 +92,21 @@ const assistantSheet = (
   </CustomSheet>
 );
 
+const assistantSheet2 = (
+  <CustomSheet
+    title="Edit Assistant"
+    description="Configure the assistant by filling in the details"
+  >
+    <CreateAssistantForm />
+  </CustomSheet>
+);
+
 const handleCreateAssistant = async () => {
   setOpen(assistantSheet);
+};
+
+const manageAssistant = async () => {
+  setOpen(assistantSheet2);
 };
 
 const handleAssistantDeletion = async (assistant_id: string) => {
@@ -178,6 +188,13 @@ return (
                     }}
                   >
                     Use Assistant
+                  </Button>
+                  <Button
+                    className="w-full"
+                    onClick={manageAssistant}
+                   
+                  >
+                    Manage Assistant
                   </Button>
                 </CardContent>
               </Card>
