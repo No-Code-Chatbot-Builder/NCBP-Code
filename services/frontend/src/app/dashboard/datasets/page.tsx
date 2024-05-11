@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { deleteDataset, getDatasets } from "@/lib/api/dataset/service";
+import { getDatasets } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -96,30 +96,6 @@ export default function Page() {
     </CustomSheet>
   );
 
-  const handleDatasetDeletion = async (
-    datasetId: string,
-    datasetName: string
-  ) => {
-    try {
-      await deleteDataset("", datasetId);
-      dispatch(removeDataset(datasetId));
-      toast(
-        CustomToast({
-          title: `${datasetName} Deleted`,
-          description: `${datasetName} has been deleted successfully.`,
-        })
-      );
-    } catch (error) {
-      toast(
-        CustomToast({
-          title: "Error During Deletion",
-          description:
-            "An error occurred while deleting the dataset. Please try again.",
-        })
-      );
-      console.error(error);
-    }
-  };
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -175,15 +151,6 @@ export default function Page() {
                         <CardTitle>{dataset.name}</CardTitle>
                         <CardDescription>{dataset.description}</CardDescription>
                       </div>
-                      <Button
-                        size="icon"
-                        variant={"destructive"}
-                        onClick={() => {
-                          handleDatasetDeletion(dataset.id, dataset.name);
-                        }}
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
                     </div>
                   </CardHeader>
 

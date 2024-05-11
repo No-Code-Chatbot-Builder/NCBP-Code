@@ -9,11 +9,13 @@ export type WorkspaceType = {
 interface WorkspaceState {
   workspaces: WorkspaceType[];
   isWorkspaceLoading: boolean;
+  selectedWorkspace: WorkspaceType | null;
   currentWorkspaceName: string | null;
 }
 
 const initialState: WorkspaceState = {
   workspaces: [],
+  selectedWorkspace: null,
   currentWorkspaceName: null,
   isWorkspaceLoading: false,
 };
@@ -58,6 +60,12 @@ export const workspaceSlice = createSlice({
     setIsWorkspaceLoading: (state, action: PayloadAction<boolean>) => {
       state.isWorkspaceLoading = action.payload;
     },
+    setSelectedWorkspace: (
+      state,
+      action: PayloadAction<WorkspaceType | null>
+    ) => {
+      state.selectedWorkspace = action.payload;
+    },
   },
 
   extraReducers(builder) {
@@ -74,6 +82,7 @@ export const {
   updateWorkspace,
   setCurrentWorkspace,
   setIsWorkspaceLoading,
+  setSelectedWorkspace,
 } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;

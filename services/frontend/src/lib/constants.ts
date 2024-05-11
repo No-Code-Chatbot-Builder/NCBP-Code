@@ -15,6 +15,14 @@ import {
   AudioWaveform,
 } from "lucide-react";
 
+export type Membership = {
+  workspaceName: string;
+  userId: string;
+  userEmail: string;
+  role: string;
+  createdAt: string;
+};
+
 export type StepCard = {
   title: string;
   description: String;

@@ -27,7 +27,7 @@ import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 
 import PersonalDetails from "./personal-details";
-import { AssistantType, dummyChatThreads, icons } from "@/lib/constants";
+import { dummyChatThreads, icons } from "@/lib/constants";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
@@ -47,14 +47,14 @@ import {
   setWorkspaces,
   setCurrentWorkspace as setReduxCurrentWorkspace,
   setIsWorkspaceLoading,
+  setSelectedWorkspace,
 } from "@/providers/redux/slice/workspaceSlice";
 import { fetchWorkspaces } from "@/lib/api/workspace/service";
 import { toast } from "sonner";
 import CustomToast from "../global/custom-toast";
-import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
-import { set } from "date-fns";
-import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
 import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
+import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 
 type Props = {
   defaultOpen?: boolean;
@@ -91,11 +91,26 @@ const WorkspaceMenuOptions = ({
         name: key,
         role: value as string,
       }));
+
       if (localCurrentWorkspace === null) {
         localStorage.setItem("currentWorkspace", formattedWorkspaces[0].name);
         dispatch(setReduxCurrentWorkspace(formattedWorkspaces[0].name));
+        //set the selected workspace to the first workspace
+        const selectedWorkspace = formattedWorkspaces.find(
+          (workspace: WorkspaceType) =>
+            workspace.name === formattedWorkspaces[0].name
+        );
+        if (selectedWorkspace) {
+          dispatch(setSelectedWorkspace(selectedWorkspace));
+        }
       } else {
         dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
+        const selectedWorkspace = formattedWorkspaces.find(
+          (workspace: WorkspaceType) => workspace.name === localCurrentWorkspace
+        );
+        if (selectedWorkspace) {
+          dispatch(setSelectedWorkspace(selectedWorkspace));
+        }
       }
       dispatch(setWorkspaces(formattedWorkspaces));
       dispatch(setIsWorkspaceLoading(false));
@@ -109,6 +124,8 @@ const WorkspaceMenuOptions = ({
     dispatch(setIsDatasetLoading(true));
     dispatch(setIsAssistantLoading(true));
     dispatch(setReduxCurrentWorkspace(name));
+    dispatch(setIsAssistantLoading(true));
+    dispatch(setIsDatasetLoading(true));
   };
 
   return (
@@ -223,7 +240,7 @@ const WorkspaceMenuOptions = ({
                       <CommandItem
                         key={option.name}
                         className={clsx(
-                          "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1",
+                          "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1 hover:scale-105 transition-all hover:text-white",
                           {
                             "bg-sidebar-hover text-sidebar-foreground":
                               pathname === option.link,

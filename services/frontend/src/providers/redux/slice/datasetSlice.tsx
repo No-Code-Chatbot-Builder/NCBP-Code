@@ -3,6 +3,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DatasetState {
   datasets: DatasetType[];
+
   isDatasetLoading: boolean;
   isDatasetFilesEmpty: boolean;
 }
@@ -38,9 +39,6 @@ export const datasetSlice = createSlice({
       console.log(state.datasets[index].data);
     },
     updateDataset: (state, action: PayloadAction<DatasetType>) => {
-      console.log("fromUpdateDatasets");
-      console.log(action.payload.id);
-      console.log(state.datasets);
       const index = state.datasets.findIndex(
         (dataset) => dataset.id === action.payload.id
       );

@@ -60,17 +60,17 @@ const CreateDatasetForm = () => {
         values.description
       );
 
-      //updating state, showing toast, closing model
-      dispatch(
-        addDataset({
-          id: res.datasetDetails.datasetId,
-          name: res.datasetDetails.name,
-          description: res.datasetDetails.description,
-          createdAt: new Date().toISOString(),
-          createdBy: user?.sub,
-          data: [],
-        })
-      );
+      res &&
+        dispatch(
+          addDataset({
+            id: res.datasetDetails.datasetId,
+            name: res.datasetDetails.name,
+            description: res.datasetDetails.description,
+            createdAt: new Date().toISOString(),
+            createdBy: user?.sub,
+            data: [],
+          })
+        );
 
       setClose();
       toast(
@@ -103,7 +103,7 @@ const CreateDatasetForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the workspace name" {...field} />
+                  <Input placeholder="Enter the dataset name" {...field} />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
@@ -118,7 +118,7 @@ const CreateDatasetForm = () => {
                 <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter the workspace description"
+                    placeholder="Enter the dataset description"
                     {...field}
                   />
                 </FormControl>

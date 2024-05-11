@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3004";
+const BASE_URL = "http://localhost:3006";
 
 export const botApiClient = axios.create({
   baseURL: BASE_URL,

@@ -31,7 +31,7 @@ import { createAssistantWithThread } from "@/lib/api/bot/service";
 import { DatasetType } from "@/lib/constants";
 import { Loader2, Trash } from "lucide-react";
 
-const CreateAssistantForm = () => {
+const EditAssistantForm = () => {
   const dispatch = useAppDispatch();
   const { setClose } = useModal();
 
@@ -62,11 +62,7 @@ const CreateAssistantForm = () => {
     (state) => state.workspaces.currentWorkspaceName
   );
 
-  const [siteList, setSiteList] = useState([
-    "www.daraz.com",
-    "www.google.com",
-    "www.iba.com",
-  ]);
+  const [siteList, setSiteList] = useState(["www.daraz.com", "www.google.com", "www.iba.com"]);
 
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
@@ -79,8 +75,8 @@ const CreateAssistantForm = () => {
         values.description,
         values.model,
         values.tool,
-        values.dataset
-        // values.site,
+        values.dataset,
+        // siteList,
       );
       console.log(res.response);
       console.log(res.response[2].split(": ")[1].trim());
@@ -114,15 +110,15 @@ const CreateAssistantForm = () => {
   };
 
   const handleAddSite = () => {
-    const newSite = form.getValues("site");
+    const newSite = form.getValues('site');
     if (newSite && !siteList.includes(newSite)) {
-      setSiteList((current) => [...current, newSite]);
-      form.setValue("site", "");
+      setSiteList(current => [...current, newSite]);
+      form.setValue('site', '');
     }
   };
 
   const handleDeleteSite = (index: number) => {
-    setSiteList((currentSites) => currentSites.filter((_, i) => i !== index));
+    setSiteList(currentSites => currentSites.filter((_, i) => i !== index));
   };
 
   const isLoading = form.formState.isSubmitting;
@@ -199,46 +195,35 @@ const CreateAssistantForm = () => {
             name="site"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel className="text-primary">
-                  Site URL (optional)
-                </FormLabel>
+                <FormLabel className="text-primary">Site URL</FormLabel>
                 <FormControl>
                   <div className="flex gap-2">
-                    <Input placeholder="Enter the site url" {...field} />
-                    <Button
-                      onClick={handleAddSite}
-                      disabled={!field.value!.trim()}
-                    >
-                      Add Site
-                    </Button>
+                    <Input
+                      placeholder="Enter the site url"
+                      {...field}
+                    />
+                    <Button onClick={handleAddSite} disabled={!field.value!.trim()}>Add Site</Button>
                   </div>
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
             )}
           />
-          {siteList.length > 0 ? (
-            <ul className="list-disc mt-2 bg-sidebar p-2 max-h-36 overflow-y-auto">
-              {siteList.map((site, index) => (
-                <li
-                  key={index}
-                  className="flex items-center justify-between text-sm text-white mb-1 bg-background p-3"
-                >
-                  {site}
-                  <button
-                    onClick={() => handleDeleteSite(index)}
-                    title="Delete site"
-                  >
-                    <Trash className="h-5 w-5 hover:text-red-500" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="list-disc mt-2 bg-sidebar p-2 text-center">
-              No site added.
-            </div>
-          )}
+          {
+            siteList.length > 0 ?
+              <ul className="list-disc mt-2 bg-sidebar p-2 max-h-36 overflow-y-auto">
+                {siteList.map((site, index) => (
+                  <li key={index} className="flex items-center justify-between text-sm text-white mb-1 bg-background p-3">
+                    {site}
+                    <button onClick={() => handleDeleteSite(index)} title="Delete site">
+                      <Trash className="h-5 w-5 hover:text-red-500" />
+                    </button>
+                  </li>
+                ))}
+              </ul> : 
+            <div className="list-disc mt-2 bg-sidebar p-2 text-center">No site added.</div>
+          }
+
 
           <FormField
             disabled={isLoading}
@@ -314,8 +299,8 @@ const CreateAssistantForm = () => {
           </div>
         </form>
       </Form>
-    </main>
+    </main >
   );
 };
 
-export default CreateAssistantForm;
+export default EditAssistantForm;

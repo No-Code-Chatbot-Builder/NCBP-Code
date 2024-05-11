@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import CreateAssistantForm from "@/components/forms/create-assistant";
 import CustomSheet from "@/components/global/custom-sheet";
 import { Button } from "@/components/ui/button";
@@ -14,17 +14,14 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Code, Loader2, Plus, Trash } from "lucide-react";
+import { Bot, Code, Pencil, PencilLine, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
-import { toast } from "sonner";
-import CustomToast from "@/components/global/custom-toast";
 import useSWR from "swr";
-import { apiClient } from "@/lib/api/apiService";
 import { botApiClient } from "@/lib/api/bot/service";
 
 export default function Page() {
@@ -36,7 +33,7 @@ export default function Page() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspaceName!
   );
 
   const fetcher = (url: string) =>
@@ -84,7 +81,7 @@ export default function Page() {
       }
     };
     fetchAssistants();
-  }, [currentReduxWorkspace, res]);
+  }, [assistants, currentReduxWorkspace, dispatch, error, isLoading, res]);
 
   const assistantSheet = (
     <CustomSheet
@@ -95,11 +92,26 @@ export default function Page() {
     </CustomSheet>
   );
 
+  const assistantSheet2 = (
+    <CustomSheet
+      title="Edit Assistant"
+      description="Configure the assistant by filling in the details"
+    >
+      <CreateAssistantForm />
+    </CustomSheet>
+  );
+
   const handleCreateAssistant = async () => {
     setOpen(assistantSheet);
   };
 
-  const handleAssistantDeletion = async (assistant_id: string) => {};
+  const manageAssistant = async () => {
+    setOpen(assistantSheet2);
+  };
+
+  const handleAssistantDeletion = async (assistant_id: string) => {
+    // const res = await deleteAssistant(currentReduxWorkspace, assistant_id);
+  };
 
   return (
     <div className="flex flex-col gap-10">
@@ -155,27 +167,37 @@ export default function Page() {
                           {assistant.description}
                         </CardDescription>
                       </div>
-                      <Button
-                        size="icon"
-                        variant={"destructive"}
-                        onClick={() => {
-                          handleAssistantDeletion(assistant.id);
-                        }}
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button
+                          onClick={manageAssistant}
+                          size={"icon"}
+                          variant={"outline"}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant={"ghost"}
+                          onClick={() => {
+                            handleAssistantDeletion(assistant.id);
+                          }}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
 
                   <CardContent className="grid gap-3">
-                    {/* <p className="text-muted-foreground">@{assistant.id}</p> */}
                     <Button
-                      className="w-full"
+                      className="w-full flex gap-2  hover:-translate-y-1"
+                      variant={"outline"}
                       onClick={() => {
                         router.replace(`/assistant/${assistant.id}`);
                       }}
                     >
-                      Use Assistant
+                      <Bot className="w-4 h-4" />
+                      <span>Use Assistant</span>
                     </Button>
                   </CardContent>
                 </Card>

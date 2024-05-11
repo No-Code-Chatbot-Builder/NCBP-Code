@@ -33,23 +33,45 @@ export const createDataset = async (
   }
 };
 
-export const deleteDataset = async (
-  currentWorkspaceName: string,
-  datasetId: string
-) => {
+export const deleteAllDatasets = async (workspaceName: string) => {
   try {
     const response = await apiClient.delete(
-      `/dataset-service/datasets/${currentWorkspaceName}/dataset/${datasetId}`
+      `/dataset-service/datasets/${workspaceName}`
     );
     toast(
       CustomToast({
         title: "Success",
-        description: "Dataset deleted successfully.",
+        description: "All datasets deleted successfully.",
       })
     );
     return response.data;
   } catch (error: any) {
+    toast(
+      CustomToast({
+        title: "Error",
+        description: `Error deleting all datasets. ${
+          error.response?.data?.message || error.message
+        }`,
+      })
+    );
     console.log(error);
+  }
+};
+
+export const deleteDatsetById = async ({
+  currentWorkspaceName,
+  datasetId,
+}: {
+  currentWorkspaceName: string;
+  datasetId: string;
+}) => {
+  try {
+    const response = await apiClient.delete(
+      `/dataset-service/datasets/${currentWorkspaceName}/${datasetId}`
+    );
+
+    return response.data;
+  } catch (error: any) {
     toast(
       CustomToast({
         title: "Error",

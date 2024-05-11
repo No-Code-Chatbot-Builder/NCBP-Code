@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchFiles } from "@/lib/api/dataset/service";
+import { deleteDatsetById, fetchFiles } from "@/lib/api/dataset/service";
 import { DataBucketType } from "@/lib/constants";
 
 import { useAppSelector } from "@/lib/hooks";
@@ -30,7 +30,15 @@ import {
   setIsDatasetLoading,
   updateDataset,
 } from "@/providers/redux/slice/datasetSlice";
-import { Code, Database, File, Plus, Trash, Users } from "lucide-react";
+import {
+  Code,
+  Database,
+  File,
+  Loader2,
+  Plus,
+  Trash,
+  Users,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { format } from "date-fns";
@@ -38,6 +46,7 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import CustomModel from "@/components/global/custom-model";
 
 type Props = {
   params: {
@@ -54,7 +63,9 @@ const DatasetByIdPage = ({ params }: Props) => {
   const isDatasetFilesEmpty = useAppSelector(
     (state) => state.datasets.isDatasetFilesEmpty
   );
-  const { setOpen } = useModal();
+  const { setOpen, setClose } = useModal();
+
+  const [isDatasetDeleting, setIsDatasetDeleting] = useState(false);
 
   const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(true);
 
@@ -111,15 +122,23 @@ const DatasetByIdPage = ({ params }: Props) => {
 
     fetchData();
   }, [currentWorkspaceName, res]);
-  const handleDataDeletion = async (dataId: string, datasetName: string) => {
+
+  const handleDatasetDeletion = async (dataId: string, datasetName: string) => {
     try {
+      setIsDatasetDeleting(true);
+      const res = await deleteDatsetById({
+        currentWorkspaceName: currentWorkspaceName || "",
+        datasetId: params.id,
+      });
+
       toast(
         CustomToast({
           title: `${datasetName} Deleted`,
           description: `${datasetName} has been deleted successfully.`,
         })
       );
-    } catch (error) {
+      window.location.href = "/dashboard/datasets";
+    } catch (error: any) {
       toast(
         CustomToast({
           title: "Error During Deletion",
@@ -128,6 +147,8 @@ const DatasetByIdPage = ({ params }: Props) => {
         })
       );
       console.error(error);
+    } finally {
+      setIsDatasetDeleting(false);
     }
   };
 
@@ -162,7 +183,47 @@ const DatasetByIdPage = ({ params }: Props) => {
     </CustomSheet>
   );
 
+  const deleteDatasetModel = (
+    <CustomModel
+      title="Delete Dataset"
+      description="Are you sure you want to delete this dataset?"
+    >
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={"outline"}
+          onClick={() => {
+            setClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant={"destructive"}
+          onClick={() => {
+            setClose();
+            handleDatasetDeletion(params.id, dataset.name);
+          }}
+        >
+          Delete
+        </Button>
+      </div>
+    </CustomModel>
+  );
+
   console.log(dataset);
+
+  if (isDatasetDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Dataset
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="flex flex-col gap-10">
@@ -253,9 +314,7 @@ const DatasetByIdPage = ({ params }: Props) => {
                             <Button
                               size="icon"
                               variant={"destructive"}
-                              onClick={() => {
-                                handleDataDeletion(dataset.id, dataset.name);
-                              }}
+                              onClick={() => {}}
                             >
                               <Trash className="w-4 h-4" />
                             </Button>
@@ -320,6 +379,16 @@ const DatasetByIdPage = ({ params }: Props) => {
                     </div>
                   )}
                 </div>
+                <section className="w-full flex justify-end mt-10">
+                  <Button
+                    variant={"destructive"}
+                    onClick={() => {
+                      setOpen(deleteDatasetModel);
+                    }}
+                  >
+                    Delete Dataset
+                  </Button>
+                </section>
               </section>
             </>
           )}

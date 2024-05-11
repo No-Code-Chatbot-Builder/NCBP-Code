@@ -161,7 +161,7 @@ const AssistantIdByPage = ({ params }: Props) => {
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );
-  const [isInputDisabled, setInputDisabled] = useState(true);
+  const [isInputDisabled, setInputDisabled] = useState(false);
 
   useEffect(() => {
     socketRef.current = io(URL, { transports: ["websocket"] });

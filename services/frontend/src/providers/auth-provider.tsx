@@ -249,6 +249,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       const userAttributes = await fetchUserAttributes();
       setUser(userAttributes);
+      localStorage.setItem("user", JSON.stringify(userAttributes));
       const session = await fetchAuthSession();
       const newToken = session.tokens?.idToken?.toString() || "";
       setToken(newToken);
@@ -372,6 +373,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setToken("");
       sessionStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/");
     } catch (error: any) {
       toast(
