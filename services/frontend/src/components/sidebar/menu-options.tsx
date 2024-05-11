@@ -102,7 +102,7 @@ const WorkspaceMenuOptions = ({
     } else if (localCurrentWorkspace && !isLoading) {
       dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
     }
-  }, [dispatch, currentReduxWorkspace, res, isLoading, error]);
+  }, [dispatch, currentReduxWorkspace, res]);
 
   const changeCurrentWorkspace = (name: string) => {
     localStorage.setItem("currentWorkspace", name);

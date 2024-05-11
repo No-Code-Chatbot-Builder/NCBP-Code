@@ -42,13 +42,16 @@ export default function Page() {
   const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
-  const { data: res, error } = useAxiosSWR(
-    `/dataset-service/datasets/${currentReduxWorkspace}/`
-  );
+  const {
+    data: res,
+    error,
+    isLoading,
+  } = useAxiosSWR(`/dataset-service/datasets/${currentReduxWorkspace}/`);
 
   useEffect(() => {
     const fetchDataset = async () => {
-      if (!currentReduxWorkspace || error) return;
+      setIsDatasetLoading(isLoading);
+      if (!currentReduxWorkspace || error || !res) return;
 
       if (error) {
         console.error(error);
@@ -78,7 +81,7 @@ export default function Page() {
       if (datasetsChanged || !filteredDatasets.length) {
         dispatch(setDatasets(filteredDatasets));
       }
-      dispatch(setIsDatasetLoading(false));
+      dispatch(setIsDatasetLoading(isLoading));
     };
 
     fetchDataset();

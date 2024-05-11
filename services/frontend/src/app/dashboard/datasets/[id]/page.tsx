@@ -75,7 +75,7 @@ const DatasetByIdPage = ({ params }: Props) => {
 
       if (!res) return;
       try {
-        if (!res.data?.data.length) {
+        if (!res?.data?.data.length) {
           dispatch(setIsDatasetFilesEmpty(true));
           setIsDatasetFilesLoading(false);
         } else {

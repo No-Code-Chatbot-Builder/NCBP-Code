@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CreateAssistantForm from "@/components/forms/create-assistant";
 import CustomSheet from "@/components/global/custom-sheet";
 import { Button } from "@/components/ui/button";
@@ -42,15 +42,15 @@ export default function Page() {
   const fetcher = (url: string) =>
     botApiClient.get(url).then((res) => res.data);
 
-  const { data: res, error } = useSWR<any>(
-    `bot/${currentReduxWorkspace}`,
-    fetcher
-  );
-  console.log(res);
+  const {
+    data: res,
+    error,
+    isLoading,
+  } = useSWR<any>(`bot/${currentReduxWorkspace}`, fetcher);
 
   useEffect(() => {
     const fetchAssistants = async () => {
-      if (!currentReduxWorkspace || error) return;
+      if (!currentReduxWorkspace || error || !res) return;
 
       try {
         if (res && res.response && res.response.assistants) {
@@ -76,7 +76,7 @@ export default function Page() {
 
           if (assistantsChanged || !filteredAssistants.length) {
             dispatch(setAssistant(filteredAssistants));
-            dispatch(setIsAssistantLoading(false));
+            dispatch(setIsAssistantLoading(isLoading));
           }
         }
       } catch (error: any) {
