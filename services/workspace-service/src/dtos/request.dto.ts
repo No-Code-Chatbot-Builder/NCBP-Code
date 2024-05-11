@@ -18,6 +18,10 @@ interface GetWorkspaceRequest {
     workspaceName: string;
 }
 
+interface GetWorkspaceUsersRequest {
+    workspaceName: string;
+}
+
 interface AddUserToWorkspaceRequest {
     workspaceName: string;
     userEmail: string;
@@ -46,4 +50,4 @@ interface DeleteWorkspaceRequest {
     workspaceName: string;
 }
 
-export { CreateWorkspaceRequest, CreateUserRequest, GetWorkspaceRequest, AddUserToWorkspaceRequest, RemoveUserFromWorkspaceRequest, RespondToWorkspaceInviteRequest, UpdateWorkspaceRequest, DeleteWorkspaceRequest };
+export { CreateWorkspaceRequest, CreateUserRequest, GetWorkspaceRequest, GetWorkspaceUsersRequest, AddUserToWorkspaceRequest, RemoveUserFromWorkspaceRequest, RespondToWorkspaceInviteRequest, UpdateWorkspaceRequest, DeleteWorkspaceRequest };

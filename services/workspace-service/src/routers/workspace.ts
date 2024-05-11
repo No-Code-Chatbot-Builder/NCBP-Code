@@ -12,6 +12,7 @@ import {
   CreateWorkspaceRequest,
   DeleteWorkspaceRequest,
   GetWorkspaceRequest,
+  GetWorkspaceUsersRequest,
   RemoveUserFromWorkspaceRequest,
   RespondToWorkspaceInviteRequest,
   UpdateWorkspaceRequest,
@@ -26,6 +27,7 @@ import { createUserHandler } from '../services/create-user.controller';
 import { respondInviteHandler } from '../services/respond-invite.controller';
 import { removeUserHandler } from '../services/remove-user.controller';
 import { listInvitesHandler } from '../services/list-invites.controller';
+import { listWorkspaceUsersHandler } from '../services/list-workspace-users.controller';
 
 const workspaceRouter = express.Router();
 
@@ -33,8 +35,8 @@ workspaceRouter.use('/workspaces', (req, res, next) => {
   next();
 });
 
-// Test 
-workspaceRouter.post("/test", async (req, res) => {
+// Test
+workspaceRouter.post('/test', async (req, res) => {
   const input: CreateUserRequest = req.body;
 
   const { statusCode, body } = await createUserHandler(input);
@@ -63,6 +65,16 @@ workspaceRouter.get('/invites', async (req, res) => {
   const { user } = req;
 
   const { statusCode, body } = await listInvitesHandler(user);
+  res.status(statusCode).json(JSON.parse(body));
+});
+
+// GET list of workspace users
+workspaceRouter.get('/users/:workspaceName', async (req, res) => {
+  const input: GetWorkspaceUsersRequest = {
+    workspaceName: req.params.workspaceName as string,
+  };
+
+  const { statusCode, body } = await listWorkspaceUsersHandler(input);
   res.status(statusCode).json(JSON.parse(body));
 });
 
