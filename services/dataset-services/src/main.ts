@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+/*
 export const setEnvironmentVariables = () => {
   try {
     const secret = process.env.SECRET;
@@ -23,9 +24,10 @@ export const setEnvironmentVariables = () => {
     process.exit(1); // Exit the application if secrets can't be loaded.
   }
 };
+*/
 
 async function bootstrap() {
-  setEnvironmentVariables(); // Set environment variables before initializing the app
+  //setEnvironmentVariables(); // Set environment variables before initializing the app
 
   const app = await NestFactory.create(AppModule);
   app.enableCors({ origin: 'http://localhost:3000' }); // Adjust CORS policy
