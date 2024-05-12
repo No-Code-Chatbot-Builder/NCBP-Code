@@ -22,7 +22,7 @@ export const getDomains = async (domain: Domain) => {
     console.log(result.Item as IDomain)
     return {
       domain: Domain.fromItem(result.Item as IDomain),
-      statusCode: HttpStatusCode.FOUND,
+      statusCode: HttpStatusCode.OK,
     };
   } catch (error) {
     console.log('Error getting domain');
