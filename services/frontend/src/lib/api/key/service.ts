@@ -2,13 +2,38 @@ import { apiClient } from "../apiService";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 
-export const createKey = async (accessMode: string) => {
+export const addDomain = async (workspaceId: string, botId: string, domain: string) => {
+  console.log(workspaceId,botId,domain)
   try {
-    const response = await apiClient.post("/keys/", { accessMode });
+    const response = await apiClient.post("/key-management-service/domains/", { workspaceId: workspaceId, botId: botId, domain: domain });
     toast(
       CustomToast({
         title: "Success",
-        description: "Key created successfully.",
+        description: "Domain added successfully.",
+      })
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: "Error adding domain.",
+      })
+    );
+  }
+};
+
+export const deleteDomain = async (workspaceId: string, botId: string, domain: string) => {
+  try {
+    const response = await apiClient.delete("/key-management-service/domains/", {
+      data: { workspaceId: workspaceId, botId: botId, domain: domain }
+    });
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "Domain deleted successfully.",
       })
     );
   } catch (error) {
@@ -16,41 +41,23 @@ export const createKey = async (accessMode: string) => {
     toast(
       CustomToast({
         title: "Error",
-        description: "Error creating key.",
+        description: "Error deleting domain.",
       })
     );
   }
 };
 
-export const deleteKey = async (clientId: string) => {
+export const getDomainsByAssistant = async (workspaceId : string,botId : string) => {
   try {
-    const response = await apiClient.delete(`/keys/${clientId}`);
+    const response = await apiClient.get(`/key-management-service/domains/?workspaceId=${workspaceId}&botId=${botId}`);
     toast(
       CustomToast({
         title: "Success",
-        description: "Key deleted successfully.",
+        description: "Domains fetched successfully.",
       })
     );
-  } catch (error) {
-    console.log(error);
-    toast(
-      CustomToast({
-        title: "Error",
-        description: "Error deleting key.",
-      })
-    );
-  }
-};
-
-export const getKeys = async () => {
-  try {
-    const response = await apiClient.get("/keys/");
-    toast(
-      CustomToast({
-        title: "Success",
-        description: "Keys fetched successfully.",
-      })
-    );
+    console.log(response.data);
+    return response.data;
   } catch (error) {
     console.log(error);
     toast(
