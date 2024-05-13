@@ -25,14 +25,16 @@ import { addData } from "@/lib/api/dataset/service";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 interface AddDataToDatasetFormProps {
-  workspaceName: string;
   datasetId: string;
 }
 
 const AddDataToDatasetForm = ({
-  workspaceName,
   datasetId,
 }: AddDataToDatasetFormProps) => {
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceName
+  );
+
   const { toast } = useToast();
   const { setClose } = useModal();
   const dispatch = useAppDispatch();
@@ -69,13 +71,12 @@ const AddDataToDatasetForm = ({
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     const file = values.file[0];
-    console.log(file.name);
+    console.log(`Selected file name: ${file.name}`);
     const formData = new FormData();
     formData.append("file", file);
-
     try {
-      const res = await addData(workspaceName, datasetId, formData);
-      console.log(res);
+      const res = await addData(currentWorkspaceName!, datasetId, formData);
+      console.log(`Response from addData: ${JSON.stringify(res)}`);
       if (
         res.responseForAddingData.success &&
         res.responseForAddingFileNameUUID.success

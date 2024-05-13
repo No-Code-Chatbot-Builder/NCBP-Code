@@ -174,9 +174,15 @@ export type DomainsType = {
   assistantId: string;
 };
 
+export type Membership = {
+  workspaceName: string;
+  userId: string;
+  userEmail: string;
+  role: string;
+  createdAt: string;
+};
 
-
-export type DataBucketType = {
+export type AddDataBucketType = {
   datasetId: string;
   data: {
     id: string;
@@ -185,6 +191,19 @@ export type DataBucketType = {
     createdBy: string;
     createdAt: string;
   };
+};
+
+export type DataBucketType = {
+    id: string;
+    name: string;
+    path: string;
+    createdBy: string;
+    createdAt: string;
+};
+
+export type DeleteDataBucketType = {
+  datasetId: string;
+  dataId: string;
 };
 
 export type DatasetType = {
