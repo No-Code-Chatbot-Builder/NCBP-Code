@@ -175,7 +175,7 @@ export default function Page() {
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button
+                        {/* <Button
                           size="icon"
                           variant={"ghost"}
                           onClick={() => {
@@ -183,7 +183,7 @@ export default function Page() {
                           }}
                         >
                           <Trash className="w-4 h-4" />
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                   </CardHeader>

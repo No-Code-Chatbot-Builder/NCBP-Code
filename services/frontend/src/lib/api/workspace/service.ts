@@ -188,6 +188,7 @@ export const inviteUser = async (workspaceName: string, userEmail: string) => {
     );
     return response.data;
   } catch (error: any) {
+    console.log(error);
     toast(
       CustomToast({
         title: "Error",
