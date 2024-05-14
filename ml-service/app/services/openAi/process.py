@@ -7,19 +7,18 @@ def upload_file(filepath):
     return response.id
 
 
-def create_fine_tuning_job(file_id, model="gpt-3.5-turbo"):
-    # fine_tuning_job = openai.FineTune.create(
-    # model_engine=model_engine,
-    # n_epochs=n_epochs,
-    # batch_size=batch_size,
-    # learning_rate=learning_rate,
-    # max_tokens=max_tokens,
-    # training_file=os.path.abspath(training_file),
+def create_fine_tuning_job(model,epochs,batch_size,learning_rate,max_tokens,file):
+    fine_tuning_job = openai.FineTune.create(
+    model_engine=model,
+    n_epochs=epochs,
+    batch_size=batch_size,
+    learning_rate=learning_rate,
+    max_tokens=max_tokens,
+    training_file=file,
     # validation_file=os.path.abspath(validation_file),
-    # )
+    )
 
-    response = openai.FineTune.create(training_file=file_id, model=model)
-    return response.id
+    return fine_tuning_job.id
 
 
 def check_fine_tuning_job_status(job_id):

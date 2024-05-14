@@ -1,8 +1,6 @@
 from fastapi import FastAPI,HTTPException,WebSocket
-import openai
 from pydantic import BaseModel
-from fastapi.responses import HTMLResponse
-from app.middlewares.data import configure_data
+from app.data_pipeline.data import configure_data
 from app.config.pinecone_config import *
 from fastapi.middleware.cors import CORSMiddleware
 import pathlib
@@ -45,9 +43,12 @@ async def fine_tune_model(request: FineTuneRequest):
     
     # chunks  = await get_data_from_pinecone(user_id,dataset_id,workspace_id)
     jsonl_data = configure_data( user_id, workspace_id, dataset_id)
+    console.log(jsonl_data);
+    # store the jsonl data in s3 and attach id in dynamo db 
+    # send notification to user for jsonl data generated .
+    # now send data to open ai for fine tuning.
     
     
-
     return {"message": "Fine-tuning process started"}
 
 
