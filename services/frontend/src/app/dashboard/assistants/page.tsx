@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import CreateAssistantForm from "@/components/forms/create-assistant";
 import CustomSheet from "@/components/global/custom-sheet";
 import { Button } from "@/components/ui/button";
@@ -14,28 +14,33 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Code, Edit, Plus, Trash } from "lucide-react";
+import { Code, Edit, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
+  removeAssistant,
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
 import useSWR from "swr";
-import { botApiClient } from "@/lib/api/bot/service";
+import { botApiClient, deleteAssistants } from "@/lib/api/bot/service";
 import CreateDomainForm from "@/components/forms/create-domain-form";
+import CustomToast from "@/components/global/custom-toast";
+import { toast } from "sonner";
+import CustomModel from "@/components/global/custom-model";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
     (state) => state.assistants.isAssistantLoading
   );
-  const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName!
   );
+  const [isAssistantDeleting, setIsAssistantDeleting] = useState(false);
+  const { setOpen, setClose } = useModal();
 
   const fetcher = (url: string) =>
     botApiClient.get(url).then((res) => res.data);
@@ -44,7 +49,6 @@ export default function Page() {
     `bot/${currentReduxWorkspace}`,
     fetcher
   );
-  console.log(res);
 
   useEffect(() => {
     const fetchAssistants = async () => {
@@ -57,7 +61,7 @@ export default function Page() {
               id: assistant.assistantId,
               name: assistant.assistantName,
               description: assistant.purpose,
-              allowedDomain : [],
+              allowedDomain: [],
             }));
 
           const filteredAssistants = formattedAssistants.filter(
@@ -88,11 +92,11 @@ export default function Page() {
   const manageDomains = (assistantId: string) => {
     setOpen(
       <CustomSheet
-      title="Add Domains for your assistants"
-      description="Here you can add domains on which your bot will be embedded."
-    >
-      <CreateDomainForm assistantId={assistantId} />
-    </CustomSheet>
+        title="Add Domains for your assistants"
+        description="Here you can add domains on which your bot will be embedded."
+      >
+        <CreateDomainForm assistantId={assistantId} />
+      </CustomSheet>
     );
   }
 
@@ -105,25 +109,74 @@ export default function Page() {
     </CustomSheet>
   );
 
-  const assistantSheet2 = (
-    <CustomSheet
-      title="Edit Assistant"
-      description="Configure the assistant by filling in the details"
+
+  const deleteAssistantModel = (assistant_id: string, assistant_name: string) => (
+    <CustomModel
+      title={`Delete ${assistant_name}`}
+      description={`Are you sure you want to delete ${assistant_name}?`}
     >
-      <CreateAssistantForm />
-    </CustomSheet>
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={"outline"}
+          onClick={() => {
+            setClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant={"destructive"}
+          onClick={() => {
+            setClose();
+            handleAssistantDeletion(assistant_id, assistant_name);
+          }}
+        >
+          Delete
+        </Button>
+      </div>
+    </CustomModel>
   );
 
   const handleCreateAssistant = async () => {
     setOpen(assistantSheet);
   };
 
-  const manageAssistant = async (assistantId: string) => {
-    setOpen(assistantSheet2);
-  };
+  const handleAssistantDeletion = async (assistant_id: string, assistant_name: string) => {
+    setIsAssistantDeleting(true);
+    try {
+      await deleteAssistants(currentReduxWorkspace, assistant_id);
+      dispatch(removeAssistant(assistant_id));
+      toast(
+        CustomToast({
+          title: `${assistant_name} Deleted`,
+          description: `${assistant_name} has been deleted successfully.`,
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the assistant. Please try again.",
+        })
+      );
+      console.error(error);
+    } finally {
+      setIsAssistantDeleting(false);
+    }
+  }
 
-  const handleAssistantDeletion = async (assistant_id: string) => {
-    // const res = await deleteAssistant(currentReduxWorkspace, assistant_id);
+  if (isAssistantDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Assistant...
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -180,7 +233,7 @@ export default function Page() {
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        <Button
+                        {/* <Button
                           size="icon"
                           variant={"default"}
                           onClick={() => {
@@ -188,12 +241,12 @@ export default function Page() {
                           }}
                         >
                           <Edit className="w-4 h-4" />
-                        </Button>
+                        </Button> */}
                         <Button
                           size="icon"
                           variant={"destructive"}
                           onClick={() => {
-                            handleAssistantDeletion(assistant.id);
+                            setOpen(deleteAssistantModel(assistant.id, assistant.name));
                           }}
                         >
                           <Trash className="w-4 h-4" />

@@ -194,8 +194,11 @@ const CreateAssistantForm = () => {
                       <SelectValue placeholder="Select model type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="gpt-3.5-turbo">GPT 3.5</SelectItem>
+                      <SelectItem value="gpt-3.5-turbo">GPT 3.5 Turbo</SelectItem>
                       <SelectItem value="gpt-4">Gpt 4</SelectItem>
+                      <SelectItem value="gpt-4-turbo">Gpt 4 Turbo</SelectItem>
+                      <SelectItem value="gpt-4o">Gpt 4o (Latest)</SelectItem>
+
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -220,7 +223,7 @@ const CreateAssistantForm = () => {
                       <SelectValue placeholder="Select tool" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="retrieval">Retrieval</SelectItem>
+                      <SelectItem value="file_search">Retrieval</SelectItem>
                       <SelectItem value="code_interpreter">
                         Code Interpreter
                       </SelectItem>

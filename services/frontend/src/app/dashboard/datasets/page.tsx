@@ -23,13 +23,14 @@ import {
   setIsDatasetLoading,
 } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Database, Edit, Plus, Trash } from "lucide-react";
+import { Database, Edit, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { FormEvent, useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import UpdateDatasetForm from "@/components/forms/update-dataset";
+import CustomModel from "@/components/global/custom-model";
 
 export default function Page() {
   const dispatch = useAppDispatch();
@@ -38,8 +39,10 @@ export default function Page() {
   const isDatasetLoading = useAppSelector(
     (state) => state.datasets.isDatasetLoading
   );
+  const [isDatasetDeleting, setIsDatasetDeleting] = useState(false);
 
-  const { setOpen } = useModal();
+
+  const { setOpen, setClose } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
   const currentReduxWorkspace = useAppSelector(
@@ -96,12 +99,40 @@ export default function Page() {
     </CustomSheet>
   );
 
+
+  const deleteDatasetModel = (datasetId: string, datasetName: string) => (
+    <CustomModel
+      title={`Delete ${datasetName} Dataset`}
+      description="Are you sure you want to delete this dataset?"
+    >
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={"outline"}
+          onClick={() => {
+            setClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant={"destructive"}
+          onClick={() => {
+            setClose();
+            handleDatasetDeletion(datasetId, datasetName);
+          }}
+        >
+          Delete
+        </Button>
+      </div>
+    </CustomModel>
+  );
+
   const handleDatasetDeletion = async (
-    e: FormEvent,
     datasetId: string,
     datasetName: string
   ) => {
-    e.preventDefault();
+    setIsDatasetDeleting(true);
+
     try {
       await deleteDataset(currentReduxWorkspace!, datasetId);
       dispatch(removeDataset(datasetId));
@@ -120,8 +151,27 @@ export default function Page() {
         })
       );
       console.error(error);
+    } finally {
+      setIsDatasetDeleting(false);
+
     }
   };
+
+
+  if (isDatasetDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Dataset....
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -185,11 +235,11 @@ export default function Page() {
                             e.preventDefault();
                             setOpen(
                               <CustomSheet
-                              title="Update Dataset"
-                              description="Add data to your dataset here."
-                            >
-                              <UpdateDatasetForm name={dataset.name} description={dataset.description} datasetId={dataset.id}/>
-                            </CustomSheet>
+                                title="Update Dataset"
+                                description="Add data to your dataset here."
+                              >
+                                <UpdateDatasetForm name={dataset.name} description={dataset.description} datasetId={dataset.id} />
+                              </CustomSheet>
                             );
                           }}
                         >
@@ -198,8 +248,8 @@ export default function Page() {
                         <Button
                           size="icon"
                           variant={"destructive"}
-                          onClick={(e) => {
-                            handleDatasetDeletion(e,dataset.id,dataset.name);
+                          onClick={() => {
+                            setOpen(deleteDatasetModel(dataset.id, dataset.name));
                           }}
                         >
                           <Trash className="w-4 h-4" />

@@ -25,6 +25,7 @@ import CustomToast from "@/components/global/custom-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { useModal } from "@/providers/modal-provider";
 
 interface CreateDomainFormProps {
   assistantId: string;
@@ -33,6 +34,7 @@ interface CreateDomainFormProps {
 const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
 
   const { toast } = useToast();
+  const { setClose } = useModal();
   const dispatch = useAppDispatch();
   const assistant = useAppSelector((state) => state.assistants.assistants.find(a => a.id === assistantId));
   const currentWorkspaceName = useAppSelector(
@@ -58,7 +60,6 @@ const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
       if (!currentWorkspaceName) return;
       try {
         const res = await getDomainsByAssistant(currentWorkspaceName, assistantId);
-        console.log(res);
         dispatch(
           setDomainsToAssistant({
             domain: res.resultDomain.allowedDomains,
@@ -104,7 +105,7 @@ const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
     }
   };
 
-  const handleDeleteSite = async (e : FormEvent, site: string) => {
+  const handleDeleteSite = async (e: FormEvent, site: string) => {
     e.preventDefault();
     try {
       await deleteDomain(currentWorkspaceName!, assistant!.id, site);
@@ -177,7 +178,7 @@ const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
                 {assistant!.allowedDomain?.map((site, index) => (
                   <li key={index} className="flex items-center justify-between text-sm text-white mb-1 bg-background p-3">
                     {site}
-                    <button onClick={(e) => handleDeleteSite(e,site)} title="Delete site">
+                    <button onClick={(e) => handleDeleteSite(e, site)} title="Delete site">
                       <Trash className="h-5 w-5 hover:text-red-500" />
                     </button>
                   </li>
@@ -186,17 +187,18 @@ const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
               <div className="list-disc mt-2 bg-sidebar p-2 text-center">No site added.</div>
           }
           <div className="flex flex-row-reverse">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Save"
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </main>
+            <Button onClick={() => setClose()}
+            disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Save"
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
+    </main >
   );
 };
 

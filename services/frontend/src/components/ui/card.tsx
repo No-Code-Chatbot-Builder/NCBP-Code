@@ -37,9 +37,7 @@ const CardTitle = React.forwardRef<
     ref={ref}
     className={cn("text-xl font-semibold leading-none", className)}
     {...props}
-  >
-    {props.children && props.children.toString().length > 18 ? `${props.children.toString().substring(0, 18)}...` : props.children}
-  </h3>
+  />
 ));
 CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef<
@@ -49,8 +47,9 @@ const CardDescription = React.forwardRef<
   <p
     ref={ref}
     className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
+  >
+    {props.children && props.children.toString().length > 60 ? `${props.children.toString().substring(0, 60)}...` : props.children}
+  </p>
 ));
 CardDescription.displayName = "CardDescription";
 

@@ -20,12 +20,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteDataset, fetchFiles } from "@/lib/api/dataset/service";
+import { deleteData, deleteDataset, fetchFiles } from "@/lib/api/dataset/service";
 import { DataBucketType } from "@/lib/constants";
 
 import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import {
+  removeDataset,
+  removeFile,
+  setFiles,
   setIsDatasetFilesEmpty,
   setIsDatasetLoading,
   updateDataset,
@@ -66,6 +69,8 @@ const DatasetByIdPage = ({ params }: Props) => {
   const { setOpen, setClose } = useModal();
 
   const [isDatasetDeleting, setIsDatasetDeleting] = useState(false);
+  const [isDataDeleting, setIsDataDeleting] = useState(false);
+
 
   const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(true);
 
@@ -90,15 +95,16 @@ const DatasetByIdPage = ({ params }: Props) => {
           dispatch(setIsDatasetFilesEmpty(true));
           setIsDatasetFilesLoading(false);
         } else {
-          const updatedFileArray = res?.data?.data.map((item: any) => ({
+          const updatedFileArray: DataBucketType[] = res?.data?.data.map((item: any) => ({
             id: item.dataId,
             name: item.name,
             path: item.path,
             createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
             createdBy: item.createdBy,
           }));
+          console.log(updatedFileArray);
           dispatch(
-            updateDataset({
+            setFiles({
               id: res.data.datasetDetails.datasetId,
               name: res.data.datasetDetails.name,
               description: res.data.datasetDetails.description,
@@ -123,18 +129,47 @@ const DatasetByIdPage = ({ params }: Props) => {
     fetchData();
   }, [currentWorkspaceName, res]);
 
-  const handleDatasetDeletion = async (dataId: string, datasetName: string) => {
+  const handleDataDeletion = async (dataId: string, dataName: string) => {
     try {
-      setIsDatasetDeleting(true);
-      const res = await deleteDataset(
+      setIsDataDeleting(true);
+      await deleteData(
         currentWorkspaceName!,
-        params.id,
+        dataset!.id,
+        dataId,
       );
-
+      dispatch(removeFile({
+        datasetId: dataset!.id,
+        dataId: dataId
+      }));
       toast(
         CustomToast({
-          title: `${datasetName} Deleted`,
-          description: `${datasetName} has been deleted successfully.`,
+          title: `${dataName} Deleted`,
+          description: `${dataName} has been deleted successfully.`,
+        })
+      );
+    } catch (error: any) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the dataset. Please try again.",
+        })
+      );
+      console.error(error);
+    } finally {
+      setIsDataDeleting(false);
+    }
+  };
+
+  const handleDatasetDeletion = async () => {
+    try {
+      setIsDatasetDeleting(true);
+      await deleteDataset(currentWorkspaceName!, dataset!.id);
+      dispatch(removeDataset(dataset!.id));
+      toast(
+        CustomToast({
+          title: `${dataset!.name} Deleted`,
+          description: `${dataset!.name} has been deleted successfully.`,
         })
       );
       window.location.href = "/dashboard/datasets";
@@ -151,28 +186,6 @@ const DatasetByIdPage = ({ params }: Props) => {
       setIsDatasetDeleting(false);
     }
   };
-
-  if (!dataset) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center ">
-        <div className="bg-card border border-dashed border-primary p-16 rounded-lg flex flex-col gap-2">
-          <h2 className="text-2xl font-bold text-center">No Dataset Found</h2>
-          <p className="text-muted-foreground text-center mt-2">
-            Load your datasets to get started
-          </p>
-          <Button
-            className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
-            onClick={() => {
-              window.location.href = "/dashboard/datasets";
-            }}
-          >
-            <Database className="w-4 h-4" />
-            <p className="text-md font-semibold">Load Datasets</p>
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const addDataSheet = (
     <CustomSheet title="Add Data" description="Add data to your dataset here.">
@@ -200,7 +213,33 @@ const DatasetByIdPage = ({ params }: Props) => {
           variant={"destructive"}
           onClick={() => {
             setClose();
-            handleDatasetDeletion(params.id, dataset.name);
+            handleDatasetDeletion();
+          }}
+        >
+          Delete
+        </Button>
+      </div>
+    </CustomModel>
+  );
+  const deleteDataModel = (dataId: string, dataName: string) => (
+    <CustomModel
+      title={`Delete ${dataName}`}
+      description={`Are you sure you want to delete ${dataName}?`}
+    >
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={"outline"}
+          onClick={() => {
+            setClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant={"destructive"}
+          onClick={() => {
+            setClose();
+            handleDataDeletion(dataId,dataName);
           }}
         >
           Delete
@@ -209,14 +248,48 @@ const DatasetByIdPage = ({ params }: Props) => {
     </CustomModel>
   );
 
-  console.log(dataset);
+
+  if (!dataset) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center ">
+        <div className="bg-card border border-dashed border-primary p-16 rounded-lg flex flex-col gap-2">
+          <h2 className="text-2xl font-bold text-center">No Dataset Found</h2>
+          <p className="text-muted-foreground text-center mt-2">
+            Load your datasets to get started
+          </p>
+          <Button
+            className="flex items-center justify-center gap-2 bg-primary p-3 rounded-lg mt-5"
+            onClick={() => {
+              window.location.href = "/dashboard/datasets";
+            }}
+          >
+            <Database className="w-4 h-4" />
+            <p className="text-md font-semibold">Load Datasets</p>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isDataDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Data...
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   if (isDatasetDeleting) {
     return (
       <div className="h-screen flex w-full items-center justify-center">
         <div className="flex flex-row gap-2 items-center">
           <p className="text-lg font-semibold animate-pulse">
-            Deleting Dataset
+            Deleting Dataset....
           </p>
           <Loader2 className="w-4 h-4 animate-spin" />
         </div>
@@ -313,7 +386,9 @@ const DatasetByIdPage = ({ params }: Props) => {
                             <Button
                               size="icon"
                               variant={"destructive"}
-                              onClick={() => { }}
+                              onClick={() => {
+                                setOpen(deleteDataModel(qa.id,qa.name));
+                              }}
                             >
                               <Trash className="w-4 h-4" />
                             </Button>
@@ -322,7 +397,7 @@ const DatasetByIdPage = ({ params }: Props) => {
                             <Button className="w-full">
                               <div className="flex flex-row justify-center items-center gap-2">
                                 <File className="w-4 h-4" />
-                                <p>Open File</p>
+                                <p>Download File</p>
                               </div>
                             </Button>
                           </CardContent>

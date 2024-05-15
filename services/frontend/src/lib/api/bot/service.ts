@@ -7,7 +7,6 @@ const BASE_URL = "http://localhost:3006";
 
 export const botApiClient = axios.create({
   baseURL: BASE_URL,
-  // timeout : 10000,
 });
 
 botApiClient.interceptors.request.use(
@@ -83,3 +82,28 @@ export const runAssistant = async (workspaceName: string, query: string) => {
     );
   }
 };
+
+export const deleteAssistants = async (
+  workspaceName: string,
+  assistantId: string,
+) => {
+  try {
+    const response = await botApiClient.delete(`/bot/${workspaceName}/${assistantId}`);
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "Assistant deleted successfully.",
+      })
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: "Error creating Assistant.",
+      })
+    );
+  }
+};
+
