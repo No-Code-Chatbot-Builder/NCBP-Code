@@ -214,9 +214,10 @@ export class DynamoDbService {
   async getDatasets(workspaceId: string) {
     const params = {
       TableName: this.tableName,
-      KeyConditionExpression: 'PK = :pk',
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :skPrefix)',
       ExpressionAttributeValues: {
-        ':pk': `WORKSPACE#${workspaceId}`
+        ':pk': `WORKSPACE#${workspaceId}`,
+        ':skPrefix': 'DATASET#'
       },
       FilterExpression: 'attribute_not_exists(deletedAt)'
     };
