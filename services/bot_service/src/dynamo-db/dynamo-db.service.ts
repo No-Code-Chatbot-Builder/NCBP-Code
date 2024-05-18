@@ -53,7 +53,8 @@ export class DynamoDbService {
               KeyConditionExpression: 'PK = :pk',
               ExpressionAttributeValues: {
                 ':pk': `WORKSPACE#${workspaceId}`
-              }
+              }, 
+              FilterExpression: 'attribute_not_exists(deletedAt)'
             };
 
     try {
