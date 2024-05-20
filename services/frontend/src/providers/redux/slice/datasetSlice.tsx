@@ -1,4 +1,4 @@
-import { DataBucketType, DatasetType } from "@/lib/constants";
+import { AddDataBucketType, DataBucketType, DatasetType, DeleteDataBucketType } from "@/lib/constants";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DatasetState {
@@ -29,7 +29,7 @@ export const datasetSlice = createSlice({
         (dataset) => dataset.id !== action.payload
       );
     },
-    addFile: (state, action: PayloadAction<DataBucketType>) => {
+    addFile: (state, action: PayloadAction<AddDataBucketType>) => {
       const index = state.datasets.findIndex(
         (dataset) => dataset.id === action.payload.datasetId
       );
@@ -38,13 +38,23 @@ export const datasetSlice = createSlice({
       }
       console.log(state.datasets[index].data);
     },
+    removeFile: (state, action: PayloadAction<DeleteDataBucketType>) => {
+      const index = state.datasets.findIndex(
+        (dataset) => dataset.id === action.payload.datasetId
+      );
+      if (index !== -1) {
+        state.datasets[index].data.filter(
+          (item) => item.id !== action.payload.dataId
+        );
+      }
+    },
     updateDataset: (state, action: PayloadAction<DatasetType>) => {
       const index = state.datasets.findIndex(
         (dataset) => dataset.id === action.payload.id
       );
-      console.log(index);
       if (index !== -1) {
-        state.datasets[index] = action.payload;
+        state.datasets[index].name = action.payload.name;
+        state.datasets[index].description = action.payload.description;
       }
     },
     setIsDatasetLoading: (state, action: PayloadAction<boolean>) => {
@@ -60,6 +70,7 @@ export const {
   addDataset,
   setDatasets,
   addFile,
+  removeFile,
   removeDataset,
   updateDataset,
   setIsDatasetLoading,

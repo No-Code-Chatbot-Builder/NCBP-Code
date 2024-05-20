@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getDatasets } from "@/lib/api/dataset/service";
+import { deleteDataset, getDatasets } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -23,15 +23,18 @@ import {
   setIsDatasetLoading,
 } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Database, Plus, Trash } from "lucide-react";
+import { Database, Edit, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { useEffect } from "react";
+import { FormEvent, useEffect } from "react";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import UpdateDatasetForm from "@/components/forms/update-dataset";
 
 export default function Page() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
   const isDatasetLoading = useAppSelector(
     (state) => state.datasets.isDatasetLoading
   );
@@ -86,7 +89,7 @@ export default function Page() {
 
     fetchDataset();
   }, [currentReduxWorkspace, res]);
-  const router = useRouter();
+
   const datasetSheet = (
     <CustomSheet
       title="Create New Dataset"
@@ -96,6 +99,32 @@ export default function Page() {
     </CustomSheet>
   );
 
+  const handleDatasetDeletion = async (
+    e: FormEvent,
+    datasetId: string,
+    datasetName: string
+  ) => {
+    e.preventDefault();
+    try {
+      await deleteDataset(currentReduxWorkspace!, datasetId);
+      dispatch(removeDataset(datasetId));
+      toast(
+        CustomToast({
+          title: `${datasetName} Deleted`,
+          description: `${datasetName} has been deleted successfully.`,
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the dataset. Please try again.",
+        })
+      );
+      console.error(error);
+    }
+  };
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -150,6 +179,38 @@ export default function Page() {
                       <div className="flex flex-col gap-1">
                         <CardTitle>{dataset.name}</CardTitle>
                         <CardDescription>{dataset.description}</CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="icon"
+                          variant={"default"}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setOpen(
+                              <CustomSheet
+                                title="Update Dataset"
+                                description="Add data to your dataset here."
+                              >
+                                <UpdateDatasetForm
+                                  name={dataset.name}
+                                  description={dataset.description}
+                                  datasetId={dataset.id}
+                                />
+                              </CustomSheet>
+                            );
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant={"destructive"}
+                          onClick={(e) => {
+                            handleDatasetDeletion(e, dataset.id, dataset.name);
+                          }}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>

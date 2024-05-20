@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteDatsetById, fetchFiles } from "@/lib/api/dataset/service";
+import { deleteDataset, fetchFiles } from "@/lib/api/dataset/service";
 import { DataBucketType } from "@/lib/constants";
 
 import { useAppSelector } from "@/lib/hooks";
@@ -126,10 +126,7 @@ const DatasetByIdPage = ({ params }: Props) => {
   const handleDatasetDeletion = async (dataId: string, datasetName: string) => {
     try {
       setIsDatasetDeleting(true);
-      const res = await deleteDatsetById({
-        currentWorkspaceName: currentWorkspaceName || "",
-        datasetId: params.id,
-      });
+      const res = await deleteDataset(currentWorkspaceName!, params.id);
 
       toast(
         CustomToast({
@@ -176,10 +173,7 @@ const DatasetByIdPage = ({ params }: Props) => {
 
   const addDataSheet = (
     <CustomSheet title="Add Data" description="Add data to your dataset here.">
-      <AddDataToDatasetForm
-        workspaceName={currentWorkspaceName || ""}
-        datasetId={params.id}
-      />
+      <AddDataToDatasetForm datasetId={params.id} />
     </CustomSheet>
   );
 

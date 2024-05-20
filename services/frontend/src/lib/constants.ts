@@ -154,7 +154,6 @@ export const sidebarOpt: SidebarOption[] = [
       { name: "Fine Tuning", icon: "finetune", link: "/dashboard/finetune" },
 
       { name: "Tools", icon: "tools", link: "/dashboard/tools" },
-      { name: "API Keys", icon: "apikeys", link: "/dashboard/apikeys" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
     ],
   },
@@ -168,11 +167,30 @@ export type AssistantType = {
   id: string;
   name: string;
   description: string;
+  allowedDomain: string[]
   // owner: string;
   // threadId: string;
 };
 
-export type DataBucketType = {
+export type DomainType = {
+  domain: string;
+  assistantId: string;
+};
+
+export type DomainsType = {
+  domain: string[];
+  assistantId: string;
+};
+
+export type Membership = {
+  workspaceName: string;
+  userId: string;
+  userEmail: string;
+  role: string;
+  createdAt: string;
+};
+
+export type AddDataBucketType = {
   datasetId: string;
   data: {
     id: string;
@@ -181,6 +199,19 @@ export type DataBucketType = {
     createdBy: string;
     createdAt: string;
   };
+};
+
+export type DataBucketType = {
+    id: string;
+    name: string;
+    path: string;
+    createdBy: string;
+    createdAt: string;
+};
+
+export type DeleteDataBucketType = {
+  datasetId: string;
+  dataId: string;
 };
 
 export type DatasetType = {

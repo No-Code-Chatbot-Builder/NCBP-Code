@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Delete, Settings } from "lucide-react";
 import DeleteWorkspaceCard from "@/components/forms/delete-workspace-form";
-import DeleteAllDatasetsCard from "@/components/forms/delete-all-datasets.tsx";
+import DeleteAllDatasetsCard from "@/components/forms/delete-all-datasets";
 import ManagePendingInvitesCard from "@/components/forms/manage-pending-invites-form";
 import { useEffect, useState } from "react";
 import { getInviteUsers } from "@/lib/api/workspace/service";

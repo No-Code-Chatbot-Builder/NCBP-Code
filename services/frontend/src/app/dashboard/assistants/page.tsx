@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Bot, Code, Pencil, PencilLine, Plus, Trash } from "lucide-react";
+import { Bot, Code, Edit, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
@@ -23,6 +23,7 @@ import {
 } from "@/providers/redux/slice/assistantSlice";
 import useSWR from "swr";
 import { botApiClient } from "@/lib/api/bot/service";
+import CreateDomainForm from "@/components/forms/create-domain-form";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -56,6 +57,7 @@ export default function Page() {
               id: assistant.assistantId,
               name: assistant.assistantName,
               description: assistant.purpose,
+              allowedDomain: [],
             }));
 
           const filteredAssistants = formattedAssistants.filter(
@@ -83,6 +85,17 @@ export default function Page() {
     fetchAssistants();
   }, [assistants, currentReduxWorkspace, dispatch, error, isLoading, res]);
 
+  const manageDomains = (assistantId: string) => {
+    setOpen(
+      <CustomSheet
+        title="Add Domains for your assistants"
+        description="Here you can add domains on which your bot will be embedded."
+      >
+        <CreateDomainForm assistantId={assistantId} />
+      </CustomSheet>
+    );
+  };
+
   const assistantSheet = (
     <CustomSheet
       title="Create New Assistant"
@@ -105,7 +118,7 @@ export default function Page() {
     setOpen(assistantSheet);
   };
 
-  const manageAssistant = async () => {
+  const manageAssistant = async (assistantId: string) => {
     setOpen(assistantSheet2);
   };
 
@@ -145,7 +158,6 @@ export default function Page() {
         <Separator className="mt-8" />
       </section>
       {isAssistantLoading ? (
-        // loading skeleton
         <section>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
             {Array.from(Array(4).keys()).map((key) => (
@@ -167,23 +179,25 @@ export default function Page() {
                           {assistant.description}
                         </CardDescription>
                       </div>
-                      <div className="flex gap-1">
+                      <div className="flex gap-2">
                         <Button
-                          onClick={manageAssistant}
-                          size={"icon"}
-                          variant={"outline"}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        {/* <Button
                           size="icon"
-                          variant={"ghost"}
+                          variant={"default"}
+                          onClick={() => {
+                            manageAssistant(assistant.id);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant={"destructive"}
                           onClick={() => {
                             handleAssistantDeletion(assistant.id);
                           }}
                         >
                           <Trash className="w-4 h-4" />
-                        </Button> */}
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>
@@ -198,6 +212,14 @@ export default function Page() {
                     >
                       <Bot className="w-4 h-4" />
                       <span>Use Assistant</span>
+                    </Button>
+                    <Button
+                      className="w-full bg-orange-500 hover:bg-orange-600"
+                      onClick={() => {
+                        manageDomains(assistant.id);
+                      }}
+                    >
+                      Manage Domains
                     </Button>
                   </CardContent>
                 </Card>

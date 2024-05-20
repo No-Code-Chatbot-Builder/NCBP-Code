@@ -1,4 +1,4 @@
-import { AssistantType } from "@/lib/constants";
+import { AssistantType, DomainType, DomainsType } from "@/lib/constants";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AssistantState {
@@ -26,6 +26,32 @@ export const AssistantSlice = createSlice({
     setAssistant: (state, action: PayloadAction<AssistantType[]>) => {
       state.assistants = action.payload;
     },
+    setDomainsToAssistant: (state, action: PayloadAction<DomainsType>) => {
+      const index = state.assistants.findIndex(
+        (assistant) => assistant.id === action.payload.assistantId
+      );
+      if (index !== -1) {
+        state.assistants[index].allowedDomain = action.payload.domain;
+      }
+    },
+    addDomainToAssistant: (state, action: PayloadAction<DomainType>) => {
+      const index = state.assistants.findIndex(
+        (assistant) => assistant.id === action.payload.assistantId
+      );
+      if (index !== -1) {
+        state.assistants[index].allowedDomain.push(action.payload.domain);
+      }
+    },
+    removeDomainFromAssistant: (state, action: PayloadAction<DomainType>) => {
+      const index = state.assistants.findIndex(
+        (assistant) => assistant.id === action.payload.assistantId
+      );
+      if (index !== -1) {
+        state.assistants[index].allowedDomain = state.assistants[index].allowedDomain.filter(
+          (domain) => domain !== action.payload.domain
+        );
+      }
+    },
     updateAssistant: (state, action: PayloadAction<AssistantType>) => {
       const index = state.assistants.findIndex(
         (assistant) => assistant.id === action.payload.id
@@ -46,6 +72,9 @@ export const {
   updateAssistant,
   setAssistant,
   setIsAssistantLoading,
+  setDomainsToAssistant,
+  addDomainToAssistant,
+  removeDomainFromAssistant
 } = AssistantSlice.actions;
 
 export const getAssistantById = createSelector(
