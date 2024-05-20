@@ -14,6 +14,7 @@ class Config:
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 
+#tested
 s3 = client(
     's3',
     # region_name= 'us-east-1',

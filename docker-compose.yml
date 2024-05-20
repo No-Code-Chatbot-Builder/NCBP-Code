@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  ml-service:
+    container_name: ml-service
+    tty: true
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '8000:80'
+    deploy:
+      mode: replicated
+      replicas: 1

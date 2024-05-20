@@ -1,69 +1,32 @@
-from typing import TYPE_CHECKING, Any
+import warnings
+from typing import Any
 
-from langchain._api import create_importer
+from langchain_core._api import LangChainDeprecationWarning
 
-if TYPE_CHECKING:
-    from langchain_community.chat_message_histories import (
-        AstraDBChatMessageHistory,
-        CassandraChatMessageHistory,
-        ChatMessageHistory,
-        CosmosDBChatMessageHistory,
-        DynamoDBChatMessageHistory,
-        ElasticsearchChatMessageHistory,
-        FileChatMessageHistory,
-        FirestoreChatMessageHistory,
-        MomentoChatMessageHistory,
-        MongoDBChatMessageHistory,
-        Neo4jChatMessageHistory,
-        PostgresChatMessageHistory,
-        RedisChatMessageHistory,
-        RocksetChatMessageHistory,
-        SingleStoreDBChatMessageHistory,
-        SQLChatMessageHistory,
-        StreamlitChatMessageHistory,
-        UpstashRedisChatMessageHistory,
-        XataChatMessageHistory,
-        ZepChatMessageHistory,
-    )
-
-# Create a way to dynamically look up deprecated imports.
-# Used to consolidate logic for raising deprecation warnings and
-# handling optional imports.
-DEPRECATED_LOOKUP = {
-    "AstraDBChatMessageHistory": "langchain_community.chat_message_histories",
-    "CassandraChatMessageHistory": "langchain_community.chat_message_histories",
-    "ChatMessageHistory": "langchain_community.chat_message_histories",
-    "CosmosDBChatMessageHistory": "langchain_community.chat_message_histories",
-    "DynamoDBChatMessageHistory": "langchain_community.chat_message_histories",
-    "ElasticsearchChatMessageHistory": "langchain_community.chat_message_histories",
-    "FileChatMessageHistory": "langchain_community.chat_message_histories",
-    "FirestoreChatMessageHistory": "langchain_community.chat_message_histories",
-    "MomentoChatMessageHistory": "langchain_community.chat_message_histories",
-    "MongoDBChatMessageHistory": "langchain_community.chat_message_histories",
-    "Neo4jChatMessageHistory": "langchain_community.chat_message_histories",
-    "PostgresChatMessageHistory": "langchain_community.chat_message_histories",
-    "RedisChatMessageHistory": "langchain_community.chat_message_histories",
-    "RocksetChatMessageHistory": "langchain_community.chat_message_histories",
-    "SQLChatMessageHistory": "langchain_community.chat_message_histories",
-    "SingleStoreDBChatMessageHistory": "langchain_community.chat_message_histories",
-    "StreamlitChatMessageHistory": "langchain_community.chat_message_histories",
-    "UpstashRedisChatMessageHistory": "langchain_community.chat_message_histories",
-    "XataChatMessageHistory": "langchain_community.chat_message_histories",
-    "ZepChatMessageHistory": "langchain_community.chat_message_histories",
-}
-
-_import_attribute = create_importer(__package__, deprecated_lookups=DEPRECATED_LOOKUP)
+from langchain.utils.interactive_env import is_interactive_env
 
 
 def __getattr__(name: str) -> Any:
-    """Look up attributes dynamically."""
-    return _import_attribute(name)
+    from langchain_community import chat_message_histories
+
+    # If not in interactive env, raise warning.
+    if not is_interactive_env():
+        warnings.warn(
+            "Importing chat message histories from langchain is deprecated. Importing "
+            "from langchain will no longer be supported as of langchain==0.2.0. "
+            "Please import from langchain-community instead:\n\n"
+            f"`from langchain_community.chat_message_histories import {name}`.\n\n"
+            "To install langchain-community run `pip install -U langchain-community`.",
+            category=LangChainDeprecationWarning,
+        )
+
+    return getattr(chat_message_histories, name)
 
 
 __all__ = [
     "AstraDBChatMessageHistory",
-    "CassandraChatMessageHistory",
     "ChatMessageHistory",
+    "CassandraChatMessageHistory",
     "CosmosDBChatMessageHistory",
     "DynamoDBChatMessageHistory",
     "ElasticsearchChatMessageHistory",
@@ -71,14 +34,14 @@ __all__ = [
     "FirestoreChatMessageHistory",
     "MomentoChatMessageHistory",
     "MongoDBChatMessageHistory",
-    "Neo4jChatMessageHistory",
     "PostgresChatMessageHistory",
     "RedisChatMessageHistory",
     "RocksetChatMessageHistory",
-    "SingleStoreDBChatMessageHistory",
     "SQLChatMessageHistory",
     "StreamlitChatMessageHistory",
-    "UpstashRedisChatMessageHistory",
+    "SingleStoreDBChatMessageHistory",
     "XataChatMessageHistory",
     "ZepChatMessageHistory",
+    "UpstashRedisChatMessageHistory",
+    "Neo4jChatMessageHistory",
 ]

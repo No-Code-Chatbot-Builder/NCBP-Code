@@ -5,17 +5,32 @@ from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import BaseMessage
 from langchain_core.outputs import ChatGeneration, LLMResult
-from langchain_core.utils import guard_import
 
 
 def import_infino() -> Any:
     """Import the infino client."""
-    return guard_import("infinopy").InfinoClient()
+    try:
+        from infinopy import InfinoClient
+    except ImportError:
+        raise ImportError(
+            "To use the Infino callbacks manager you need to have the"
+            " `infinopy` python package installed."
+            "Please install it with `pip install infinopy`"
+        )
+    return InfinoClient()
 
 
 def import_tiktoken() -> Any:
     """Import tiktoken for counting tokens for OpenAI models."""
-    return guard_import("tiktoken")
+    try:
+        import tiktoken
+    except ImportError:
+        raise ImportError(
+            "To use the ChatOpenAI model with Infino callback manager, you need to "
+            "have the `tiktoken` python package installed."
+            "Please install it with `pip install tiktoken`"
+        )
+    return tiktoken
 
 
 def get_num_tokens(string: str, openai_model_name: str) -> int:

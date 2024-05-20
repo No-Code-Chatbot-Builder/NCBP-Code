@@ -13,6 +13,7 @@ class Config:
     DB_ACCESS_KEY_ID = os.getenv('DB_ACCESS_KEY_ID')
     DB_SECRET_ACCESS_KEY = os.getenv('DB_SECRET_ACCESS_KEY')
 
+#tested
 def initialize_db() -> ServiceResource:
     ddb = boto3.resource('dynamodb',
                          region_name=Config.DB_REGION_NAME,

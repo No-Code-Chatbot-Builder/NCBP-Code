@@ -1,5 +1,3 @@
-from langchain_core.chat_history import InMemoryChatMessageHistory as ChatMessageHistory
+from langchain_community.chat_message_histories.in_memory import ChatMessageHistory
 
-__all__ = [
-    "ChatMessageHistory",
-]
+__all__ = ["ChatMessageHistory"]

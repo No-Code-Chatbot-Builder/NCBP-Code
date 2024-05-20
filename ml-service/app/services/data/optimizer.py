@@ -3,13 +3,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 # from transformers import pipeline
 
-def clean_question(question):
-    question = re.sub(r'^[0-9]+[a-zA-Z]*[.)\-\s]*|^[Qq][0-9]+\s*', '', question).strip()
-    return question
-
-def clean_answer(answer):
-    answer = re.sub(r'^\n+', '', answer).strip()
-    return answer
 
 def remove_irrelevant_pairs(qa_pairs):
     filtered_qa_pairs = []
