@@ -353,7 +353,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
   }
 }
 
-// async createAssistantOnly () {
+//// async createAssistantOnly () {
 //   const openai = new OpenAI();
 //   const myAssistant = await openai.beta.assistants.create({
 //     instructions:
