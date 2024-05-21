@@ -31,6 +31,7 @@
     "aws-jwt-verify": "^4.0.1",
     "aws-sdk": "^2.1574.0",
     "axios": "^1.6.7",
+    "dotenv": "^16.4.5",
     "nest-aws-sdk": "^3.0.1",
     "openai": "^4.29.0",
     "reflect-metadata": "^0.2.0",
