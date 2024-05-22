@@ -1,11 +1,12 @@
 import os
 import requests
-
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
 
 class Config:
     HUGGINGFACE_API_KEY = os.getenv('HUGGINGFACE_API_KEY')
     MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
-    
+    model = "mistral-large-latest"
 
 prompt_template_q = """
     You are an expert at creating comprehensive questions based on the text delimited by triple back-ticks.
@@ -37,6 +38,18 @@ prompt_template_a = """
 """
 
 async def generate_from_huggingface(prompt, api_key):
+    client = MistralClient(api_key=Config.MISTRAL_API_KEY)
+    messages = [
+        ChatMessage(role="user", content=prompt)
+    ]
+    chat_response = client.chat(
+        model=Config.model,
+        messages=messages,
+    )
+    print(chat_response.choices[0].message.content)
+    return chat_response.choices[0].message.content
+
+
     headers = {
         "Authorization": f"Bearer {api_key}"
     }
@@ -83,7 +96,7 @@ def extract_answer(generated_text):
 
 
 #tested
-async def llm_pipeline(document_ques_gen):
+async def llm_pipeline(chunks):
     i = 0
     api_key = Config.HUGGINGFACE_API_KEY
     if not api_key:
@@ -91,7 +104,7 @@ async def llm_pipeline(document_ques_gen):
     
     qa_pairs = []
     
-    for document in document_ques_gen:
+    for document in chunks:
         prompt = prompt_template_q.format(text=document.page_content)
         generated_question_text = await generate_from_huggingface(prompt, api_key)
         generated_questions = extract_questions(generated_question_text)

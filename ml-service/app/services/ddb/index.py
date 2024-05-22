@@ -1,8 +1,10 @@
 from boto3.dynamodb.conditions import Key
+from app.config.ddb_config import table
+import uuid
 
 
 #tested
-async def construct_s3_keys(items,table, user_id, workspace_id, dataset_id):
+async def construct_s3_keys(items, user_id, workspace_id, dataset_id):
     data_ids = []
     for item in items:
         response = table.query(
@@ -14,9 +16,8 @@ async def construct_s3_keys(items,table, user_id, workspace_id, dataset_id):
     # print("s3 keys-----------------------------------------",s3_keys)
     return s3_keys
 
-
 #tested
-async def fetch_dataset_info(table, dataset_id):
+async def fetch_dataset_info(dataset_id):
     response = table.query(
         KeyConditionExpression=Key('PK').eq(f'DATASET#{dataset_id}') & Key('SK').begins_with('DATA#')
     )
@@ -27,3 +28,83 @@ async def fetch_dataset_info(table, dataset_id):
     # print("Docs : ----------",docs)
     # print("Links : ----------",links)
     return docs,links
+
+
+def save_fine_tuning_job_to_dynamodb(workspace_id, fine_tuning_job, user_id, created_at, instruction, data_id, assistant_name,epochs,lr,batch_size):
+    id = str(uuid.uuid4())
+    table.put_item(
+        Item={
+            'PK': f'WORKSPACE#{workspace_id}',
+            'SK': f'FTASSISTANT#{id}',
+            'jobId' : fine_tuning_job.id,
+            'assistantId': '', #here when model training is completed id will be inserted and status will be changed with complete
+            'assistantName': assistant_name,
+            'purpose': instruction,
+            'baseModel' : fine_tuning_job.model,
+            'trainingFileId': data_id,
+            'epochs' : '',
+            'batchSize' : '',
+            'learningRate' : '',
+            'status' : 'In Progress',
+            'organisationId' : fine_tuning_job.organisation_id,
+            'createdBy': user_id,
+            'createdAt': created_at,
+            'deleted' : 'false'
+        }
+    )
+
+
+def retrieve_all_fine_tuned_bots(workspace_id):
+    response = table.query(
+        KeyConditionExpression=Key('PK').eq(f'WORKSPACE#{workspace_id}') &
+                               Key('SK').begins_with('FTASSISTANT#')
+    )
+    return response['Items']
+
+
+async def update_fine_tuning_job_on_success(workspace_id,job_id,assistant_id):
+    items = table.scan(
+        FilterExpression= Key('PK').eq(f'WORKSPACE#{workspace_id}') & Key('SK').begins_with('FTASSISTANT#') & Key('jobId').eq(job_id)
+    )['Items']
+    
+    for item in items:
+        table.update_item(
+            Key={
+                'PK': item['PK'],
+                'SK': item['SK']
+            },
+            UpdateExpression='SET #status = :status, assistantId = :assistantId',
+            ExpressionAttributeNames={
+                '#status': 'status'
+            },
+            ExpressionAttributeValues={
+                ':status': 'succeeded',
+                ':assistantId': assistant_id
+            },
+            ReturnValues="UPDATED_NEW"
+        )
+        
+
+async def update_fine_tuning_job_on_cancel(workspace_id,job_id):
+ 
+    items = table.scan(
+        FilterExpression= Key('PK').eq(f'WORKSPACE#{workspace_id}') & Key('SK').begins_with('FTASSISTANT#') & Key('jobId').eq(job_id)
+    )['Items']
+    
+    for item in items:
+        table.update_item(
+            Key={
+                'PK': item['PK'],
+                'SK': item['SK']
+            },
+            UpdateExpression='SET #status = :status',
+            ExpressionAttributeNames={
+                '#status': 'status'
+            },
+            ExpressionAttributeValues={
+                ':status': 'cancelled',
+            },
+            ReturnValues="UPDATED_NEW"
+        )        
+        
+

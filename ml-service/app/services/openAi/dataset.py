@@ -1,10 +1,12 @@
 import json
 
 
-
+#tested
 async def merge_jsonl_data(jsonl_data1, jsonl_data2):
-    if not jsonl_data1.endswith('\n'):
+    if jsonl_data1 and not jsonl_data1.endswith('\n'):
         jsonl_data1 += '\n'
+    if jsonl_data2 and not jsonl_data2.endswith('\n'):
+        jsonl_data2 += '\n'
 
     merged_jsonl_data = jsonl_data1 + jsonl_data2
     return merged_jsonl_data

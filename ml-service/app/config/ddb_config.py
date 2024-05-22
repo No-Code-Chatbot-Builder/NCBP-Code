@@ -12,6 +12,8 @@ class Config:
     DB_REGION_NAME = os.getenv('DB_REGION_NAME')
     DB_ACCESS_KEY_ID = os.getenv('DB_ACCESS_KEY_ID')
     DB_SECRET_ACCESS_KEY = os.getenv('DB_SECRET_ACCESS_KEY')
+    DDB_TABLE_NAME =  os.getenv('DDB_TABLE_NAME')
+
 
 #tested
 def initialize_db() -> ServiceResource:
@@ -21,3 +23,7 @@ def initialize_db() -> ServiceResource:
                          aws_secret_access_key=Config.DB_SECRET_ACCESS_KEY)
     print("dynamo db connected")
     return ddb
+
+ddb = initialize_db()
+table = ddb.Table(Config.DDB_TABLE_NAME)
+

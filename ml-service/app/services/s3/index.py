@@ -1,13 +1,13 @@
 from app.config.s3_config import s3
-from app.utils import extract_docs,web_scraping
+from app.config.ddb_config import table
+from app.utils import extract_docs
 import os
-import uuid
+# import uuid
 from app.utils.chunking import file_processing
-
+from app.services.openAi.process import upload_jsonl_to_openAi
 
 class Config:
     S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-
 
 #tested
 async def fetch_s3_docs(s3_keys):
@@ -33,11 +33,11 @@ async def fetch_s3_docs(s3_keys):
             print(f"Failed to download or process document {key}: {e}")
     return qa_chunks
 
-
-
-async def save_to_db(jsonl_data,table,user_id, workspace_id, dataset_id):
-    data_id = str(uuid.uuid4())
-    key = f"USER#{user_id}/WORKSPACE#{workspace_id}/DATASET#{dataset_id}/jsonl/{data_id}"
+#tested
+async def save_to_db(jsonl_data,user_id, workspace_id, dataset_id):
+    data_id = await upload_jsonl_to_openAi(response.content)
+    # data_id = str(uuid.uuid4())
+    key = f"USER#{user_id}/WORKSPACE#{workspace_id}/DATASET#{dataset_id}/JSONL#{data_id}"
     try:
         response = s3.put_object(Bucket=Config.S3_BUCKET_NAME, Key=key, Body=jsonl_data)
         if response['ResponseMetadata']['HTTPStatusCode'] == 200:
@@ -46,7 +46,7 @@ async def save_to_db(jsonl_data,table,user_id, workspace_id, dataset_id):
                     'PK': f'WORKSPACE#{workspace_id}',
                     'SK': f'DATASET#{dataset_id}'
                 },
-                UpdateExpression='SET jsonl_id = :val',
+                UpdateExpression='SET jsonlId = :val',
                 ExpressionAttributeValues={
                     ':val': data_id
                 },
