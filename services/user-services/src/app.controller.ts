@@ -12,7 +12,7 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-  @Get('/user/health')
+  @Get('/users/health')
   getHealth(): string {
     return "User Service is working";
   }
