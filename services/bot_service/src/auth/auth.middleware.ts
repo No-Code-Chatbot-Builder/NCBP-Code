@@ -13,12 +13,12 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 
 // Extend Request to include custom query parameters
-// interface CustomRequest extends Request80 {
-//   query: {
-//     botId: string;
-//     workspaceId: string;
-//   };
-// }
+interface CustomRequest extends Request {
+  query: {
+    botId: string;
+    workspaceId: string;
+  };
+}
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -30,29 +30,29 @@ export class AuthMiddleware implements NestMiddleware {
     });
   }
 
-  async use(req: Request, res: Response, next: NextFunction) {
+  async use(req: CustomRequest, res: Response, next: NextFunction) {
     console.log('middleware');
-    // Extract botId and workspaceId from request
-    // const { botId, workspaceId } = req.query;
+    //Extract botId and workspaceId from request
+    const { botId, workspaceId } = req.query;
 
-    // // Fetch domains
-    // try {
-    //     const domainResponse: AxiosResponse = await this.httpService.get('http://localhost:80/domains/', {
-    //         params: { botId, workspaceId }
-    //     }).toPromise();
+    // Fetch domains
+    try {
+        const domainResponse: AxiosResponse = await this.httpService.get('http://key-management-service.services/domains/', {
+            params: { botId, workspaceId }
+        }).toPromise();
 
-    //     const domains = domainResponse.data.resultDomain.domains; // Assuming domains are in this path
-    //     const requestOrigin = req.headers['origin'] as string | undefined; // Define requestOrigin here
+        const domains = domainResponse.data.resultDomain.domains; // Assuming domains are in this path
+        const requestOrigin = req.headers['origin'] as string | undefined; // Define requestOrigin here
 
-    //     // Check if origin is in allowed domains
-    //     if (domains.includes(requestOrigin)) {
-    //         next(); // If origin matches, proceed without token verification
-    //         return;
-    //     }
-    // } catch (error) {
-    //     console.error('Error fetching domains:', error);
-    //     throw new HttpException('Failed to fetch domains', HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
+        // Check if origin is in allowed domains
+        if (domains.includes(requestOrigin)) {
+            next(); // If origin matches, proceed without token verification
+            return;
+        }
+    } catch (error) {
+        console.error('Error fetching domains:', error);
+        throw new HttpException('Failed to fetch domains', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     // Continue with the token verification process only if origin doesn't match
     const headers = req.headers as { authorization?: string }; // Define headers here
