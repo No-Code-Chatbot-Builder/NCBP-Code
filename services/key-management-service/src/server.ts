@@ -7,12 +7,14 @@ import { setEnviromentVariables } from './utils/helpers';
 
 const app = express();
 const port = process.env.PORT || 5000;
-
-// if (process.env.NODE_ENV === 'prod') {
-//   setEnviromentVariables();
-// }
 app.use(cors())
 app.use(express.json());
+
+app.get('/domains/health', (req, res) => {
+  res.send('<h1>Key Management Service is running</h1>');
+});
+
+setEnviromentVariables();
 
 app.use('/domains', authenticate, keyRouter);
 
