@@ -1,6 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
+process.env.PORT = 80;
+
 if (!process.env.PORT) {
   console.error('⚠️  Missing PORT in .env');
   process.exit();
