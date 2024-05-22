@@ -4,10 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --max-old-space-size=512 --respawn --files src/server.ts",
+    "dev": "npm run build && node dist/server.js",
     "stop": "pm2 stop ecosystem.config.cjs",
     "start": "tsc && pm2 start ecosystem.config.cjs",
-    "build": "tsc",
+    "build": "npx tsc",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "pretty": "prettier --write \"src/**/*.ts\""
@@ -23,7 +23,6 @@
     "@typescript-eslint/parser": "^5.12.1",
     "eslint": "^8.10.0",
     "prettier": "^2.5.1",
-    "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.5"
   },
   "husky": {
