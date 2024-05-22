@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "prod": "ts-node-dev --files --respawn src/server.ts",
-    "dev": "ts-node-dev --max-old-space-size=512 --files --respawn src/server.ts",
+    "dev": "ts-node-dev --files --respawn src/server.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
