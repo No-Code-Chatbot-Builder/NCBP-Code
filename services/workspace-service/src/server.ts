@@ -10,7 +10,7 @@ const port = process.env.PORT || 80
 app.use(cors())
 app.use(express.json());
 
-// setEnviromentVariables();
+setEnviromentVariables();
 
 app.get('/workspaces/health', (req, res) => {
   res.send('<h1>Workspace Service is running</h1>');
