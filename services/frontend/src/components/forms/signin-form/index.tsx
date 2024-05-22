@@ -139,7 +139,7 @@ const SignUpInput = () => {
           </Button>
         </form>
       </Form>
-      <div className="flex items-center my-4">
+      {/* <div className="flex items-center my-4">
         <div className="flex-grow border-t border-secondary/50"></div>
         <span className="flex-shrink mx-4 text-secondary/50 text-sm">
           or continue with
@@ -148,8 +148,8 @@ const SignUpInput = () => {
       </div>
       <div>
         <SocialSignInButtons />
-      </div>
-      <div className="flex items-center justify-center space-x-2">
+      </div> */}
+      <div className="flex items-center justify-center space-x-2 mt-4">
         <div className="text-sm text-secondary">
           Dont have an account?{" "}
           <Link href="sign-up" className="hover:underline">

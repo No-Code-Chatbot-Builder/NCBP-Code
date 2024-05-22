@@ -12,6 +12,8 @@ services:
     networks:
       - my_network
 
+      
+
   dataset-service:
     container_name: dataset-service
     image: 637423235266.dkr.ecr.us-east-1.amazonaws.com/dataset-service:latest

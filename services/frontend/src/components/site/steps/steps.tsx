@@ -40,10 +40,10 @@ const Steps = ({ title, description, className, stepCard }: Props) => {
         />
       </div>
       <div className={cn("flex flex-col gap-4", className ? "lg:mx-20" : "")}>
-        <h1 className="text-3xl lg:text-4xl font-bold text-secondary">
+        <h1 className="text-3xl lg:text-4xl font-bold dark:text-white text-black">
           {title}
         </h1>
-        <p className="text-sm lg:text-lg leading-normal text-muted-foreground w-full lg:w-full">
+        <p className="text-sm lg:text-md leading-normal text-muted-foreground w-full lg:w-full">
           {description}
         </p>
       </div>

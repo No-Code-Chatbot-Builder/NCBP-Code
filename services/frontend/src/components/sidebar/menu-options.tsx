@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import {
   ArrowLeft,
   ChevronsUpDown,
+  Loader2,
   Menu,
   Plus,
   PlusCircleIcon,
@@ -55,6 +56,7 @@ import CustomToast from "../global/custom-toast";
 import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
 import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import { cn } from "@/lib/utils";
 
 type Props = {
   defaultOpen?: boolean;
@@ -75,6 +77,9 @@ const WorkspaceMenuOptions = ({
   const workspaces = useAppSelector(
     (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
   );
+  const isWorkspaceLoading = useAppSelector(
+    (state) => state.workspaces.isWorkspaceLoading
+  );
 
   const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
@@ -83,8 +88,8 @@ const WorkspaceMenuOptions = ({
 
   useEffect(() => {
     const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
+    dispatch(setIsWorkspaceLoading(true));
     if (!isLoading && !error && res.data.workspaces) {
-      dispatch(setIsWorkspaceLoading(true));
       const formattedWorkspaces: WorkspaceType[] = Object.entries(
         res.data.workspaces
       ).map(([key, value]: [string, unknown]) => ({
@@ -121,6 +126,8 @@ const WorkspaceMenuOptions = ({
 
   const changeCurrentWorkspace = (name: string) => {
     localStorage.setItem("currentWorkspace", name);
+    localStorage.removeItem("datasets");
+    localStorage.removeItem("assistants");
     dispatch(setIsDatasetLoading(true));
     dispatch(setIsAssistantLoading(true));
     dispatch(setReduxCurrentWorkspace(name));
@@ -164,7 +171,7 @@ const WorkspaceMenuOptions = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="mt-3 ml-5 w-[25rem] h-fit z-50">
-          <Card className="border-2 border-text-muted">
+          <Card className="border border-primary/50">
             <CardHeader>
               <CardTitle className="text-xl">Toggle Workspace</CardTitle>
               <CardDescription className="text-xs">
@@ -173,22 +180,31 @@ const WorkspaceMenuOptions = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {workspaces.length === 0 ? (
+                {isWorkspaceLoading && workspaces.length === 0 ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <p className="text-muted-foreground text-sm">
+                      Loading Workspaces...
+                    </p>
+                  </div>
+                ) : !isWorkspaceLoading && workspaces.length === 0 ? (
                   <div className="text-muted-foreground text-sm">
                     Create a workspace to get started.
                   </div>
                 ) : (
-                  <div className="text-muted-foreground text-sm">
-                    <div className="max-h-44 md:max-h-96 overflow-y-auto">
+                  <div className="text-muted-foreground gap-2">
+                    <div className="flex flex-row gap-2 flex-wrap max-h-[200px] overflow-y-auto py-2">
                       {workspaces?.map((workspace: WorkspaceType) => (
                         <div
                           onClick={() => changeCurrentWorkspace(workspace.name)}
                           key={workspace.name}
-                          className={`${
-                            workspace.name == currentReduxWorkspace
-                              ? "bg-primary/30"
-                              : "hover:bg-primary/30"
-                          } hover:cursor-pointer px-2 py-3 my-2 border border-primary rounded-lg text-md font-medium text-center`}
+                          className={cn(
+                            "p-3 bg-sidebar/60 hover:cursor-pointer w-fit text-primry rounded-full border-primary hover:bg-sidebar transition-all ease-in-out duration-300 text-sm ",
+                            {
+                              "bg-primary/50 hover:bg-primary/50 scale-[1.01] font-medium":
+                                workspace.name === currentReduxWorkspace,
+                            }
+                          )}
                         >
                           {workspace.name}
                         </div>
@@ -312,39 +328,7 @@ const ChatbotMenuOptions = () => {
               NoCodeBot.ai
             </h1>
           </div>
-          <Button
-            size={"sm"}
-            variant={"outline"}
-            className="ml-12 text-xs p-1 rounded-xl"
-            onClick={() => {
-              //create new thread and add it in the chat threads
-            }}
-          >
-            New Chat
-          </Button>
         </div>
-        <Command className="rounded-lg overflow-visible bg-transparent">
-          <CommandList>
-            <CommandGroup>
-              <h3 className="text-sm text-primary font-medium mb-4">Today</h3>
-              {dummyChatThreads.map((chat) => (
-                <CommandItem
-                  key={chat.id}
-                  className={clsx(
-                    "md:w-[230px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1"
-                  )}
-                >
-                  <Link
-                    href={"#"}
-                    className="flex items-center gap-4 rounded-md transition-all md:w-[250px] w-full p-1"
-                  >
-                    <span className="font-medium">{chat.name}</span>
-                  </Link>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
       </div>
       <div>
         <Popover>

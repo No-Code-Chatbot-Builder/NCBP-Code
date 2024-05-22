@@ -19,6 +19,7 @@ import { AudioWaveform, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CreateFineTuneModelForm from "@/components/forms/create-finetune-model";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
+import CreateDomainForm from "@/components/forms/create-domain-form";
 
 export default function Page() {
   const loader = useAppSelector((state) => state.assistants.isAssistantLoading);
@@ -34,6 +35,17 @@ export default function Page() {
       <CreateFineTuneModelForm />
     </CustomSheet>
   );
+
+  const manageDomains = (assistantId: string) => {
+    setOpen(
+      <CustomSheet
+        title="Add Domains for your assistants"
+        description="Here you can add domains on which your bot will be embedded."
+      >
+        <CreateDomainForm assistantId={assistantId} />
+      </CustomSheet>
+    );
+  }
 
   const handleCreateFinetuner = async () => {
     setOpen(finetuneSheet);
@@ -98,6 +110,14 @@ export default function Page() {
                       }}
                     >
                       Use Assistant
+                    </Button>
+                    <Button
+                      className="w-full bg-orange-500 hover:bg-orange-600"
+                      onClick={() => {
+                        manageDomains(assistant.id)
+                      }}
+                    >
+                      Manage Domains
                     </Button>
                   </CardContent>
                 </Card>

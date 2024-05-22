@@ -3,11 +3,10 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3006";
+const BASE_URL = "http://localhost:3007";
 
 export const botApiClient = axios.create({
   baseURL: BASE_URL,
-  // timeout : 10000,
 });
 
 botApiClient.interceptors.request.use(
@@ -79,6 +78,32 @@ export const runAssistant = async (workspaceName: string, query: string) => {
       CustomToast({
         title: "Error",
         description: "Error fetching Datasets.",
+      })
+    );
+  }
+};
+
+export const deleteAssistants = async (
+  workspaceName: string,
+  assistantId: string
+) => {
+  try {
+    const response = await botApiClient.delete(
+      `/bot/${workspaceName}/${assistantId}`
+    );
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "Assistant deleted successfully.",
+      })
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: "Error creating Assistant.",
       })
     );
   }

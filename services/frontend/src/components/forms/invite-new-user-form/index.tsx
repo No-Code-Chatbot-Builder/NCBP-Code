@@ -5,13 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import {
   Form,
@@ -57,6 +50,7 @@ const InviteNewUserForm = () => {
     try {
       const response = await inviteUser(workspaceId ?? "", values.email);
       console.log(response);
+      await inviteUser(workspaceId!, values.email);
       toast(
         CustomToast({
           title: "User Invited",

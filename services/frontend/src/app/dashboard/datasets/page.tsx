@@ -23,37 +23,42 @@ import {
   setIsDatasetLoading,
 } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Database, Edit, Plus, Trash } from "lucide-react";
+import { Database, Edit, Loader2, Plus, Trash, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { FormEvent, useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import UpdateDatasetForm from "@/components/forms/update-dataset";
+import CustomModel from "@/components/global/custom-model";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Page() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-
   const isDatasetLoading = useAppSelector(
     (state) => state.datasets.isDatasetLoading
   );
+  const [isDatasetDeleting, setIsDatasetDeleting] = useState(false);
 
-  const { setOpen } = useModal();
+  const { setOpen, setClose } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
   const currentReduxWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
-  const {
-    data: res,
-    error,
-    isLoading,
-  } = useAxiosSWR(`/dataset-service/datasets/${currentReduxWorkspace}/`);
+  const { data: res, error } = useAxiosSWR(
+    `/dataset-service/datasets/${currentReduxWorkspace}/`
+  );
 
   useEffect(() => {
     const fetchDataset = async () => {
-      setIsDatasetLoading(isLoading);
+      setIsDatasetLoading(true);
       if (!currentReduxWorkspace || error || !res) return;
 
       if (error) {
@@ -72,6 +77,7 @@ export default function Page() {
       const filteredDatasets = res.data.datasets.filter(
         (dataset: DatasetType) => dataset.name
       );
+      localStorage.setItem("datasets", JSON.stringify(filteredDatasets));
       const currentDatasetNames = datasets
         .map((dataset: DatasetType) => dataset.name)
         .sort();
@@ -84,10 +90,16 @@ export default function Page() {
       if (datasetsChanged || !filteredDatasets.length) {
         dispatch(setDatasets(filteredDatasets));
       }
-      dispatch(setIsDatasetLoading(isLoading));
+      dispatch(setIsDatasetLoading(false));
     };
-
-    fetchDataset();
+    if (localStorage.getItem("datasets")) {
+      console.log("fetching from local storage");
+      const datasets = JSON.parse(localStorage.getItem("datasets") || "[]");
+      dispatch(setDatasets(datasets));
+      dispatch(setIsDatasetLoading(false));
+    } else {
+      fetchDataset();
+    }
   }, [currentReduxWorkspace, res]);
 
   const datasetSheet = (
@@ -99,12 +111,42 @@ export default function Page() {
     </CustomSheet>
   );
 
+  const deleteDatasetModel = (datasetId: string, datasetName: string) => {
+    localStorage.removeItem("datasets");
+    return (
+      <CustomModel
+        title={`Delete ${datasetName} Dataset`}
+        description="Are you sure you want to delete this dataset?"
+      >
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={"outline"}
+            onClick={() => {
+              setClose();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={"destructive"}
+            onClick={() => {
+              setClose();
+              handleDatasetDeletion(datasetId, datasetName);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </CustomModel>
+    );
+  };
+
   const handleDatasetDeletion = async (
-    e: FormEvent,
     datasetId: string,
     datasetName: string
   ) => {
-    e.preventDefault();
+    setIsDatasetDeleting(true);
+
     try {
       await deleteDataset(currentReduxWorkspace!, datasetId);
       dispatch(removeDataset(datasetId));
@@ -123,8 +165,24 @@ export default function Page() {
         })
       );
       console.error(error);
+    } finally {
+      setIsDatasetDeleting(false);
     }
   };
+
+  if (isDatasetDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Dataset....
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -162,8 +220,8 @@ export default function Page() {
       {isDatasetLoading ? (
         // loading skeleton
         <section>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
-            {Array.from(Array(4).keys()).map((key) => (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            {Array.from(Array(3).keys()).map((key) => (
               <LoadingSkeleton key={key} />
             ))}
           </div>
@@ -171,7 +229,7 @@ export default function Page() {
       ) : (
         <section>
           {datasets?.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
               {datasets.map((dataset: DatasetType) => (
                 <Card key={dataset.id}>
                   <CardHeader>
@@ -180,37 +238,58 @@ export default function Page() {
                         <CardTitle>{dataset.name}</CardTitle>
                         <CardDescription>{dataset.description}</CardDescription>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="icon"
-                          variant={"default"}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setOpen(
-                              <CustomSheet
-                                title="Update Dataset"
-                                description="Add data to your dataset here."
+                      <div className="flex mr-1">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                size="icon"
+                                variant={"ghost"}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setOpen(
+                                    <CustomSheet
+                                      title="Update Dataset"
+                                      description="Add data to your dataset here."
+                                    >
+                                      <UpdateDatasetForm
+                                        name={dataset.name}
+                                        description={dataset.description}
+                                        datasetId={dataset.id}
+                                      />
+                                    </CustomSheet>
+                                  );
+                                }}
                               >
-                                <UpdateDatasetForm
-                                  name={dataset.name}
-                                  description={dataset.description}
-                                  datasetId={dataset.id}
-                                />
-                              </CustomSheet>
-                            );
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant={"destructive"}
-                          onClick={(e) => {
-                            handleDatasetDeletion(e, dataset.id, dataset.name);
-                          }}
-                        >
-                          <Trash className="w-4 h-4" />
-                        </Button>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit Dataset</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                size="icon"
+                                variant={"ghost"}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setOpen(
+                                    deleteDatasetModel(dataset.id, dataset.name)
+                                  );
+                                }}
+                              >
+                                <Trash className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete Dataset</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </div>
                   </CardHeader>

@@ -28,9 +28,7 @@ interface AddDataToDatasetFormProps {
   datasetId: string;
 }
 
-const AddDataToDatasetForm = ({
-  datasetId,
-}: AddDataToDatasetFormProps) => {
+const AddDataToDatasetForm = ({ datasetId }: AddDataToDatasetFormProps) => {
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspaceName
   );
@@ -109,10 +107,12 @@ const AddDataToDatasetForm = ({
         })
       );
     } catch (error) {
+      console.error("Network error occurred:", error);
       toast(
         CustomToast({
           title: "Error During File Upload",
-          description: "An error occured while uploading the file.",
+          description:
+            "AA network error occurred while uploading the file. Please try again later.",
         })
       );
     }

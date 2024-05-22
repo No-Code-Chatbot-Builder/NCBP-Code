@@ -172,7 +172,7 @@ const SignUpInput = () => {
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-between text-left font-normal",
+                          "w-full justify-between text-left font-normal bg-background hover:scale-100 hover:bg-background",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -270,17 +270,8 @@ const SignUpInput = () => {
           </Button>
         </form>
       </Form>
-      <div className="flex items-center my-4">
-        <div className="flex-grow border-t border-secondary/50"></div>
-        <span className="flex-shrink mx-4 text-secondary/50 text-sm">
-          or continue with
-        </span>
-        <div className="flex-grow border-t border-secondary/50"></div>
-      </div>
-      <div>
-        <SocialSignInButtons />
-      </div>
-      <div className="flex items-center justify-center space-x-2">
+
+      <div className="flex items-center justify-center space-x-2 mt-4">
         {/* Social Sign Up Links */}
         <div className="text-sm text-secondary">
           Already have an account?{" "}

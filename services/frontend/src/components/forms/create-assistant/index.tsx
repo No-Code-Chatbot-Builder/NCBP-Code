@@ -42,7 +42,6 @@ const CreateAssistantForm = () => {
     description: z.string().min(5, {
       message: "Description must contain atleast 5 characters long",
     }),
-    site: z.string().optional(),
     dataset: z.string().min(1, { message: "Select the dataset" }),
     tool: z.string().min(1, { message: "Select the tool" }),
     model: z.string().min(1, { message: "Select the model" }),
@@ -54,7 +53,6 @@ const CreateAssistantForm = () => {
     defaultValues: {
       name: "",
       description: "",
-      site: "",
     },
   });
 
@@ -67,6 +65,7 @@ const CreateAssistantForm = () => {
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       console.log(values);
+      localStorage.removeItem("assistants");
       const res = await createAssistantWithThread(
         currentWorkspaceName!,
         values.name,
@@ -74,7 +73,6 @@ const CreateAssistantForm = () => {
         values.model,
         values.tool,
         values.dataset
-
         // values.site,
       );
       console.log(res.response);
