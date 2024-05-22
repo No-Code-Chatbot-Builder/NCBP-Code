@@ -10,7 +10,7 @@ export const setEnvironmentVariables = () => {
 
     const secretJson = JSON.parse(secret);
     const requiredKeys = [
-     ' DYNAMODB_TABLE_NAME',
+     'DYNAMODB_TABLE_NAME',
       'USER_POOL_ID',
       'CLIENT_ID',
       'AWS_ACCESS_KEY_ID',
