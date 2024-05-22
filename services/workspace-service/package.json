@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "npm run build && node dist/server.js",
+    "dev": "npm run build && node --max-old-space-size=4096 dist/server.js",
     "stop": "pm2 stop ecosystem.config.cjs",
     "start": "tsc && pm2 start ecosystem.config.cjs",
     "build": "npx tsc",
