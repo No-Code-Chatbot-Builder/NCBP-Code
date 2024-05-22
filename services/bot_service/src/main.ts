@@ -19,6 +19,7 @@ export const setEnvironmentVariables = () => {
       'AWS_ACCESS_KEY_ID',
       'AWS_SECRET_ACCESS_KEY',
       'AWS_DEFAULT_REGION',
+      'OPENAI_API_KEY' ,
     ];
 
     requiredKeys.forEach((key) => {
@@ -34,6 +35,7 @@ export const setEnvironmentVariables = () => {
 };
 
 async function bootstrap() {
+  setEnvironmentVariables();
   const app = await NestFactory.create(AppModule);
   app.enableCors({ origin: 'http://localhost:3000' });
   await app.listen(3007);
