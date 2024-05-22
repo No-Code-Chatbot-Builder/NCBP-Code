@@ -141,7 +141,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
     );
     try {
       const response = await this.httpService
-        .post('http://localhost:80/queryVectorEmbeddings', {
+        .post('http://langchain-embedding-service.services/queryVectorEmbeddings', {
           text: query,
         })
         .toPromise();
