@@ -75,6 +75,8 @@ export class LangchainDocLoaderService {
         break;
       // Add more cases as needed for other file types
     }
+
+    return text;
   }
   async docLoader(loader: TextLoader | PDFLoader | PPTXLoader | TextLoader): Promise<any> {
     const docs = await loader.load();
