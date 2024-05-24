@@ -5,6 +5,8 @@ import 'dotenv/config';
 import { authenticate } from './middlewares/authentication.middleware';
 import { setEnviromentVariables } from './utils/helpers';
 
+setEnviromentVariables();
+
 const app = express();
 const port = process.env.PORT || 5000;
 app.use(cors())
@@ -14,7 +16,6 @@ app.get('/domains/health', (req, res) => {
   res.send('<h1>Key Management Service is running</h1>');
 });
 
-setEnviromentVariables();
 
 app.use('/domains', authenticate, keyRouter);
 

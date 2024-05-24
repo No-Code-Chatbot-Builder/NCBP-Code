@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "prod": "ts-node-dev --files --respawn src/server.ts",
-    "dev": "ts-node-dev --files --respawn src/server.ts",
-    "build": "tsc",
+    "dev": "npm run build && node --max-old-space-size=4096 dist/server.js",
+    "build": "npx tsc",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix",
     "pretty": "prettier --write \"src/**/*.ts\""
