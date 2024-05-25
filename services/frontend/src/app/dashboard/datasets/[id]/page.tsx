@@ -38,13 +38,11 @@ import {
   updateDataset,
 } from "@/providers/redux/slice/datasetSlice";
 import {
-  Code,
   Database,
   File,
   Loader2,
   Plus,
   Trash,
-  Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -78,11 +76,11 @@ const DatasetByIdPage = ({ params }: Props) => {
   const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(true);
 
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const { data: res } = useAxiosSWR(
-    `/dataset-service/datasets/${currentWorkspaceName}/${params.id}`
+    `/datasets/${currentWorkspaceName}/${params.id}`
   );
 
   useEffect(() => {
@@ -132,7 +130,7 @@ const DatasetByIdPage = ({ params }: Props) => {
     };
 
     fetchData();
-  }, [currentWorkspaceName, res]);
+  }, [currentWorkspaceName, dataset, dispatch, res]);
 
   const handleDataDeletion = async (dataId: string, dataName: string) => {
     try {

@@ -30,7 +30,7 @@ const UpdateDatasetForm = ({ name , description, datasetId  }: { name: string; d
   const dispatch = useAppDispatch();
   const { setClose } = useModal();
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const user = useCustomAuth().user;

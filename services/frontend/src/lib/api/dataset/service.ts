@@ -1,6 +1,29 @@
 import { apiClient } from "../apiService";
 import { toast } from "sonner";
+import axios from "axios";
 import CustomToast from "@/components/global/custom-toast";
+
+
+
+// const BASE_URL = "http://localhost:3010";
+
+// const client = axios.create({
+//   baseURL: BASE_URL,
+// });
+
+// client.interceptors.request.use(
+//   (config) => {
+//     const token = sessionStorage.getItem("token");
+//     console.log(token);
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 //tested
 export const createDataset = async (
@@ -10,7 +33,7 @@ export const createDataset = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/dataset-service/datasets/${currentWorkspaceName}`,
+      `/datasets/${currentWorkspaceName}`,
       { name: name, description: description }
     );
 
@@ -43,7 +66,7 @@ export const updateDatasets = async (
 ) => {
   try {
     const response = await apiClient.put(
-      `/dataset-service/datasets/${currentWorkspaceName}/${datasetId}`,
+      `/datasets/${currentWorkspaceName}/${datasetId}`,
       { name: name, description: description }
     );
 
@@ -73,7 +96,7 @@ export const deleteDataset = async (
 ) => {
   try {
     const response = await apiClient.delete(
-      `/dataset-service/datasets/${currentWorkspaceName}/${datasetId}`
+      `/datasets/${currentWorkspaceName}/${datasetId}`
     );
     toast(
       CustomToast({
@@ -104,7 +127,7 @@ export const deleteDatsetById = async ({
 }) => {
   try {
     const response = await apiClient.delete(
-      `/dataset-service/datasets/${currentWorkspaceName}/${datasetId}`
+      `/datasets/${currentWorkspaceName}/${datasetId}`
     );
 
     return response.data;
@@ -124,7 +147,7 @@ export const deleteDatsetById = async ({
 export const getDatasets = async (workspaceName: string) => {
   try {
     const response = await apiClient.get(
-      `/dataset-service/datasets/${workspaceName}/`
+      `/datasets/${workspaceName}/`
     );
 
     return response.data;
@@ -138,7 +161,7 @@ export const fetchFiles = async (workspaceName: string, datasetId: string) => {
   console.log(workspaceName, datasetId);
   try {
     const response = await apiClient.get(
-      `/dataset-service/datasets/${workspaceName}/${datasetId}`
+      `/datasets/${workspaceName}/${datasetId}`
     );
 
     toast(
@@ -170,7 +193,7 @@ export const addData = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/dataset-service/datasets/${workspaceName}/${datasetId}/data`,
+      `/datasets/${workspaceName}/${datasetId}/data`,
       data,
       {
         headers: {
@@ -206,7 +229,7 @@ export const deleteData = async (
 ) => {
   try {
     const response = await apiClient.delete(
-      `/dataset-service/datasets/${currentWorkspaceName}/${datasetId}/data/${dataId}`
+      `/datasets/${currentWorkspaceName}/${datasetId}/data/${dataId}`
     );
     toast(
       CustomToast({
@@ -235,7 +258,7 @@ export const getData = async (
 ) => {
   try {
     const response = await apiClient.get(
-      `/dataset-service/datasets/${workspaceName}/${datasetId}/data/${dataId}`
+      `/datasets/${workspaceName}/${datasetId}/data/${dataId}`
     );
     toast(
       CustomToast({
@@ -260,7 +283,7 @@ export const getData = async (
 export const deleteAllDatasets = async (workspaceName: string) => {
   try {
     const response = await apiClient.delete(
-      `/dataset-service/datasets/${workspaceName}`
+      `/datasets/${workspaceName}`
     );
     toast(
       CustomToast({

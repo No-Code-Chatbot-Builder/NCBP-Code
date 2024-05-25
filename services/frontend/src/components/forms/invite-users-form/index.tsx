@@ -53,42 +53,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CustomSheet from "@/components/global/custom-sheet";
 import { useModal } from "@/providers/modal-provider";
 import InviteNewUserForm from "../invite-new-user-form";
+import { useAppSelector } from "@/lib/hooks";
+import { WorkspaceUserType } from "@/providers/redux/slice/workspaceSlice";
 
-const data: User[] = [
-  {
-    id: "m5gr84i9",
-    email: "ibrahimsheikht@gmail.com",
-    role: "Admin",
-  },
-  {
-    id: "cb87dwdd",
-    email: "hash.hussain53@gmail.com",
-    role: "Guest",
-  },
-  {
-    id: "dwibu79",
-    email: "zohaibazam@gmail.com",
-    role: "Guest",
-  },
-  {
-    id: "cbidw7832",
-    email: "shariqanwar@gmail.com",
-    role: "Guest",
-  },
-  {
-    id: "debweg7873",
-    email: "nabeelbhai@gmail.com",
-    role: "Guest",
-  },
-];
 
 export type User = {
   id: string;
-  role: "Admin" | "Guest";
+  role: "Owner" | "Member" | "Pending";
   email: string;
 };
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<WorkspaceUserType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -112,7 +87,7 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "email",
+    accessorKey: "userEmail",
     header: ({ column }) => {
       return (
         <Button
@@ -124,7 +99,7 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("userEmail")}</div>,
   },
   {
     accessorKey: "role",
@@ -137,6 +112,7 @@ export const columns: ColumnDef<User>[] = [
       </div>
     ),
   },
+
   {
     id: "actions",
     enableHiding: false,
@@ -157,15 +133,14 @@ export const columns: ColumnDef<User>[] = [
 export default function ManageUsersCard() {
   const { setOpen } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const workspaceUsers = useAppSelector((state) => state.workspaces.currentWorkspaceUsers);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: workspaceUsers,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

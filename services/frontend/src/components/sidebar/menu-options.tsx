@@ -1,14 +1,12 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import {
-  ArrowLeft,
   ChevronsUpDown,
   Loader2,
   Menu,
   Plus,
-  PlusCircleIcon,
   Settings,
   User,
 } from "lucide-react";
@@ -26,9 +24,8 @@ import { useModal } from "@/providers/modal-provider";
 import Image from "next/image";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
-
 import PersonalDetails from "./personal-details";
-import { dummyChatThreads, icons } from "@/lib/constants";
+import { icons } from "@/lib/constants";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
@@ -40,23 +37,23 @@ import {
 import { ModeDashboardToggle } from "../global/mode-dashboard";
 import CustomModel from "../global/custom-model";
 import CreateWorkspaceForm from "../forms/create-workspace";
-
 import { useCustomAuth } from "@/providers/auth-provider";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   WorkspaceType,
   setWorkspaces,
-  setCurrentWorkspace as setReduxCurrentWorkspace,
   setIsWorkspaceLoading,
-  setSelectedWorkspace,
+  setCurrentWorkspace,
+  addWorkspace,
+  CurrentWorkspaceType,
 } from "@/providers/redux/slice/workspaceSlice";
-import { fetchWorkspaces } from "@/lib/api/workspace/service";
 import { toast } from "sonner";
 import CustomToast from "../global/custom-toast";
 import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
 import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import { cn } from "@/lib/utils";
+import { createWorkspace, fetchWorkspace } from "@/lib/api/workspace/service";
 
 type Props = {
   defaultOpen?: boolean;
@@ -81,58 +78,72 @@ const WorkspaceMenuOptions = ({
     (state) => state.workspaces.isWorkspaceLoading
   );
 
-  const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
-  const { data: res, error, isLoading } = useAxiosSWR("/user-service/users/");
+  const { data: res, error, isLoading } = useAxiosSWR("/users/");
+
+  const fetchCurrentWorkspace = async (workspaceName: string) => {
+    const res = await fetchWorkspace(workspaceName);
+    dispatch(setCurrentWorkspace(res.workspace));
+    localStorage.setItem("currentWorkspace", JSON.stringify(res.workspace));
+  };
+
+  const createInitialWorkspace = async () => {
+    try {
+      await createWorkspace("defaultworkspace", "");
+      const workspace: WorkspaceType = {
+        name: "defaultworkspace",
+        role: "owner",
+      };
+      dispatch(addWorkspace(workspace));
+      fetchCurrentWorkspace(workspace.name);
+    } catch (error: any) {
+      console.log(error);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: error.toString(),
+        })
+      );
+    }
+  };
 
   useEffect(() => {
+
     const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
+    const parsedLocalCurrentWorkspace: CurrentWorkspaceType =
+      localCurrentWorkspace != "undefined"
+        ? JSON.parse(localCurrentWorkspace!)
+        : null;
     dispatch(setIsWorkspaceLoading(true));
-    if (!isLoading && !error && res.data.workspaces) {
-      const formattedWorkspaces: WorkspaceType[] = Object.entries(
-        res.data.workspaces
-      ).map(([key, value]: [string, unknown]) => ({
-        name: key,
-        role: value as string,
-      }));
+    if (!isLoading && !error) {
+      if (res.data.workspaces) {
+        const formattedWorkspaces: WorkspaceType[] = Object.entries(
+          res.data.workspaces
+        ).map(([key, value]: [string, unknown]) => ({
+          name: key,
+          role: value as string,
+        }));
 
-      if (localCurrentWorkspace === null) {
-        localStorage.setItem("currentWorkspace", formattedWorkspaces[0].name);
-        dispatch(setReduxCurrentWorkspace(formattedWorkspaces[0].name));
-        //set the selected workspace to the first workspace
-        const selectedWorkspace = formattedWorkspaces.find(
-          (workspace: WorkspaceType) =>
-            workspace.name === formattedWorkspaces[0].name
-        );
-        if (selectedWorkspace) {
-          dispatch(setSelectedWorkspace(selectedWorkspace));
+        if (parsedLocalCurrentWorkspace == null) {
+          fetchCurrentWorkspace(formattedWorkspaces[0].name);
+        } else {
+          dispatch(setCurrentWorkspace(parsedLocalCurrentWorkspace));
         }
+        dispatch(setWorkspaces(formattedWorkspaces));
       } else {
-        dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
-        const selectedWorkspace = formattedWorkspaces.find(
-          (workspace: WorkspaceType) => workspace.name === localCurrentWorkspace
-        );
-        if (selectedWorkspace) {
-          dispatch(setSelectedWorkspace(selectedWorkspace));
-        }
+        createInitialWorkspace();
       }
-      dispatch(setWorkspaces(formattedWorkspaces));
-      dispatch(setIsWorkspaceLoading(false));
-    } else if (localCurrentWorkspace && !isLoading) {
-      dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
     }
-  }, [dispatch, currentReduxWorkspace, res]);
+  }, [dispatch, error, isLoading, res]);
 
-  const changeCurrentWorkspace = (name: string) => {
-    localStorage.setItem("currentWorkspace", name);
+  const changeCurrentWorkspace = (workspace: WorkspaceType) => {
+    fetchCurrentWorkspace(workspace.name);
     localStorage.removeItem("datasets");
     localStorage.removeItem("assistants");
     dispatch(setIsDatasetLoading(true));
     dispatch(setIsAssistantLoading(true));
-    dispatch(setReduxCurrentWorkspace(name));
-    dispatch(setIsAssistantLoading(true));
-    dispatch(setIsDatasetLoading(true));
   };
 
   return (
@@ -161,8 +172,8 @@ const WorkspaceMenuOptions = ({
                     NoCodeBot.ai
                   </h1>
                   <p className="text-muted-foreground text-sm font-normal">
-                    {localStorage.getItem("currentWorkspace") ||
-                      currentReduxWorkspace}
+                    {/* {localStorage.getItem("currentWorkspace") || */}
+                    {currentWorkspaceName}
                   </p>
                 </div>
               </div>
@@ -196,13 +207,13 @@ const WorkspaceMenuOptions = ({
                     <div className="flex flex-row gap-2 flex-wrap max-h-[200px] overflow-y-auto py-2">
                       {workspaces?.map((workspace: WorkspaceType) => (
                         <div
-                          onClick={() => changeCurrentWorkspace(workspace.name)}
+                          onClick={() => changeCurrentWorkspace(workspace)}
                           key={workspace.name}
                           className={cn(
                             "p-3 bg-sidebar/60 hover:cursor-pointer w-fit text-primry rounded-full border-primary hover:bg-sidebar transition-all ease-in-out duration-300 text-sm ",
                             {
                               "bg-primary/50 hover:bg-primary/50 scale-[1.01] font-medium":
-                                workspace.name === currentReduxWorkspace,
+                                workspace.name === currentWorkspaceName,
                             }
                           )}
                         >

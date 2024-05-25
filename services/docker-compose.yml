@@ -12,8 +12,6 @@ services:
     networks:
       - my_network
 
-      
-
   dataset-service:
     container_name: dataset-service
     image: 637423235266.dkr.ecr.us-east-1.amazonaws.com/dataset-service:latest
@@ -41,7 +39,7 @@ services:
     image: zohaibazam58/langchain-embedding-service:latest
     restart: always
     ports:
-      - "3004:80"
+      - "80:80"
     env_file:
       - .env
     networks:
@@ -52,7 +50,7 @@ services:
     image: 637423235266.dkr.ecr.us-east-1.amazonaws.com/key-management-service:latest
     restart: always
     ports:
-      - "3005:80"
+      - "3004:80"
     env_file:
       - .env
     networks:

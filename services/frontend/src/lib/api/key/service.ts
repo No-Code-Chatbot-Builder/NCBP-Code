@@ -5,7 +5,7 @@ import CustomToast from "@/components/global/custom-toast";
 export const addDomain = async (workspaceId: string, botId: string, domain: string) => {
   console.log(workspaceId,botId,domain)
   try {
-    const response = await apiClient.post("/key-management-service/domains/", { workspaceId: workspaceId, botId: botId, domain: domain });
+    const response = await apiClient.post("/domains/", { workspaceId: workspaceId, botId: botId, domain: domain });
     toast(
       CustomToast({
         title: "Success",
@@ -27,7 +27,7 @@ export const addDomain = async (workspaceId: string, botId: string, domain: stri
 
 export const deleteDomain = async (workspaceId: string, botId: string, domain: string) => {
   try {
-    const response = await apiClient.delete("/key-management-service/domains/", {
+    const response = await apiClient.delete("/domains/", {
       data: { workspaceId: workspaceId, botId: botId, domain: domain }
     });
     toast(
@@ -49,7 +49,7 @@ export const deleteDomain = async (workspaceId: string, botId: string, domain: s
 
 export const getDomainsByAssistant = async (workspaceId : string,botId : string) => {
   try {
-    const response = await apiClient.get(`/key-management-service/domains/?workspaceId=${workspaceId}&botId=${botId}`);
+    const response = await apiClient.get(`/domains/?workspaceId=${workspaceId}&botId=${botId}`);
     toast(
       CustomToast({
         title: "Success",

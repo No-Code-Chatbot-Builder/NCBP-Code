@@ -32,7 +32,7 @@ import { deleteAllDatasets } from "@/lib/api/dataset/service";
 const DeleteAllDatasetsCard = () => {
   const { toast } = useToast();
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const FormSchema = z.object({
@@ -49,9 +49,9 @@ const DeleteAllDatasetsCard = () => {
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+  const handleSubmit = async () => {
     try {
-      await deleteAllDatasets(currentWorkspaceName ?? "");
+      await deleteAllDatasets(currentWorkspaceName!);
     } catch (err: any) {
       toast(
         CustomToast({

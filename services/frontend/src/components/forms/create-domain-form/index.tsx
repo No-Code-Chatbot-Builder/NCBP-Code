@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,19 +11,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { addDomainToAssistant, removeDomainFromAssistant, setDomainsToAssistant } from "@/providers/redux/slice/assistantSlice";
-
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Trash } from "lucide-react";
 import { addDomain, deleteDomain, getDomainsByAssistant } from "@/lib/api/key/service";
 import CustomToast from "@/components/global/custom-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 
@@ -38,7 +33,7 @@ const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
   const dispatch = useAppDispatch();
   const assistant = useAppSelector((state) => state.assistants.assistants.find(a => a.id === assistantId));
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
   const FormSchema = z.object({
     assistant: z.string().min(1, { message: "Select the assistant" }),
@@ -71,7 +66,7 @@ const CreateDomainForm = ({ assistantId }: CreateDomainFormProps) => {
       }
     };
     fetchDomains();
-  }, []);
+  }, [assistant, assistantId, currentWorkspaceName, dispatch]);
 
 
   const handleAddSite = async (e: FormEvent) => {

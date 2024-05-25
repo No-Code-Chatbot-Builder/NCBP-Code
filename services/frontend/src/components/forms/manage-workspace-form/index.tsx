@@ -31,15 +31,15 @@ import { useAppSelector } from "@/lib/hooks";
 const ManageWorkspaceCard = () => {
   const { toast } = useToast();
 
-  const selectedWorkspace = useAppSelector(
-    (state) => state.workspaces.selectedWorkspace
+  const currentWorkspace = useAppSelector(
+    (state) => state.workspaces.currentWorkspace
   );
 
   const FormSchema = z.object({
     workspaceName: z.string().min(2, {
       message: "Workspace Name must be at least 2 characters.",
     }),
-    role: z.string().min(2, {
+    description: z.string().min(2, {
       message: "Role must be at least 2 characters.",
     }),
   });
@@ -48,13 +48,22 @@ const ManageWorkspaceCard = () => {
     mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      workspaceName: selectedWorkspace?.name ?? "",
-      role: selectedWorkspace?.role ?? "",
+      workspaceName: currentWorkspace?.name ?? "",
+      description: currentWorkspace?.description ?? "",
     },
   });
 
+  const isOwner = () => {
+    return true;
+  };
+
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-    console.log(values);
+    editWorkspace(
+      values.workspaceName,
+      values.description,
+      currentWorkspace?.members!,
+      currentWorkspace?.createdAt!
+    );
   };
   const isLoading = form.formState.isSubmitting;
   return (
@@ -81,6 +90,7 @@ const ManageWorkspaceCard = () => {
                     <FormLabel className="">Workspace Name</FormLabel>
                     <FormControl>
                       <Input
+                        disabled={!isOwner()}
                         placeholder="Enter your workspace name"
                         {...field}
                         className="bg-card dark:border-primary/50"
@@ -93,13 +103,14 @@ const ManageWorkspaceCard = () => {
               <FormField
                 disabled={isLoading}
                 control={form.control}
-                name="role"
+                name="description"
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel className="">Workspace Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Your role"
+                        disabled={!isOwner()}
+                        placeholder="Your workspace description"
                         {...field}
                         className="bg-card dark:border-primary/50"
                       />
@@ -112,8 +123,8 @@ const ManageWorkspaceCard = () => {
               <Button
                 className="px-10"
                 type="submit"
-                disabled={isLoading}
-                size={"lg"}
+                disabled={isLoading || !isOwner()}
+                size="lg"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

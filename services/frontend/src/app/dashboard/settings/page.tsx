@@ -1,6 +1,6 @@
 "use client";
 
-import ManageUsersCard from "@/components/forms/invite-users-form";
+import ManageUsersCard from "@/components/forms/workspace-users-table";
 import ManageWorkspaceCard from "@/components/forms/manage-workspace-form";
 import PricingCards from "@/components/pricing/pricing-cards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,22 +10,46 @@ import DeleteWorkspaceCard from "@/components/forms/delete-workspace-form";
 import DeleteAllDatasetsCard from "@/components/forms/delete-all-datasets";
 import ManagePendingInvitesCard from "@/components/forms/manage-pending-invites-form";
 import { useEffect, useState } from "react";
-import { getInviteUsers } from "@/lib/api/workspace/service";
+import {
+  fetchWorkspaceUsers,
+  getPendingInvites,
+} from "@/lib/api/workspace/service";
 import { Membership } from "@/lib/constants";
+import { useAppSelector } from "@/lib/hooks";
+import {
+  WorkspaceUserType,
+  setWorkspaceUsers,
+} from "@/providers/redux/slice/workspaceSlice";
+import { useDispatch } from "react-redux";
 
 export default function Page() {
+  const dispatch = useDispatch();
   const [memberships, setMemberships] = useState<Membership[]>([]);
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
+  );
   useEffect(() => {
-    async function fetchInvites() {
+    async function fetchData() {
       try {
-        const { membership } = await getInviteUsers();
-        setMemberships(membership);
+        let response = await fetchWorkspaceUsers(currentWorkspaceName!);
+        console.log(response);
+        const users: WorkspaceUserType[] = response.membership.map(
+          (user: any) => ({
+            role: user.role,
+            userEmail: user.userEmail,
+            userId: user.userId,
+            workspaceName: user.workspaceName,
+          })
+        );
+        dispatch(setWorkspaceUsers(users));
+        response = await getPendingInvites();
+        setMemberships(response.membership);
       } catch (error: any) {
         console.log(error);
       }
     }
-    fetchInvites();
-  }, []);
+    if (currentWorkspaceName != null) fetchData();
+  }, [currentWorkspaceName, dispatch]);
   return (
     <div className="flex flex-col gap-10">
       <div>

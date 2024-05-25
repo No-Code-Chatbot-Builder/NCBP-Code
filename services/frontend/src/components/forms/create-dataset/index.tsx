@@ -29,7 +29,7 @@ const CreateDatasetForm = () => {
   const dispatch = useAppDispatch();
   const { setClose } = useModal();
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const user = useCustomAuth().user;
@@ -59,6 +59,7 @@ const CreateDatasetForm = () => {
         values.name,
         values.description
       );
+
 
       res &&
         dispatch(

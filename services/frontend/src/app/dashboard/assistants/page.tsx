@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Code, Edit, Loader2, Plus, Trash } from "lucide-react";
+import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
@@ -22,12 +22,12 @@ import {
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
-import useSWR from "swr";
-import { botApiClient, deleteAssistants } from "@/lib/api/bot/service";
+import { deleteAssistants } from "@/lib/api/bot/service";
 import CreateDomainForm from "@/components/forms/create-domain-form";
 import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import CustomModel from "@/components/global/custom-model";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
@@ -36,23 +36,19 @@ export default function Page() {
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName!
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
   const [isAssistantDeleting, setIsAssistantDeleting] = useState(false);
   const { setOpen, setClose } = useModal();
 
-  const fetcher = (url: string) =>
-    botApiClient.get(url).then((res) => res.data);
-
-  const { data: res, error } = useSWR<any>(
-    `bot/${currentReduxWorkspace}`,
-    fetcher
+  const { data: res, error } = useAxiosSWR(
+    `/bot/${currentWorkspaceName}`
   );
 
   useEffect(() => {
     const fetchAssistants = async () => {
-      if (!currentReduxWorkspace || error) return;
+      if (!currentWorkspaceName || error) return;
 
       try {
         if (res && res.response && res.response.assistants) {
@@ -87,7 +83,7 @@ export default function Page() {
       }
     };
     fetchAssistants();
-  }, [currentReduxWorkspace, res]);
+  }, [assistants, currentWorkspaceName, dispatch, error, res]);
 
   const manageDomains = (assistantId: string) => {
     setOpen(
@@ -149,7 +145,7 @@ export default function Page() {
   ) => {
     setIsAssistantDeleting(true);
     try {
-      await deleteAssistants(currentReduxWorkspace, assistant_id);
+      await deleteAssistants(currentWorkspaceName!, assistant_id);
       dispatch(removeAssistant(assistant_id));
       toast(
         CustomToast({

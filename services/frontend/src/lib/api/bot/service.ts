@@ -1,27 +1,27 @@
-// import { apiClient } from "../apiService";
+import { apiClient } from "../apiService";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3007";
+// const BASE_URL = "http://localhost:3011";
 
-export const botApiClient = axios.create({
-  baseURL: BASE_URL,
-});
+// export const botApiClient = axios.create({
+//   baseURL: BASE_URL,
+// });
 
-botApiClient.interceptors.request.use(
-  (config) => {
-    const token = sessionStorage.getItem("token");
-    console.log(token);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// botApiClient.interceptors.request.use(
+//   (config) => {
+//     const token = sessionStorage.getItem("token");
+//     console.log(token);
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 export const createAssistantWithThread = async (
   workspaceName: string,
@@ -40,7 +40,7 @@ export const createAssistantWithThread = async (
       dataSetId: datasetId,
     };
     console.log(body);
-    const response = await botApiClient.post(
+    const response = await apiClient.post(
       `/bot/${workspaceName}/assistant`,
       body
     );
@@ -60,7 +60,7 @@ export const runAssistant = async (workspaceName: string, query: string) => {
   try {
     console.log("running...");
     console.log(workspaceName, query);
-    const response = await botApiClient.post(
+    const response = await apiClient.post(
       `/bot/${workspaceName}/runAssistant`,
       { query: query }
     );
@@ -88,7 +88,7 @@ export const deleteAssistants = async (
   assistantId: string
 ) => {
   try {
-    const response = await botApiClient.delete(
+    const response = await apiClient.delete(
       `/bot/${workspaceName}/${assistantId}`
     );
     toast(

@@ -8,14 +8,7 @@ import {
   ArrowUp,
   CopyIcon,
   Loader2,
-  Pause,
-  PauseCircle,
-  Send,
-  ThumbsDown,
-  ThumbsUp,
-  User,
 } from "lucide-react";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { Socket, io } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
@@ -27,11 +20,10 @@ import {
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { IoIosCopy, IoIosCheckmarkCircleOutline } from "react-icons/io";
+import {  IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 type Props = {
   params: {
@@ -150,14 +142,14 @@ const AssistantIdByPage = ({ params }: Props) => {
     )
   );
   const form = useForm();
-  const workspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
   const assistant = useAppSelector((state) =>
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `http://localhost:3007?workspaceId=${workspaceName}&assistantId=${params.id}`;
+  const URL = `Fargat-Farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );

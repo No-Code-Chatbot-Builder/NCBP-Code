@@ -20,8 +20,6 @@ import { Loader2 } from "lucide-react";
 import CustomToast from "@/components/global/custom-toast";
 import { useModal } from "@/providers/modal-provider";
 import { useAppDispatch } from "@/lib/hooks";
-
-import { useCustomAuth } from "@/providers/auth-provider";
 import { createWorkspace } from "@/lib/api/workspace/service";
 import {
   WorkspaceType,
@@ -37,6 +35,7 @@ const CreateWorkspaceForm = () => {
       .string()
       .min(1, { message: "Please enter the workspace name" })
       .min(5, { message: "Name must contain at least 5 characters long" }),
+      description : z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -44,6 +43,7 @@ const CreateWorkspaceForm = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
+      description: "",
     },
   });
 
@@ -51,7 +51,7 @@ const CreateWorkspaceForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await createWorkspace(values.name);
+      await createWorkspace(values.name, values.description || '');
       const workspace: WorkspaceType = {
         name: values.name,
         role: "owner",
@@ -75,7 +75,6 @@ const CreateWorkspaceForm = () => {
     }
   };
   const isLoading = form.formState.isSubmitting;
-  const router = useRouter();
 
   return (
     <main>
@@ -90,6 +89,21 @@ const CreateWorkspaceForm = () => {
                 <FormLabel className="text-primary">Name</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter the workspace name" {...field} />
+                </FormControl>
+                <FormMessage className="text-red-600 text-xs px-1" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            disabled={isLoading}
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel className="text-primary">Description (optional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter the workspace description" {...field} />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>

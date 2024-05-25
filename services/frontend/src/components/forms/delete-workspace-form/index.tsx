@@ -30,7 +30,7 @@ import { useAppSelector } from "@/lib/hooks";
 const DeleteWorkspaceCard = () => {
   const { toast } = useToast();
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const FormSchema = z.object({

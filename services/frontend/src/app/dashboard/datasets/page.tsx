@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { deleteDataset, getDatasets } from "@/lib/api/dataset/service";
+import { deleteDataset } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -23,11 +23,11 @@ import {
   setIsDatasetLoading,
 } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Database, Edit, Loader2, Plus, Trash, Trash2 } from "lucide-react";
+import { Database, Edit, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import UpdateDatasetForm from "@/components/forms/update-dataset";
 import CustomModel from "@/components/global/custom-model";
@@ -49,18 +49,17 @@ export default function Page() {
   const { setOpen, setClose } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
-  const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
   const { data: res, error } = useAxiosSWR(
-    `/dataset-service/datasets/${currentReduxWorkspace}/`
+    `/datasets/${currentWorkspaceName}/`
   );
 
   useEffect(() => {
     const fetchDataset = async () => {
       setIsDatasetLoading(true);
-      if (!currentReduxWorkspace || error || !res) return;
-
+      if (!currentWorkspaceName || error || !res) return;
       if (error) {
         console.error(error);
         toast(
@@ -71,9 +70,10 @@ export default function Page() {
         );
         return;
       }
-
-      if (!res?.data?.datasets) return;
-
+      if (!res?.data?.datasets) {
+        setIsDatasetLoading(false);
+        return;
+      }
       const filteredDatasets = res.data.datasets.filter(
         (dataset: DatasetType) => dataset.name
       );
@@ -92,15 +92,14 @@ export default function Page() {
       }
       dispatch(setIsDatasetLoading(false));
     };
-    if (localStorage.getItem("datasets")) {
-      console.log("fetching from local storage");
-      const datasets = JSON.parse(localStorage.getItem("datasets") || "[]");
-      dispatch(setDatasets(datasets));
-      dispatch(setIsDatasetLoading(false));
+    const storedDatasets = JSON.parse(localStorage.getItem("datasets")!);
+    console.log(storedDatasets);
+    if (storedDatasets != null) {
+      dispatch(setDatasets(storedDatasets));
     } else {
       fetchDataset();
     }
-  }, [currentReduxWorkspace, res]);
+  }, [currentWorkspaceName, error]);
 
   const datasetSheet = (
     <CustomSheet
@@ -148,7 +147,7 @@ export default function Page() {
     setIsDatasetDeleting(true);
 
     try {
-      await deleteDataset(currentReduxWorkspace!, datasetId);
+      await deleteDataset(currentWorkspaceName!, datasetId);
       dispatch(removeDataset(datasetId));
       toast(
         CustomToast({

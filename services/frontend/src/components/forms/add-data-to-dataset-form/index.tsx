@@ -30,7 +30,7 @@ interface AddDataToDatasetFormProps {
 
 const AddDataToDatasetForm = ({ datasetId }: AddDataToDatasetFormProps) => {
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const { toast } = useToast();

@@ -57,7 +57,7 @@ const CreateAssistantForm = () => {
   });
 
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const datasets = useAppSelector((state) => state.datasets.datasets);

@@ -1,32 +1,43 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export type WorkspaceType = {
   name: string;
   role: string;
 };
 
+export type CurrentWorkspaceType = {
+  name: string;
+  owner: {
+    id: string;
+    email: string;
+  };
+  members: number;
+  createdAt: string;
+  updatedAt: string;
+  website?: string;
+  description?: string;
+};
+
+export type WorkspaceUserType = {
+  role: string;
+  userEmail: string;
+  userId: string;
+  workspaceName: string;
+};
+
 interface WorkspaceState {
   workspaces: WorkspaceType[];
+  currentWorkspaceUsers: WorkspaceUserType[];
   isWorkspaceLoading: boolean;
-  selectedWorkspace: WorkspaceType | null;
-  currentWorkspaceName: string | null;
+  currentWorkspace: CurrentWorkspaceType | null;
 }
 
 const initialState: WorkspaceState = {
   workspaces: [],
-  selectedWorkspace: null,
-  currentWorkspaceName: null,
+  currentWorkspaceUsers: [],
+  currentWorkspace: null,
   isWorkspaceLoading: false,
 };
-
-export const fetchWorkspaces = createAsyncThunk(
-  "workspaces/fetchWorkspaces",
-  async () => {
-    //const response = await fetchWorkspacesFromDatabase();
-    //return response.data;
-  }
-);
 
 export const workspaceSlice = createSlice({
   name: "workspaces",
@@ -43,6 +54,14 @@ export const workspaceSlice = createSlice({
         (workspace) => workspace.name !== action.payload
       );
     },
+    setWorkspaceUsers: (state, action: PayloadAction<WorkspaceUserType[]>) => {
+      state.currentWorkspaceUsers = action.payload;
+    },
+    removeWorkspaceUser: (state, action: PayloadAction<string>) => {
+      state.currentWorkspaceUsers = state.currentWorkspaceUsers.filter(
+        (user) => user.userId !== action.payload
+      );
+    },
     updateWorkspace: (state, action: PayloadAction<WorkspaceType>) => {
       const index = state.workspaces.findIndex(
         (workspace) => workspace.name === action.payload.name
@@ -51,27 +70,18 @@ export const workspaceSlice = createSlice({
         state.workspaces[index] = action.payload;
       }
     },
-    setCurrentWorkspace: (state, action: PayloadAction<string | null>) => {
-      state.currentWorkspaceName = action.payload;
-    },
     clearCurrentWorkspace: (state) => {
-      state.currentWorkspaceName = null;
+      state.currentWorkspace = null;
     },
     setIsWorkspaceLoading: (state, action: PayloadAction<boolean>) => {
       state.isWorkspaceLoading = action.payload;
     },
-    setSelectedWorkspace: (
+    setCurrentWorkspace: (
       state,
-      action: PayloadAction<WorkspaceType | null>
+      action: PayloadAction<CurrentWorkspaceType | null>
     ) => {
-      state.selectedWorkspace = action.payload;
+      state.currentWorkspace = action.payload;
     },
-  },
-
-  extraReducers(builder) {
-    builder.addCase(fetchWorkspaces.fulfilled, (state, action) => {
-      // state.workspaces = action.payload;
-    });
   },
 });
 
@@ -81,8 +91,9 @@ export const {
   removeWorkspace,
   updateWorkspace,
   setCurrentWorkspace,
+  setWorkspaceUsers,
   setIsWorkspaceLoading,
-  setSelectedWorkspace,
+  removeWorkspaceUser,
 } = workspaceSlice.actions;
 
 export default workspaceSlice.reducer;
