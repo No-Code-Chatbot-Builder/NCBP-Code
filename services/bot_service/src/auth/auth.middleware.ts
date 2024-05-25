@@ -35,25 +35,6 @@ export class AuthMiddleware implements NestMiddleware {
     //Extract botId and workspaceId from request
     const { botId, workspaceId } = req.query;
 
-    // Fetch domains
-    try {
-        const domainResponse: AxiosResponse = await this.httpService.get('http://key-management-service.services/domains/', {
-            params: { botId, workspaceId }
-        }).toPromise();
-
-        const domains = domainResponse.data.resultDomain.domains; // Assuming domains are in this path
-        const requestOrigin = req.headers['origin'] as string | undefined; // Define requestOrigin here
-
-        // Check if origin is in allowed domains
-        if (domains.includes(requestOrigin)) {
-            next(); // If origin matches, proceed without token verification
-            return;
-        }
-    } catch (error) {
-        console.error('Error fetching domains:', error);
-        throw new HttpException('Failed to fetch domains', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     // Continue with the token verification process only if origin doesn't match
     const headers = req.headers as { authorization?: string }; // Define headers here
     if (headers.authorization && headers.authorization.startsWith('Bearer')) {
@@ -109,6 +90,26 @@ export class AuthMiddleware implements NestMiddleware {
         console.log(error);
         console.log('Token not valid!');
       }
+    }
+
+    else {
+      try {
+        const domainResponse: AxiosResponse = await this.httpService.get('http://key-management-service.services/domains/', {
+            params: { botId, workspaceId }
+        }).toPromise();
+
+        const domains = domainResponse.data.resultDomain.domains; // Assuming domains are in this path
+        const requestOrigin = req.headers['origin'] as string | undefined; // Define requestOrigin here
+
+        // Check if origin is in allowed domains
+        if (domains.includes(requestOrigin)) {
+            next(); // If origin matches, proceed without token verification
+            return;
+        }
+    } catch (error) {
+        console.error('Error fetching domains:', error);
+        throw new HttpException('Failed to fetch domains', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     }
   }
 }
