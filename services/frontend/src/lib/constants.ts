@@ -15,14 +15,6 @@ import {
   AudioWaveform,
 } from "lucide-react";
 
-export type Membership = {
-  workspaceName: string;
-  userId: string;
-  userEmail: string;
-  role: string;
-  createdAt: string;
-};
-
 export type StepCard = {
   title: string;
   description: String;
@@ -167,7 +159,7 @@ export type AssistantType = {
   id: string;
   name: string;
   description: string;
-  allowedDomain: string[]
+  allowedDomain: string[];
   // owner: string;
   // threadId: string;
 };
@@ -202,11 +194,11 @@ export type AddDataBucketType = {
 };
 
 export type DataBucketType = {
-    id: string;
-    name: string;
-    path: string;
-    createdBy: string;
-    createdAt: string;
+  id: string;
+  name: string;
+  path: string;
+  createdBy: string;
+  createdAt: string;
 };
 
 export type DeleteDataBucketType = {
