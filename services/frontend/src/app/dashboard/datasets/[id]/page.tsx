@@ -86,16 +86,19 @@ const DatasetByIdPage = ({ params }: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!dataset || currentWorkspaceName === null) {
+        console.log("Data");
         setIsDatasetFilesLoading(true);
         return;
       }
 
-      if (!res) return;
+      // if (!res) return;
       try {
-        if (!res?.data?.data.length) {
+        if (res?.data?.data.length <= 0) {
+          console.log("Data");
           dispatch(setIsDatasetFilesEmpty(true));
           setIsDatasetFilesLoading(false);
         } else {
+          console.log("Data");
           const updatedFileArray: DataBucketType[] = res?.data?.data.map(
             (item: any) => ({
               id: item.dataId,
@@ -130,7 +133,7 @@ const DatasetByIdPage = ({ params }: Props) => {
     };
 
     fetchData();
-  }, [currentWorkspaceName, dataset, dispatch, res]);
+  }, []);
 
   const handleDataDeletion = async (dataId: string, dataName: string) => {
     try {

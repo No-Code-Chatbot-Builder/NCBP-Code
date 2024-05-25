@@ -59,7 +59,7 @@ export default function Page() {
   useEffect(() => {
     const fetchDataset = async () => {
       setIsDatasetLoading(true);
-      if (!currentWorkspaceName || error || !res) return;
+      // if (!currentWorkspaceName || !res) return;
       if (error) {
         console.error(error);
         toast(
@@ -70,14 +70,17 @@ export default function Page() {
         );
         return;
       }
-      if (!res?.data?.datasets) {
+
+      if (res?.data?.datasets.length <= 0) {
         setIsDatasetLoading(false);
         return;
       }
       const filteredDatasets = res.data.datasets.filter(
         (dataset: DatasetType) => dataset.name
       );
+      console.log("sd");
       localStorage.setItem("datasets", JSON.stringify(filteredDatasets));
+
       const currentDatasetNames = datasets
         .map((dataset: DatasetType) => dataset.name)
         .sort();
@@ -90,16 +93,19 @@ export default function Page() {
       if (datasetsChanged || !filteredDatasets.length) {
         dispatch(setDatasets(filteredDatasets));
       }
-      dispatch(setIsDatasetLoading(false));
     };
-    const storedDatasets = JSON.parse(localStorage.getItem("datasets")!);
-    console.log(storedDatasets);
+
+    const storedDatasets = localStorage.getItem("datasets");
+    const parsedDatasets: DatasetType[] =
+      storedDatasets != "undefined" ? JSON.parse(storedDatasets!) : null;
     if (storedDatasets != null) {
-      dispatch(setDatasets(storedDatasets));
+      dispatch(setDatasets(parsedDatasets));
     } else {
       fetchDataset();
     }
-  }, [currentWorkspaceName, error]);
+    dispatch(setIsDatasetLoading(false));
+
+  }, [currentWorkspaceName]);
 
   const datasetSheet = (
     <CustomSheet
