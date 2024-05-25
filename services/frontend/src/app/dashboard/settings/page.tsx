@@ -1,6 +1,5 @@
 "use client";
 
-import ManageUsersCard from "@/components/forms/workspace-users-table";
 import ManageWorkspaceCard from "@/components/forms/manage-workspace-form";
 import PricingCards from "@/components/pricing/pricing-cards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +20,7 @@ import {
   setWorkspaceUsers,
 } from "@/providers/redux/slice/workspaceSlice";
 import { useDispatch } from "react-redux";
+import ManageUsersCard from "@/components/forms/invite-users-form";
 
 export default function Page() {
   const dispatch = useDispatch();

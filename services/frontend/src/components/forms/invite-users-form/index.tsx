@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Delete,
   DeleteIcon,
+  Loader2,
   MoreHorizontal,
   Trash,
 } from "lucide-react";
@@ -55,7 +56,6 @@ import { useModal } from "@/providers/modal-provider";
 import InviteNewUserForm from "../invite-new-user-form";
 import { useAppSelector } from "@/lib/hooks";
 import { WorkspaceUserType } from "@/providers/redux/slice/workspaceSlice";
-
 
 export type User = {
   id: string;
@@ -99,7 +99,9 @@ export const columns: ColumnDef<WorkspaceUserType>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("userEmail")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("userEmail")}</div>
+    ),
   },
   {
     accessorKey: "role",
@@ -133,8 +135,12 @@ export const columns: ColumnDef<WorkspaceUserType>[] = [
 export default function ManageUsersCard() {
   const { setOpen } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const workspaceUsers = useAppSelector((state) => state.workspaces.currentWorkspaceUsers);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const workspaceUsers = useAppSelector(
+    (state) => state.workspaces.currentWorkspaceUsers
+  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
@@ -259,7 +265,9 @@ export default function ManageUsersCard() {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    <div className="flex justify-center items-center">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
