@@ -25,14 +25,14 @@ import { addData } from "@/lib/api/dataset/service";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 interface AddDataToDatasetFormProps {
-  workspaceName: string;
   datasetId: string;
 }
 
-const AddDataToDatasetForm = ({
-  workspaceName,
-  datasetId,
-}: AddDataToDatasetFormProps) => {
+const AddDataToDatasetForm = ({ datasetId }: AddDataToDatasetFormProps) => {
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
+  );
+
   const { toast } = useToast();
   const { setClose } = useModal();
   const dispatch = useAppDispatch();
@@ -69,13 +69,12 @@ const AddDataToDatasetForm = ({
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     const file = values.file[0];
-    console.log(file.name);
+    console.log(`Selected file name: ${file.name}`);
     const formData = new FormData();
     formData.append("file", file);
-
     try {
-      const res = await addData(workspaceName, datasetId, formData);
-      console.log(res);
+      const res = await addData(currentWorkspaceName!, datasetId, formData);
+      console.log(`Response from addData: ${JSON.stringify(res)}`);
       if (
         res.responseForAddingData.success &&
         res.responseForAddingFileNameUUID.success
@@ -108,10 +107,12 @@ const AddDataToDatasetForm = ({
         })
       );
     } catch (error) {
+      console.error("Network error occurred:", error);
       toast(
         CustomToast({
           title: "Error During File Upload",
-          description: "An error occured while uploading the file.",
+          description:
+            "AA network error occurred while uploading the file. Please try again later.",
         })
       );
     }

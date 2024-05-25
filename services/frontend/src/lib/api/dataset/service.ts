@@ -1,7 +1,31 @@
 import { apiClient } from "../apiService";
 import { toast } from "sonner";
+import axios from "axios";
 import CustomToast from "@/components/global/custom-toast";
 
+
+
+// const BASE_URL = "http://localhost:3010";
+
+// const client = axios.create({
+//   baseURL: BASE_URL,
+// });
+
+// client.interceptors.request.use(
+//   (config) => {
+//     const token = sessionStorage.getItem("token");
+//     console.log(token);
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
+
+//tested
 export const createDataset = async (
   currentWorkspaceName: string,
   name: string,
@@ -9,7 +33,7 @@ export const createDataset = async (
 ) => {
   try {
     const response = await apiClient.post(
-      `/dataset-service/datasets/${currentWorkspaceName}`,
+      `/datasets/${currentWorkspaceName}`,
       { name: name, description: description }
     );
 
@@ -33,23 +57,81 @@ export const createDataset = async (
   }
 };
 
+//tested
+export const updateDatasets = async (
+  currentWorkspaceName: string,
+  datasetId: string,
+  name: string,
+  description: string
+) => {
+  try {
+    const response = await apiClient.put(
+      `/datasets/${currentWorkspaceName}/${datasetId}`,
+      { name: name, description: description }
+    );
+
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "Dataset updated successfully.",
+      })
+    );
+    return response.data;
+  } catch (error: any) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: `Error creating Dataset. ${
+          error.response?.data?.message || error.message
+        }`,
+      })
+    );
+  }
+};
+//tested
 export const deleteDataset = async (
   currentWorkspaceName: string,
   datasetId: string
 ) => {
   try {
     const response = await apiClient.delete(
-      `/dataset-service/datasets/${currentWorkspaceName}/dataset/${datasetId}`
+      `/datasets/${currentWorkspaceName}/${datasetId}`
     );
     toast(
       CustomToast({
         title: "Success",
-        description: "Dataset deleted successfully.",
+        description: "All datasets deleted successfully.",
       })
     );
     return response.data;
   } catch (error: any) {
+    toast(
+      CustomToast({
+        title: "Error",
+        description: `Error deleting all datasets. ${
+          error.response?.data?.message || error.message
+        }`,
+      })
+    );
     console.log(error);
+  }
+};
+
+export const deleteDatsetById = async ({
+  currentWorkspaceName,
+  datasetId,
+}: {
+  currentWorkspaceName: string;
+  datasetId: string;
+}) => {
+  try {
+    const response = await apiClient.delete(
+      `/datasets/${currentWorkspaceName}/${datasetId}`
+    );
+
+    return response.data;
+  } catch (error: any) {
     toast(
       CustomToast({
         title: "Error",
@@ -61,10 +143,11 @@ export const deleteDataset = async (
   }
 };
 
+//tested
 export const getDatasets = async (workspaceName: string) => {
   try {
     const response = await apiClient.get(
-      `/dataset-service/datasets/${workspaceName}/`
+      `/datasets/${workspaceName}/`
     );
 
     return response.data;
@@ -73,11 +156,12 @@ export const getDatasets = async (workspaceName: string) => {
   }
 };
 
+//tested
 export const fetchFiles = async (workspaceName: string, datasetId: string) => {
   console.log(workspaceName, datasetId);
   try {
     const response = await apiClient.get(
-      `/dataset-service/datasets/${workspaceName}/${datasetId}`
+      `/datasets/${workspaceName}/${datasetId}`
     );
 
     toast(
@@ -101,15 +185,21 @@ export const fetchFiles = async (workspaceName: string, datasetId: string) => {
   }
 };
 
+//tested
 export const addData = async (
   workspaceName: string,
   datasetId: string,
-  data: any
+  data: FormData
 ) => {
   try {
     const response = await apiClient.post(
-      `/dataset-service/datasets/${workspaceName}/${datasetId}/data`,
-      data
+      `/datasets/${workspaceName}/${datasetId}/data`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     toast(
       CustomToast({
@@ -131,6 +221,36 @@ export const addData = async (
   }
 };
 
+//tested
+export const deleteData = async (
+  currentWorkspaceName: string,
+  datasetId: string,
+  dataId: string
+) => {
+  try {
+    const response = await apiClient.delete(
+      `/datasets/${currentWorkspaceName}/${datasetId}/data/${dataId}`
+    );
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "Dataset deleted successfully.",
+      })
+    );
+    return response.data;
+  } catch (error: any) {
+    console.log(error);
+    toast(
+      CustomToast({
+        title: "Error",
+        description: `Error deleting Dataset. ${
+          error.response?.data?.message || error.message
+        }`,
+      })
+    );
+  }
+};
+
 export const getData = async (
   workspaceName: string,
   datasetId: string,
@@ -138,7 +258,7 @@ export const getData = async (
 ) => {
   try {
     const response = await apiClient.get(
-      `/dataset-service/datasets/${workspaceName}/${datasetId}/data/${dataId}`
+      `/datasets/${workspaceName}/${datasetId}/data/${dataId}`
     );
     toast(
       CustomToast({
@@ -157,5 +277,30 @@ export const getData = async (
         }`,
       })
     );
+  }
+};
+
+export const deleteAllDatasets = async (workspaceName: string) => {
+  try {
+    const response = await apiClient.delete(
+      `/datasets/${workspaceName}`
+    );
+    toast(
+      CustomToast({
+        title: "Success",
+        description: "All datasets deleted successfully.",
+      })
+    );
+    return response.data;
+  } catch (error: any) {
+    toast(
+      CustomToast({
+        title: "Error",
+        description: `Error deleting all datasets. ${
+          error.response?.data?.message || error.message
+        }`,
+      })
+    );
+    console.log(error);
   }
 };

@@ -8,14 +8,7 @@ import {
   ArrowUp,
   CopyIcon,
   Loader2,
-  Pause,
-  PauseCircle,
-  Send,
-  ThumbsDown,
-  ThumbsUp,
-  User,
 } from "lucide-react";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { Socket, io } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
@@ -27,7 +20,7 @@ import {
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { IoIosCopy, IoIosCheckmarkCircleOutline } from "react-icons/io";
+import {  IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { Button } from "@/components/ui/button";
@@ -39,10 +32,9 @@ type Props = {
 };
 
 const UserMessage = ({ message }: { message: string }) => (
-  <div>
-    <div className="flex items-center gap-2">
-      <Image src="/assets/ncbai.svg" alt="Chatbot" width={35} height={35} />
-      <p className="text-muted-foreground font-medium">{message}</p>
+  <div className="flex justify-end">
+    <div className="bg-card p-3 rounded-full">
+      <p className="text-muted-foreground font-normal">{message}</p>
     </div>
   </div>
 );
@@ -80,8 +72,8 @@ const ChatbotMessage = ({ message }: { message: string }) => {
     );
   };
   return (
-    <div>
-      <div className="mb-4 bg-card p-6 py-8 rounded-xl text-muted-foreground font-medium tracking-wide leading-snug border border-primary">
+    <div className="flex flex-start flex-col">
+      <div className="bg-card p-4 rounded-xl">
         {chunks.map((chunk, index) => {
           if (
             hasCode &&
@@ -127,15 +119,15 @@ const ChatbotMessage = ({ message }: { message: string }) => {
         })}
       </div>
       <div className="flex text-muted-foreground flex-row-reverse mr-4">
-        <button className="p-1 hover:text-white">
+        <Button className="p-1 hover:text-white" variant={"ghost"} size="icon">
           <CopyIcon className="w-4 h-4" />
-        </button>
-        <button className="p-1 hover:text-white">
+        </Button>
+        {/* <button className="p-1 hover:text-white">
           <ThumbsUp className="w-4 h-4" />
         </button>
         <button className="p-1 hover:text-white">
           <ThumbsDown className="w-4 h-4" />
-        </button>
+        </button> */}
       </div>
     </div>
   );
@@ -150,18 +142,18 @@ const AssistantIdByPage = ({ params }: Props) => {
     )
   );
   const form = useForm();
-  const workspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
   const assistant = useAppSelector((state) =>
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `http://localhost:3004?workspaceId=${workspaceName}&assistantId=${params.id}`;
+  const URL = `Fargat-Farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );
-  const [isInputDisabled, setInputDisabled] = useState(true);
+  const [isInputDisabled, setInputDisabled] = useState(false);
 
   useEffect(() => {
     socketRef.current = io(URL, { transports: ["websocket"] });
@@ -238,7 +230,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     <div className="stretch mx-auto w-full md:w-3/4 max-w-5xl pt-24 pb-40">
       {messages &&
         messages[0]?.messages?.map((message: ChatState, index: number) => (
-          <div key={index} className="mb-8 whitespace-pre-wrap">
+          <div key={index} className="mb-2 whitespace-pre-wrap">
             {message.role === "user" ? (
               <>
                 <UserMessage message={message.content} />
@@ -253,35 +245,37 @@ const AssistantIdByPage = ({ params }: Props) => {
           </div>
         ))}
 
-      <div className="flex flex-col items-center justify-center">
-        <div className="bg-background fixed bottom-0 w-full md:w-2/3 max-w-7xl px-10 pb-10">
+      <div className="flex flex-col items-center justify-center bg-background w-full">
+        <div className=" fixed bottom-0  px-10 pb-10 w-2/3 mx-auto">
           <div className="relative">
-            <form onSubmit={handleSubmit}>
-              <Input
-                {...form.register("query")}
-                type="text"
-                placeholder="Ask Anything"
-                className="mt-4 border-secondary/30 bg-card rounded-lg text-muted-foreground px-6 py-7 shadow-xl"
-                disabled={isInputDisabled}
-              />
-              <Button
-                type="submit"
-                variant={
-                  form.watch("query") && form.watch("query").trim().length > 0
-                    ? "default"
-                    : "ghost"
-                }
-                size={"icon"}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:bg-primary"
-                disabled={isInputDisabled}
-              >
-                {isInputDisabled ? (
-                  <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
-                ) : (
-                  <ArrowUp className="w-5 h-5 text-muted-foreground" />
-                )}
-              </Button>
-            </form>
+            <div className="">
+              <form onSubmit={handleSubmit}>
+                <Input
+                  {...form.register("query")}
+                  type="text"
+                  placeholder="Ask Anything"
+                  className="mt-4 border-secondary/30 bg-card rounded-full text-muted-foreground px-6 py-7 shadow-xl"
+                  disabled={isInputDisabled}
+                />
+                <Button
+                  type="submit"
+                  variant={
+                    form.watch("query") && form.watch("query").trim().length > 0
+                      ? "default"
+                      : "ghost"
+                  }
+                  size={"icon"}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:bg-primary rounded-full"
+                  disabled={isInputDisabled}
+                >
+                  {isInputDisabled ? (
+                    <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+                  ) : (
+                    <ArrowUp className="w-5 h-5 text-muted-foreground" />
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
 
           <p className="text-secondary font-medium text-xs mt-2">

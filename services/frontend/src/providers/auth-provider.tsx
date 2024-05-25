@@ -249,6 +249,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
       const userAttributes = await fetchUserAttributes();
       setUser(userAttributes);
+      localStorage.setItem("user", JSON.stringify(userAttributes));
       const session = await fetchAuthSession();
       const newToken = session.tokens?.idToken?.toString() || "";
       setToken(newToken);
@@ -361,7 +362,13 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
+      router.push("/");
       await signOut();
+      sessionStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("datasets");
+      localStorage.removeItem("assistants");
+      localStorage.removeItem("currentWorkspace");
       toast(
         <CustomToast
           title="User Signed Out"
@@ -371,8 +378,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoggedIn(false);
       setUser(null);
       setToken("");
-      sessionStorage.removeItem("token");
-      router.push("/");
     } catch (error: any) {
       toast(
         <CustomToast title="Error Signing Out" description={error.toString()} />

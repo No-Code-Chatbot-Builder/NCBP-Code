@@ -5,7 +5,11 @@ import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useCustomAuth } from "@/providers/auth-provider";
 
 const PersonalDetails = () => {
-  const { user } = useCustomAuth();
+  const { user: authUser } = useCustomAuth();
+  let user = JSON.parse(localStorage.getItem("user") || "{}");
+  if (!Object.keys(user).length) {
+    user = authUser;
+  }
 
   return (
     <div className="flex gap-2 p-2 my-2 justify-between items-center">

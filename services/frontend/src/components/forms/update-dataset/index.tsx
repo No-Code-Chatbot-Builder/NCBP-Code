@@ -11,18 +11,29 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { createKey } from "@/lib/api/key/service";
+import { useModal } from "@/providers/modal-provider";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { addDataset, updateDataset } from "@/providers/redux/slice/datasetSlice";
 import CustomToast from "@/components/global/custom-toast";
+import { toast } from "sonner";
+import { createDataset, updateDatasets } from "@/lib/api/dataset/service";
+import { useCustomAuth } from "@/providers/auth-provider";
 
-const CreateAPIKeyForm = () => {
-  const { toast } = useToast();
+const UpdateDatasetForm = ({ name , description, datasetId  }: { name: string; description: string, datasetId: string }) => {
+  console.log(name,description,datasetId);
+  const dispatch = useAppDispatch();
+  const { setClose } = useModal();
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
+  );
+
+  const user = useCustomAuth().user;
 
   const FormSchema = z.object({
     name: z
@@ -43,20 +54,39 @@ const CreateAPIKeyForm = () => {
   });
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+
     try {
-      await createKey("values.accessMode");
+      const res = await updateDatasets(
+        currentWorkspaceName!,
+        datasetId,
+        values.name,
+        values.description
+      );
+
+      res &&
+        dispatch(
+          updateDataset({
+            id: res.datasetDetails.datasetId,
+            name: res.datasetDetails.name,
+            description: res.datasetDetails.description,
+            createdAt: new Date().toISOString(),
+            createdBy: user?.sub,
+            data: [],
+          })
+        );
+
+      setClose();
       toast(
         CustomToast({
-          title: "API Key Created",
-          description: "API Key has been created successfully.",
+          title: "Dataset Added",
+          description: "Your Dataset has been created.",
         })
       );
     } catch (error: any) {
       toast(
         CustomToast({
-          title: "Error During API Key Creation",
-          description:
-            "An error occurred while creating the API Key. Please try again.",
+          title: "Error Creating Dataset",
+          description: error.toString(),
         })
       );
     }
@@ -75,7 +105,7 @@ const CreateAPIKeyForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-primary">Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the workspace name" {...field} />
+                  <Input placeholder="Enter the workspace name" {...field} defaultValue={name} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
@@ -90,22 +120,26 @@ const CreateAPIKeyForm = () => {
                 <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
                   <Input
-                    type="password"
                     placeholder="Enter the workspace description"
                     {...field}
+                    defaultValue={description}
+                    onChange={field.onChange}
                   />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
             )}
           />
-          <div className="flex flex-row-reverse">
+          <div className="flex flex-row-reverse gap-4">
             <Button type="submit" disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Create API Key"
+                "Update Dataset"
               )}
+            </Button>
+            <Button variant="outline" onClick={() => setClose()}>
+              Cancel
             </Button>
           </div>
         </form>
@@ -114,4 +148,4 @@ const CreateAPIKeyForm = () => {
   );
 };
 
-export default CreateAPIKeyForm;
+export default UpdateDatasetForm;

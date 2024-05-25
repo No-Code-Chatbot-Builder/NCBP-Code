@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,7 +22,6 @@ import {
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { toast } from "sonner";
@@ -30,6 +29,7 @@ import CustomToast from "@/components/global/custom-toast";
 import { addAssistant } from "@/providers/redux/slice/assistantSlice";
 import { createAssistantWithThread } from "@/lib/api/bot/service";
 import { DatasetType } from "@/lib/constants";
+import { Loader2, Trash } from "lucide-react";
 
 const CreateAssistantForm = () => {
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ const CreateAssistantForm = () => {
   });
 
   const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+    (state) => state.workspaces.currentWorkspace?.name
   );
 
   const datasets = useAppSelector((state) => state.datasets.datasets);
@@ -65,6 +65,7 @@ const CreateAssistantForm = () => {
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       console.log(values);
+      localStorage.removeItem("assistants");
       const res = await createAssistantWithThread(
         currentWorkspaceName!,
         values.name,
@@ -72,6 +73,7 @@ const CreateAssistantForm = () => {
         values.model,
         values.tool,
         values.dataset
+        // values.site,
       );
       console.log(res.response);
       console.log(res.response[2].split(": ")[1].trim());
@@ -81,6 +83,7 @@ const CreateAssistantForm = () => {
           id: res.response[2].split(": ")[1].trim(),
           name: values.name,
           description: values.description,
+          allowedDomain: [],
           // owner: "currentuser",
           // threadId: res.response[3].threadId,
         })
@@ -171,7 +174,6 @@ const CreateAssistantForm = () => {
               </FormItem>
             )}
           />
-
           <FormField
             disabled={isLoading}
             control={form.control}

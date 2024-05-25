@@ -5,13 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import {
   Form,
@@ -23,15 +16,19 @@ import {
 } from "@/components/ui/form";
 import { useModal } from "@/providers/modal-provider";
 import CustomToast from "@/components/global/custom-toast";
-import { inviteUser } from "@/lib/api/workspace/service";
+import {
+  inviteUser,
+} from "@/lib/api/workspace/service";
 import { useAppSelector } from "@/lib/hooks";
+import { useCustomAuth } from "@/providers/auth-provider";
 
 const InviteNewUserForm = () => {
   const { toast } = useToast();
   const { setClose } = useModal();
-  const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const workspaceName= useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
+  const { user } = useCustomAuth();
 
   const FormSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -49,7 +46,7 @@ const InviteNewUserForm = () => {
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      await inviteUser(currentWorkspaceName, "user id", values.email);
+      await inviteUser(workspaceName!, values.email);
       toast(
         CustomToast({
           title: "User Invited",

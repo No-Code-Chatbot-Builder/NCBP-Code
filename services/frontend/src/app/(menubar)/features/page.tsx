@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Card,
@@ -25,16 +27,26 @@ import {
   IconSignature,
   IconTableColumn,
 } from "@tabler/icons-react";
+import Image from "next/image";
 
 const Skeleton = () => (
-  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-blue-500/30 dark:to-blue-400/20 to-neutral-100"></div>
+  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-blue-500/30 dark:to-blue-400/20 to-neutral-100" />
 );
 const items = [
   {
     title: "No Code Magic",
     description:
       "No need to learn code to power chatbots for your company or university with personalized data.",
-    header: <Skeleton />,
+    header: (
+      <Skeleton />
+      // <Image
+      //   src="/assets/nocodemagic.png"
+      //   alt="Code Block"
+      //   width={300}
+      //   height={300}
+      //   className="object-contain rounded-2xl"
+      // />
+    ),
     icon: <Code2 className="h-5 w-5 dark:text-white text-black" />,
   },
   {

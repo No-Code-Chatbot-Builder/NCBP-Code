@@ -18,39 +18,37 @@ import { Code, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
+  removeAssistant,
   setAssistant,
   setIsAssistantLoading,
 } from "@/providers/redux/slice/assistantSlice";
-import { toast } from "sonner";
+import { deleteAssistants } from "@/lib/api/bot/service";
+import CreateDomainForm from "@/components/forms/create-domain-form";
 import CustomToast from "@/components/global/custom-toast";
-import useSWR from "swr";
-import { apiClient } from "@/lib/api/apiService";
-import { botApiClient } from "@/lib/api/bot/service";
+import { toast } from "sonner";
+import CustomModel from "@/components/global/custom-model";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
     (state) => state.assistants.isAssistantLoading
   );
-  const { setOpen } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
+  const [isAssistantDeleting, setIsAssistantDeleting] = useState(false);
+  const { setOpen, setClose } = useModal();
 
-  const fetcher = (url: string) =>
-    botApiClient.get(url).then((res) => res.data);
-
-  const { data: res, error } = useSWR<any>(
-    `bot/${currentReduxWorkspace}`,
-    fetcher
+  const { data: res, error } = useAxiosSWR(
+    `/bot/${currentWorkspaceName}`
   );
-  console.log(res);
 
   useEffect(() => {
     const fetchAssistants = async () => {
-      if (!currentReduxWorkspace || error) return;
+      if (!currentWorkspaceName || error) return;
 
       try {
         if (res && res.response && res.response.assistants) {
@@ -59,6 +57,7 @@ export default function Page() {
               id: assistant.assistantId,
               name: assistant.assistantName,
               description: assistant.purpose,
+              allowedDomain: [],
             }));
 
           const filteredAssistants = formattedAssistants.filter(
@@ -84,7 +83,18 @@ export default function Page() {
       }
     };
     fetchAssistants();
-  }, [currentReduxWorkspace, res]);
+  }, [assistants, currentWorkspaceName, dispatch, error, res]);
+
+  const manageDomains = (assistantId: string) => {
+    setOpen(
+      <CustomSheet
+        title="Add Domains for your assistants"
+        description="Here you can add domains on which your bot will be embedded."
+      >
+        <CreateDomainForm assistantId={assistantId} />
+      </CustomSheet>
+    );
+  };
 
   const assistantSheet = (
     <CustomSheet
@@ -95,11 +105,80 @@ export default function Page() {
     </CustomSheet>
   );
 
+  const deleteAssistantModel = (
+    assistant_id: string,
+    assistant_name: string
+  ) => (
+    <CustomModel
+      title={`Delete ${assistant_name}`}
+      description={`Are you sure you want to delete ${assistant_name}?`}
+    >
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={"outline"}
+          onClick={() => {
+            setClose();
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant={"destructive"}
+          onClick={() => {
+            setClose();
+            handleAssistantDeletion(assistant_id, assistant_name);
+          }}
+        >
+          Delete
+        </Button>
+      </div>
+    </CustomModel>
+  );
+
   const handleCreateAssistant = async () => {
     setOpen(assistantSheet);
   };
 
-  const handleAssistantDeletion = async (assistant_id: string) => {};
+  const handleAssistantDeletion = async (
+    assistant_id: string,
+    assistant_name: string
+  ) => {
+    setIsAssistantDeleting(true);
+    try {
+      await deleteAssistants(currentWorkspaceName!, assistant_id);
+      dispatch(removeAssistant(assistant_id));
+      toast(
+        CustomToast({
+          title: `${assistant_name} Deleted`,
+          description: `${assistant_name} has been deleted successfully.`,
+        })
+      );
+    } catch (error) {
+      toast(
+        CustomToast({
+          title: "Error During Deletion",
+          description:
+            "An error occurred while deleting the assistant. Please try again.",
+        })
+      );
+      console.error(error);
+    } finally {
+      setIsAssistantDeleting(false);
+    }
+  };
+
+  if (isAssistantDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Assistant...
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -133,10 +212,9 @@ export default function Page() {
         <Separator className="mt-8" />
       </section>
       {isAssistantLoading ? (
-        // loading skeleton
         <section>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
-            {Array.from(Array(4).keys()).map((key) => (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            {Array.from(Array(3).keys()).map((key) => (
               <LoadingSkeleton key={key} />
             ))}
           </div>
@@ -144,7 +222,7 @@ export default function Page() {
       ) : (
         <section>
           {assistants.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
               {assistants.map((assistant: AssistantType) => (
                 <Card key={assistant.id}>
                   <CardHeader>
@@ -155,15 +233,28 @@ export default function Page() {
                           {assistant.description}
                         </CardDescription>
                       </div>
-                      <Button
-                        size="icon"
-                        variant={"destructive"}
-                        onClick={() => {
-                          handleAssistantDeletion(assistant.id);
-                        }}
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        {/* <Button
+                          size="icon"
+                          variant={"default"}
+                          onClick={() => {
+                            manageAssistant(assistant.id);
+                          }}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button> */}
+                        <Button
+                          size="icon"
+                          variant={"destructive"}
+                          onClick={() => {
+                            setOpen(
+                              deleteAssistantModel(assistant.id, assistant.name)
+                            );
+                          }}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
 
@@ -176,6 +267,14 @@ export default function Page() {
                       }}
                     >
                       Use Assistant
+                    </Button>
+                    <Button
+                      className="w-full bg-orange-500 hover:bg-orange-600"
+                      onClick={() => {
+                        manageDomains(assistant.id);
+                      }}
+                    >
+                      Manage Domains
                     </Button>
                   </CardContent>
                 </Card>

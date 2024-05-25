@@ -13,14 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Delete,
-  DeleteIcon,
-  MoreHorizontal,
-  Trash,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,9 +21,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -49,21 +39,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CustomSheet from "@/components/global/custom-sheet";
 import { useModal } from "@/providers/modal-provider";
-import InviteNewUserForm from "../invite-new-user-form";
-import { useAppSelector } from "@/lib/hooks";
-import { WorkspaceUserType } from "@/providers/redux/slice/workspaceSlice";
+import { Membership } from "@/lib/constants";
+import { respondInvite } from "@/lib/api/workspace/service";
 
-
-export type User = {
-  id: string;
-  role: "Owner" | "Member" | "Pending";
-  email: string;
+const acceptInvite = async (workspaceName: string) => {
+  try {
+    const response = await respondInvite(workspaceName, "accepted");
+    console.log(response);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-export const columns: ColumnDef<WorkspaceUserType>[] = [
+const rejectInvite = async (workspaceName: string) => {
+  try {
+    const response = await respondInvite(workspaceName, "rejected");
+    console.log(response);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const columns: ColumnDef<Membership>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -86,24 +84,27 @@ export const columns: ColumnDef<WorkspaceUserType>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+
   {
-    accessorKey: "userEmail",
+    accessorKey: "workspaceName",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Workspace
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("userEmail")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("workspaceName")}</div>
+    ),
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: "Status",
     cell: ({ row }) => (
       <div className="capitalize w-20 ">
         <div className="bg-primary/10 dark:bg-primary/40 rounded-lg border border-primary flex justify-center py-1 text-primary dark:text-white">
@@ -112,35 +113,44 @@ export const columns: ColumnDef<WorkspaceUserType>[] = [
       </div>
     ),
   },
-
   {
     id: "actions",
+    header: () => <div className="flex justify-end mr-4">Actions</div>,
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <Button
-          variant={"destructive"}
-          size={"icon"}
-          onClick={() => alert("Delete user")}
-        >
-          <Trash className="w-4 h-4" />
-        </Button>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="outline"
+            onClick={() => rejectInvite(row.original.workspaceName)}
+          >
+            Reject
+          </Button>
+          <Button onClick={() => acceptInvite(row.original.workspaceName)}>
+            Accept
+          </Button>
+        </div>
       );
     },
   },
 ];
 
-export default function ManageUsersCard() {
+export default function ManagePendingInvitesCard({
+  memberships,
+}: {
+  memberships: Membership[];
+}) {
   const { setOpen } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const workspaceUsers = useAppSelector((state) => state.workspaces.currentWorkspaceUsers);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: workspaceUsers,
+    data: memberships,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -158,20 +168,13 @@ export default function ManageUsersCard() {
     },
   });
 
-  const inviteUserSheet = (
-    <CustomSheet
-      title="Invite User"
-      description="Invite a user to your workspace"
-    >
-      <InviteNewUserForm />
-    </CustomSheet>
-  );
-
   return (
     <Card className="w-full my-10">
       <CardHeader className="">
-        <CardTitle>Manage Users</CardTitle>
-        <CardDescription>Manage the users in your workspace</CardDescription>
+        <CardTitle>Pending Invites</CardTitle>
+        <CardDescription>
+          Join other workspaces with pending invites
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center py-4">
@@ -212,9 +215,6 @@ export default function ManageUsersCard() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button className="ml-auto" onClick={() => setOpen(inviteUserSheet)}>
-            Invite Users
-          </Button>
         </div>
         <div className="rounded-md border dark:border-primary/50">
           <Table>

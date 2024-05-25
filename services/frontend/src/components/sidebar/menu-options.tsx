@@ -1,13 +1,12 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import {
-  ArrowLeft,
   ChevronsUpDown,
+  Loader2,
   Menu,
   Plus,
-  PlusCircleIcon,
   Settings,
   User,
 } from "lucide-react";
@@ -25,9 +24,8 @@ import { useModal } from "@/providers/modal-provider";
 import Image from "next/image";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
-
 import PersonalDetails from "./personal-details";
-import { AssistantType, dummyChatThreads, icons } from "@/lib/constants";
+import { icons } from "@/lib/constants";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
@@ -39,22 +37,23 @@ import {
 import { ModeDashboardToggle } from "../global/mode-dashboard";
 import CustomModel from "../global/custom-model";
 import CreateWorkspaceForm from "../forms/create-workspace";
-
 import { useCustomAuth } from "@/providers/auth-provider";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   WorkspaceType,
   setWorkspaces,
-  setCurrentWorkspace as setReduxCurrentWorkspace,
   setIsWorkspaceLoading,
+  setCurrentWorkspace,
+  addWorkspace,
+  CurrentWorkspaceType,
 } from "@/providers/redux/slice/workspaceSlice";
-import { fetchWorkspaces } from "@/lib/api/workspace/service";
 import { toast } from "sonner";
 import CustomToast from "../global/custom-toast";
-import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
-import { set } from "date-fns";
-import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
 import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
+import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import { cn } from "@/lib/utils";
+import { createWorkspace, fetchWorkspace } from "@/lib/api/workspace/service";
 
 type Props = {
   defaultOpen?: boolean;
@@ -75,40 +74,76 @@ const WorkspaceMenuOptions = ({
   const workspaces = useAppSelector(
     (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
   );
-
-  const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const isWorkspaceLoading = useAppSelector(
+    (state) => state.workspaces.isWorkspaceLoading
   );
-  const { data: res, error, isLoading } = useAxiosSWR("/user-service/users/");
+
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
+  );
+  const { data: res, error, isLoading } = useAxiosSWR("/users/");
+
+  const fetchCurrentWorkspace = async (workspaceName: string) => {
+    const res = await fetchWorkspace(workspaceName);
+    dispatch(setCurrentWorkspace(res.workspace));
+    localStorage.setItem("currentWorkspace", JSON.stringify(res.workspace));
+  };
+
+  const createInitialWorkspace = async () => {
+    try {
+      await createWorkspace("defaultworkspace", "");
+      const workspace: WorkspaceType = {
+        name: "defaultworkspace",
+        role: "owner",
+      };
+      dispatch(addWorkspace(workspace));
+      fetchCurrentWorkspace(workspace.name);
+    } catch (error: any) {
+      console.log(error);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: error.toString(),
+        })
+      );
+    }
+  };
 
   useEffect(() => {
-    const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
-    if (!isLoading && !error && res.data.workspaces) {
-      dispatch(setIsWorkspaceLoading(true));
-      const formattedWorkspaces: WorkspaceType[] = Object.entries(
-        res.data.workspaces
-      ).map(([key, value]: [string, unknown]) => ({
-        name: key,
-        role: value as string,
-      }));
-      if (localCurrentWorkspace === null) {
-        localStorage.setItem("currentWorkspace", formattedWorkspaces[0].name);
-        dispatch(setReduxCurrentWorkspace(formattedWorkspaces[0].name));
-      } else {
-        dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
-      }
-      dispatch(setWorkspaces(formattedWorkspaces));
-      dispatch(setIsWorkspaceLoading(false));
-    } else if (localCurrentWorkspace && !isLoading) {
-      dispatch(setReduxCurrentWorkspace(localCurrentWorkspace));
-    }
-  }, [dispatch, currentReduxWorkspace, res, isLoading, error]);
 
-  const changeCurrentWorkspace = (name: string) => {
-    localStorage.setItem("currentWorkspace", name);
+    const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
+    const parsedLocalCurrentWorkspace: CurrentWorkspaceType =
+      localCurrentWorkspace != "undefined"
+        ? JSON.parse(localCurrentWorkspace!)
+        : null;
+    dispatch(setIsWorkspaceLoading(true));
+    if (!isLoading && !error) {
+      if (res.data.workspaces) {
+        const formattedWorkspaces: WorkspaceType[] = Object.entries(
+          res.data.workspaces
+        ).map(([key, value]: [string, unknown]) => ({
+          name: key,
+          role: value as string,
+        }));
+
+        if (parsedLocalCurrentWorkspace == null) {
+          fetchCurrentWorkspace(formattedWorkspaces[0].name);
+        } else {
+          dispatch(setCurrentWorkspace(parsedLocalCurrentWorkspace));
+        }
+        dispatch(setWorkspaces(formattedWorkspaces));
+      } else {
+        createInitialWorkspace();
+      }
+    }
+  }, [dispatch, error, isLoading, res]);
+
+  const changeCurrentWorkspace = (workspace: WorkspaceType) => {
+    fetchCurrentWorkspace(workspace.name);
+    localStorage.removeItem("datasets");
+    localStorage.removeItem("assistants");
     dispatch(setIsDatasetLoading(true));
     dispatch(setIsAssistantLoading(true));
-    dispatch(setReduxCurrentWorkspace(name));
   };
 
   return (
@@ -137,8 +172,8 @@ const WorkspaceMenuOptions = ({
                     NoCodeBot.ai
                   </h1>
                   <p className="text-muted-foreground text-sm font-normal">
-                    {localStorage.getItem("currentWorkspace") ||
-                      currentReduxWorkspace}
+                    {/* {localStorage.getItem("currentWorkspace") || */}
+                    {currentWorkspaceName}
                   </p>
                 </div>
               </div>
@@ -147,7 +182,7 @@ const WorkspaceMenuOptions = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="mt-3 ml-5 w-[25rem] h-fit z-50">
-          <Card className="border-2 border-text-muted">
+          <Card className="border border-primary/50">
             <CardHeader>
               <CardTitle className="text-xl">Toggle Workspace</CardTitle>
               <CardDescription className="text-xs">
@@ -156,22 +191,31 @@ const WorkspaceMenuOptions = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {workspaces.length === 0 ? (
+                {isWorkspaceLoading && workspaces.length === 0 ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <p className="text-muted-foreground text-sm">
+                      Loading Workspaces...
+                    </p>
+                  </div>
+                ) : !isWorkspaceLoading && workspaces.length === 0 ? (
                   <div className="text-muted-foreground text-sm">
                     Create a workspace to get started.
                   </div>
                 ) : (
-                  <div className="text-muted-foreground text-sm">
-                    <div className="max-h-44 md:max-h-96 overflow-y-auto">
+                  <div className="text-muted-foreground gap-2">
+                    <div className="flex flex-row gap-2 flex-wrap max-h-[200px] overflow-y-auto py-2">
                       {workspaces?.map((workspace: WorkspaceType) => (
                         <div
-                          onClick={() => changeCurrentWorkspace(workspace.name)}
+                          onClick={() => changeCurrentWorkspace(workspace)}
                           key={workspace.name}
-                          className={`${
-                            workspace.name == currentReduxWorkspace
-                              ? "bg-primary/30"
-                              : "hover:bg-primary/30"
-                          } hover:cursor-pointer px-2 py-3 my-2 border border-primary rounded-lg text-md font-medium text-center`}
+                          className={cn(
+                            "p-3 bg-sidebar/60 hover:cursor-pointer w-fit text-primry rounded-full border-primary hover:bg-sidebar transition-all ease-in-out duration-300 text-sm ",
+                            {
+                              "bg-primary/50 hover:bg-primary/50 scale-[1.01] font-medium":
+                                workspace.name === currentWorkspaceName,
+                            }
+                          )}
                         >
                           {workspace.name}
                         </div>
@@ -223,7 +267,7 @@ const WorkspaceMenuOptions = ({
                       <CommandItem
                         key={option.name}
                         className={clsx(
-                          "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1",
+                          "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1 hover:scale-105 transition-all hover:text-white",
                           {
                             "bg-sidebar-hover text-sidebar-foreground":
                               pathname === option.link,
@@ -295,39 +339,7 @@ const ChatbotMenuOptions = () => {
               NoCodeBot.ai
             </h1>
           </div>
-          <Button
-            size={"sm"}
-            variant={"outline"}
-            className="ml-12 text-xs p-1 rounded-xl"
-            onClick={() => {
-              //create new thread and add it in the chat threads
-            }}
-          >
-            New Chat
-          </Button>
         </div>
-        <Command className="rounded-lg overflow-visible bg-transparent">
-          <CommandList>
-            <CommandGroup>
-              <h3 className="text-sm text-primary font-medium mb-4">Today</h3>
-              {dummyChatThreads.map((chat) => (
-                <CommandItem
-                  key={chat.id}
-                  className={clsx(
-                    "md:w-[230px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1"
-                  )}
-                >
-                  <Link
-                    href={"#"}
-                    className="flex items-center gap-4 rounded-md transition-all md:w-[250px] w-full p-1"
-                  >
-                    <span className="font-medium">{chat.name}</span>
-                  </Link>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
       </div>
       <div>
         <Popover>

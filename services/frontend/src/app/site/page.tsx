@@ -178,29 +178,29 @@ export default function Home() {
         <div className="flex flex-col gap-y-6 mt-10 p-0 lg:p-10 text-center items-center z-20 bg-clip-text">
           <MovingButton
             borderRadius="1.75rem"
-            className="p-3 border border-primary rounded-full text-sm bg-info text-info-foreground"
+            className="p-2 border border-primary rounded-full text-sm bg-info text-info-foreground"
           >
             NoCodeBot.ai is currently in Development Mode.{" "}
           </MovingButton>
 
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
-            <h1 className="text-5xl lg:text-7xl font-bold text-center">
+            <h1 className="text-5xl lg:text-6xl font-bold text-center">
               Make Custom AI Assistants
             </h1>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-md">
             Easily create custom AI Agents according to your specific longterm
             needs.
           </p>
 
           <Link href="/sign-in">
             <motion.button
-              className="w-fit flex flex-row gap-2 rounded-lg bg-primary px-10 py-4 font-medium text-white"
+              className="w-fit flex flex-row gap-2 rounded-lg bg-primary px-10 py-4 font-medium text-white text-sm items-center"
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.05 }}
               transition={{ bounceDamping: 10 }}
             >
-              <LogIn />
+              <LogIn className="w-4 h-4" />
               Get Started Now
             </motion.button>
           </Link>

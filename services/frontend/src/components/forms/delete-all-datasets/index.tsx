@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/card";
 import { deleteWorkspace } from "@/lib/api/workspace/service";
 import { useAppSelector } from "@/lib/hooks";
+import CustomToast from "@/components/global/custom-toast";
+import { deleteAllDatasets } from "@/lib/api/dataset/service";
 
-const DeleteWorkspaceCard = () => {
+const DeleteAllDatasetsCard = () => {
   const { toast } = useToast();
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
@@ -47,18 +49,26 @@ const DeleteWorkspaceCard = () => {
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-    console.log(values);
-    await deleteWorkspace(currentWorkspaceName ?? "");
+  const handleSubmit = async () => {
+    try {
+      await deleteAllDatasets(currentWorkspaceName!);
+    } catch (err: any) {
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "An error occurred while deleting the dataset",
+        })
+      );
+    }
   };
   const isLoading = form.formState.isSubmitting;
 
   return (
     <Card className="w-full my-10">
       <CardHeader>
-        <CardTitle>Delete Workspace</CardTitle>
+        <CardTitle>Delete Datasets</CardTitle>
         <CardDescription>
-          Deleting a workspace will permanently remove all data associated with
+          Deleting all datasets will permanently remove all data associated with
           it.
         </CardDescription>
       </CardHeader>
@@ -97,7 +107,7 @@ const DeleteWorkspaceCard = () => {
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Delete Workspace"
+                "Delete All Datasets"
               )}
             </Button>
           </form>
@@ -107,4 +117,4 @@ const DeleteWorkspaceCard = () => {
   );
 };
 
-export default DeleteWorkspaceCard;
+export default DeleteAllDatasetsCard;

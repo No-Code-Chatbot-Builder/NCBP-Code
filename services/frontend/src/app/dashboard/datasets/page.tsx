@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { deleteDataset, getDatasets } from "@/lib/api/dataset/service";
+import { deleteDataset } from "@/lib/api/dataset/service";
 import { DatasetType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -23,33 +23,43 @@ import {
   setIsDatasetLoading,
 } from "@/providers/redux/slice/datasetSlice";
 import { useModal } from "@/providers/modal-provider";
-import { Database, Plus, Trash } from "lucide-react";
+import { Database, Edit, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import UpdateDatasetForm from "@/components/forms/update-dataset";
+import CustomModel from "@/components/global/custom-model";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Page() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const isDatasetLoading = useAppSelector(
     (state) => state.datasets.isDatasetLoading
   );
+  const [isDatasetDeleting, setIsDatasetDeleting] = useState(false);
 
-  const { setOpen } = useModal();
+  const { setOpen, setClose } = useModal();
   const datasets = useAppSelector((state) => state.datasets.datasets);
 
-  const currentReduxWorkspace = useAppSelector(
-    (state) => state.workspaces.currentWorkspaceName
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
   );
   const { data: res, error } = useAxiosSWR(
-    `/dataset-service/datasets/${currentReduxWorkspace}/`
+    `/datasets/${currentWorkspaceName}/`
   );
 
   useEffect(() => {
     const fetchDataset = async () => {
-      if (!currentReduxWorkspace || error) return;
-
+      setIsDatasetLoading(true);
+      if (!currentWorkspaceName || error || !res) return;
       if (error) {
         console.error(error);
         toast(
@@ -60,12 +70,14 @@ export default function Page() {
         );
         return;
       }
-
-      if (!res?.data?.datasets) return;
-
+      if (!res?.data?.datasets) {
+        setIsDatasetLoading(false);
+        return;
+      }
       const filteredDatasets = res.data.datasets.filter(
         (dataset: DatasetType) => dataset.name
       );
+      localStorage.setItem("datasets", JSON.stringify(filteredDatasets));
       const currentDatasetNames = datasets
         .map((dataset: DatasetType) => dataset.name)
         .sort();
@@ -80,10 +92,15 @@ export default function Page() {
       }
       dispatch(setIsDatasetLoading(false));
     };
+    const storedDatasets = JSON.parse(localStorage.getItem("datasets")!);
+    console.log(storedDatasets);
+    if (storedDatasets != null) {
+      dispatch(setDatasets(storedDatasets));
+    } else {
+      fetchDataset();
+    }
+  }, [currentWorkspaceName, error]);
 
-    fetchDataset();
-  }, [currentReduxWorkspace, res]);
-  const router = useRouter();
   const datasetSheet = (
     <CustomSheet
       title="Create New Dataset"
@@ -93,12 +110,44 @@ export default function Page() {
     </CustomSheet>
   );
 
+  const deleteDatasetModel = (datasetId: string, datasetName: string) => {
+    localStorage.removeItem("datasets");
+    return (
+      <CustomModel
+        title={`Delete ${datasetName} Dataset`}
+        description="Are you sure you want to delete this dataset?"
+      >
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={"outline"}
+            onClick={() => {
+              setClose();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={"destructive"}
+            onClick={() => {
+              setClose();
+              handleDatasetDeletion(datasetId, datasetName);
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      </CustomModel>
+    );
+  };
+
   const handleDatasetDeletion = async (
     datasetId: string,
     datasetName: string
   ) => {
+    setIsDatasetDeleting(true);
+
     try {
-      await deleteDataset("", datasetId);
+      await deleteDataset(currentWorkspaceName!, datasetId);
       dispatch(removeDataset(datasetId));
       toast(
         CustomToast({
@@ -115,8 +164,24 @@ export default function Page() {
         })
       );
       console.error(error);
+    } finally {
+      setIsDatasetDeleting(false);
     }
   };
+
+  if (isDatasetDeleting) {
+    return (
+      <div className="h-screen flex w-full items-center justify-center">
+        <div className="flex flex-row gap-2 items-center">
+          <p className="text-lg font-semibold animate-pulse">
+            Deleting Dataset....
+          </p>
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <section>
@@ -154,8 +219,8 @@ export default function Page() {
       {isDatasetLoading ? (
         // loading skeleton
         <section>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
-            {Array.from(Array(4).keys()).map((key) => (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            {Array.from(Array(3).keys()).map((key) => (
               <LoadingSkeleton key={key} />
             ))}
           </div>
@@ -163,7 +228,7 @@ export default function Page() {
       ) : (
         <section>
           {datasets?.length > 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
               {datasets.map((dataset: DatasetType) => (
                 <Card key={dataset.id}>
                   <CardHeader>
@@ -172,15 +237,59 @@ export default function Page() {
                         <CardTitle>{dataset.name}</CardTitle>
                         <CardDescription>{dataset.description}</CardDescription>
                       </div>
-                      <Button
-                        size="icon"
-                        variant={"destructive"}
-                        onClick={() => {
-                          handleDatasetDeletion(dataset.id, dataset.name);
-                        }}
-                      >
-                        <Trash className="w-4 h-4" />
-                      </Button>
+                      <div className="flex mr-1">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                size="icon"
+                                variant={"ghost"}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setOpen(
+                                    <CustomSheet
+                                      title="Update Dataset"
+                                      description="Add data to your dataset here."
+                                    >
+                                      <UpdateDatasetForm
+                                        name={dataset.name}
+                                        description={dataset.description}
+                                        datasetId={dataset.id}
+                                      />
+                                    </CustomSheet>
+                                  );
+                                }}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit Dataset</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Button
+                                size="icon"
+                                variant={"ghost"}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setOpen(
+                                    deleteDatasetModel(dataset.id, dataset.name)
+                                  );
+                                }}
+                              >
+                                <Trash className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete Dataset</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     </div>
                   </CardHeader>
 

@@ -1,8 +1,9 @@
-import { DataBucketType, DatasetType } from "@/lib/constants";
+import { AddDataBucketType, DataBucketType, DatasetType, DeleteDataBucketType } from "@/lib/constants";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DatasetState {
   datasets: DatasetType[];
+
   isDatasetLoading: boolean;
   isDatasetFilesEmpty: boolean;
 }
@@ -28,25 +29,40 @@ export const datasetSlice = createSlice({
         (dataset) => dataset.id !== action.payload
       );
     },
-    addFile: (state, action: PayloadAction<DataBucketType>) => {
+    addFile: (state, action: PayloadAction<AddDataBucketType>) => {
       const index = state.datasets.findIndex(
         (dataset) => dataset.id === action.payload.datasetId
       );
       if (index !== -1) {
-        state.datasets[index].data.push(action.payload.data as any);
+        state.datasets[index].data.push(action.payload.data as DataBucketType);
       }
       console.log(state.datasets[index].data);
     },
-    updateDataset: (state, action: PayloadAction<DatasetType>) => {
-      console.log("fromUpdateDatasets");
-      console.log(action.payload.id);
-      console.log(state.datasets);
+    removeFile: (state, action: PayloadAction<DeleteDataBucketType>) => {
+      const index = state.datasets.findIndex(
+        (dataset) => dataset.id === action.payload.datasetId
+      );
+      if (index !== -1) {
+        state.datasets[index].data = state.datasets[index].data.filter(
+          (item) => item.id !== action.payload.dataId
+        );
+      }
+    },
+    setFiles: (state, action: PayloadAction<DatasetType>) => {
       const index = state.datasets.findIndex(
         (dataset) => dataset.id === action.payload.id
       );
-      console.log(index);
       if (index !== -1) {
         state.datasets[index] = action.payload;
+      }
+    },
+    updateDataset: (state, action: PayloadAction<DatasetType>) => {
+      const index = state.datasets.findIndex(
+        (dataset) => dataset.id === action.payload.id
+      );
+      if (index !== -1) {
+        state.datasets[index].name = action.payload.name;
+        state.datasets[index].description = action.payload.description;
       }
     },
     setIsDatasetLoading: (state, action: PayloadAction<boolean>) => {
@@ -62,10 +78,12 @@ export const {
   addDataset,
   setDatasets,
   addFile,
+  removeFile,
   removeDataset,
   updateDataset,
   setIsDatasetLoading,
   setIsDatasetFilesEmpty,
+  setFiles,
 } = datasetSlice.actions;
 
 export const getDatasetById = createSelector(
