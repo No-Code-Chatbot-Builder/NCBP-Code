@@ -147,7 +147,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
         })
         .toPromise();
       console.log('just hit langchain service');
-      console.log(response);
+      console.log(response.data);
 
       context = await this.getRaggedTextFromPineCone(
         response.data,
