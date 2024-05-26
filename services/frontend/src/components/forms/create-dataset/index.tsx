@@ -31,7 +31,6 @@ const CreateDatasetForm = () => {
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
   );
-  const datasets = useAppSelector((state) => state.datasets.datasets);
 
   const user = useCustomAuth().user;
 
@@ -72,15 +71,6 @@ const CreateDatasetForm = () => {
             data: [],
           })
         );
-
-      localStorage.setItem("datasets", JSON.stringify([...datasets, {
-        id: res.datasetDetails.datasetId,
-        name: res.datasetDetails.name,
-        description: res.datasetDetails.description,
-        createdAt: new Date().toISOString(),
-        createdBy: user?.sub,
-        data: [],
-      }]));
 
       setClose();
       toast(

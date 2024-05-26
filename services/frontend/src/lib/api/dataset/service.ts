@@ -1,29 +1,6 @@
 import { apiClient } from "../apiService";
 import { toast } from "sonner";
-import axios from "axios";
 import CustomToast from "@/components/global/custom-toast";
-
-
-
-// const BASE_URL = "http://localhost:3010";
-
-// const client = axios.create({
-//   baseURL: BASE_URL,
-// });
-
-// client.interceptors.request.use(
-//   (config) => {
-//     const token = sessionStorage.getItem("token");
-//     console.log(token);
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
 
 //tested
 export const createDataset = async (
@@ -32,10 +9,10 @@ export const createDataset = async (
   description: string
 ) => {
   try {
-    const response = await apiClient.post(
-      `/datasets/${currentWorkspaceName}`,
-      { name: name, description: description }
-    );
+    const response = await apiClient.post(`/datasets/${currentWorkspaceName}`, {
+      name: name,
+      description: description,
+    });
 
     toast(
       CustomToast({
@@ -104,7 +81,7 @@ export const deleteDataset = async (
         description: "All datasets deleted successfully.",
       })
     );
-    return response.data;
+    return {statusCode : 201};
   } catch (error: any) {
     toast(
       CustomToast({
@@ -115,6 +92,8 @@ export const deleteDataset = async (
       })
     );
     console.log(error);
+    return {statusCode : 500};
+
   }
 };
 
@@ -146,9 +125,7 @@ export const deleteDatsetById = async ({
 //tested
 export const getDatasets = async (workspaceName: string) => {
   try {
-    const response = await apiClient.get(
-      `/datasets/${workspaceName}/`
-    );
+    const response = await apiClient.get(`/datasets/${workspaceName}/`);
 
     return response.data;
   } catch (error: any) {
@@ -228,7 +205,7 @@ export const deleteData = async (
   dataId: string
 ) => {
   try {
-    const response = await apiClient.delete(
+    await apiClient.delete(
       `/datasets/${currentWorkspaceName}/${datasetId}/data/${dataId}`
     );
     toast(
@@ -237,7 +214,7 @@ export const deleteData = async (
         description: "Dataset deleted successfully.",
       })
     );
-    return response.data;
+    return { statusCode: 201 };
   } catch (error: any) {
     console.log(error);
     toast(
@@ -248,6 +225,7 @@ export const deleteData = async (
         }`,
       })
     );
+    return { statusCode: 500 };
   }
 };
 
@@ -282,16 +260,14 @@ export const getData = async (
 
 export const deleteAllDatasets = async (workspaceName: string) => {
   try {
-    const response = await apiClient.delete(
-      `/datasets/${workspaceName}`
-    );
+    const response = await apiClient.delete(`/datasets/${workspaceName}`);
     toast(
       CustomToast({
         title: "Success",
         description: "All datasets deleted successfully.",
       })
     );
-    return response.data;
+    return { statusCode: 201 };
   } catch (error: any) {
     toast(
       CustomToast({
@@ -302,5 +278,6 @@ export const deleteAllDatasets = async (workspaceName: string) => {
       })
     );
     console.log(error);
+    return { statusCode: 500 };
   }
 };

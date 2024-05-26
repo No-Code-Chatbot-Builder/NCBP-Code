@@ -52,60 +52,54 @@ export default function Page() {
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
   );
-  const { data: res, error } = useAxiosSWR(
-    `/datasets/${currentWorkspaceName}/`
+  const isWorkspaceLoading = useAppSelector(
+    (state) => state.workspaces.isWorkspaceLoading
   );
 
+  const {
+    data: res,
+    error,
+    isLoading,
+  } = useAxiosSWR(`/datasets/${currentWorkspaceName}/`);
+
   useEffect(() => {
-    const fetchDataset = async () => {
-      setIsDatasetLoading(true);
-      // if (!currentWorkspaceName || !res) return;
-      if (error) {
-        console.error(error);
-        toast(
-          CustomToast({
-            title: "Error",
-            description: "Failed to load datasets.",
-          })
-        );
-        return;
-      }
-
-      if (res?.data?.datasets.length <= 0) {
-        setIsDatasetLoading(false);
-        return;
-      }
-      const filteredDatasets = res.data.datasets.filter(
-        (dataset: DatasetType) => dataset.name
-      );
-      console.log("sd");
-      localStorage.setItem("datasets", JSON.stringify(filteredDatasets));
-
-      const currentDatasetNames = datasets
-        .map((dataset: DatasetType) => dataset.name)
-        .sort();
-      const newDatasetNames = filteredDatasets
-        .map((dataset: DatasetType) => dataset.name)
-        .sort();
-      const datasetsChanged =
-        JSON.stringify(currentDatasetNames) !== JSON.stringify(newDatasetNames);
-
-      if (datasetsChanged || !filteredDatasets.length) {
-        dispatch(setDatasets(filteredDatasets));
-      }
-    };
-
-    const storedDatasets = localStorage.getItem("datasets");
-    const parsedDatasets: DatasetType[] =
-      storedDatasets != "undefined" ? JSON.parse(storedDatasets!) : null;
-    if (storedDatasets != null) {
-      dispatch(setDatasets(parsedDatasets));
-    } else {
-      fetchDataset();
+    dispatch(setIsDatasetLoading(true));
+    if (isWorkspaceLoading || isLoading) {
+      return;
     }
-    dispatch(setIsDatasetLoading(false));
+    if (error) {
+      console.error(error);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load datasets.",
+        })
+      );
+      dispatch(setIsDatasetLoading(false));
+      return;
+    }
 
-  }, [currentWorkspaceName]);
+    if (res?.data?.datasets?.length <= 0) {
+      dispatch(setDatasets([]));
+      dispatch(setIsDatasetLoading(false));
+      return;
+    }
+    const newDatasets = res.data.datasets;
+    const currentDatasetNames = datasets
+      .map((dataset: DatasetType) => dataset.name)
+      .sort();
+    const newDatasetNames = newDatasets
+      .map((dataset: DatasetType) => dataset.name)
+      .sort();
+    const datasetsChanged =
+      JSON.stringify(currentDatasetNames) !== JSON.stringify(newDatasetNames);
+
+    if (datasetsChanged) {
+      dispatch(setDatasets(newDatasets));
+    }
+
+    dispatch(setIsDatasetLoading(false));
+  }, [currentWorkspaceName, isLoading, error]);
 
   const datasetSheet = (
     <CustomSheet
@@ -117,7 +111,6 @@ export default function Page() {
   );
 
   const deleteDatasetModel = (datasetId: string, datasetName: string) => {
-    localStorage.removeItem("datasets");
     return (
       <CustomModel
         title={`Delete ${datasetName} Dataset`}
@@ -153,14 +146,16 @@ export default function Page() {
     setIsDatasetDeleting(true);
 
     try {
-      await deleteDataset(currentWorkspaceName!, datasetId);
-      dispatch(removeDataset(datasetId));
-      toast(
-        CustomToast({
-          title: `${datasetName} Deleted`,
-          description: `${datasetName} has been deleted successfully.`,
-        })
-      );
+      const res = await deleteDataset(currentWorkspaceName!, datasetId);
+      if (res.statusCode == 201) {
+        dispatch(removeDataset(datasetId));
+        toast(
+          CustomToast({
+            title: `${datasetName} Deleted`,
+            description: `${datasetName} has been deleted successfully.`,
+          })
+        );
+      }
     } catch (error) {
       toast(
         CustomToast({

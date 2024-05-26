@@ -4,11 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getAssistantById } from "@/providers/redux/slice/assistantSlice";
 import React, { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  ArrowUp,
-  CopyIcon,
-  Loader2,
-} from "lucide-react";
+import { ArrowUp, CopyIcon, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Socket, io } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
@@ -20,7 +16,7 @@ import {
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import {  IoIosCheckmarkCircleOutline } from "react-icons/io";
+import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { Button } from "@/components/ui/button";
@@ -149,14 +145,17 @@ const AssistantIdByPage = ({ params }: Props) => {
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `Fargat-Farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
+  const URL = `ws://fargat-farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );
   const [isInputDisabled, setInputDisabled] = useState(false);
 
   useEffect(() => {
-    socketRef.current = io(URL, { transports: ["websocket"] });
+    socketRef.current = io(URL, {
+      path: "/bot/socket.io",
+      transports: ["websocket"],
+    });
 
     socketRef.current.on("connect", () => {
       console.log("Connected to socket server");
@@ -208,7 +207,13 @@ const AssistantIdByPage = ({ params }: Props) => {
     try {
       if (socketRef.current) {
         console.log("emitting .....");
-        socketRef.current.emit("runAssistant", JSON.stringify({ query }));
+        socketRef.current.emit(
+          "runAssistant",
+          JSON.stringify({
+            query: query,
+            dataSetId: "7e9deafc-2192-466b-a2d2-e54985431b7c",
+          })
+        );
         dispatch(
           addMessage({
             assistantId: params.id,
