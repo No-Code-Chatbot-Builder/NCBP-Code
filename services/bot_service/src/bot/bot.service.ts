@@ -16,7 +16,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import path from 'path';
 
-@WebSocketGateway({ path: '/bot' })
+@WebSocketGateway({ path: '/bot/socket.io' })
 export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private clientWorkspaceMap: Map<
