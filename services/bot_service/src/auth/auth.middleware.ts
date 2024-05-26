@@ -31,7 +31,7 @@ export class AuthMiddleware implements NestMiddleware {
   }
 
   async use(req: CustomRequest, res: Response, next: NextFunction) {
-    console.log('middleware');
+    //console.log('middleware');
     //Extract botId and workspaceId from request
     const { botId, workspaceId } = req.query;
 
@@ -63,7 +63,7 @@ export class AuthMiddleware implements NestMiddleware {
           }),
         },
       );
-      console.log('above payload');
+      //console.log('above payload');
       try {
         const payload = await verifier.verify(token);
         //console.log(payload);

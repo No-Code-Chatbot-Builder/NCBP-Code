@@ -15,7 +15,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({ namespace: '/bot' })
 export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private clientWorkspaceMap: Map<
