@@ -26,9 +26,9 @@ export class LangchainDocLoaderService {
     let document: any;
 
     if (typeof this.data === 'object') {
-      document = this.fileProcessor(this.data);
+      document = await this.fileProcessor(this.data);
     } else if (typeof this.data === 'string') {
-      document = this.webLoader(this.data);
+      document = await this.webLoader(this.data);
     }
 
     let texts: string[] = [];
