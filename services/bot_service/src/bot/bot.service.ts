@@ -265,8 +265,8 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
     // If the data is already marked as deleted, we return an appropriate message.
     if (currentData !== null && currentData !== undefined) {
       if (
-        currentData.deletedAt !== null &&
-        currentData.datasets[0].deletedAt !== undefined
+        currentData?.deletedAt !== null &&
+        currentData?.data[0]?.deletedAt !== undefined
       ) {
         return {
           success: false,

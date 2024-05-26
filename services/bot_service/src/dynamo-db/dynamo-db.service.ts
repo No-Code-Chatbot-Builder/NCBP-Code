@@ -74,7 +74,7 @@ export class DynamoDbService {
         success: true,
         message: 'Assistants fetched successfully.',
         assistants: data.Items?.map((item) => ({
-          id: item.id,
+          id: item.assistantId,
           assistantId: item.assistantId,
           purpose: item.purpose,
           assistantName: item.assistantName,
