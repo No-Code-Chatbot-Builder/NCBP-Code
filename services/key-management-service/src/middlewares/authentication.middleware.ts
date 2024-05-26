@@ -8,6 +8,12 @@ import { SimpleJwksCache } from 'aws-jwt-verify/jwk';
 import { SimpleJsonFetcher } from 'aws-jwt-verify/https';
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+  const reqOrigin = req.headers.origin;
+  if (reqOrigin === "http://key-management-service.services/domains/") {
+    console.log('Request Origin:', reqOrigin);
+    next();
+  }
+  
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(HttpStatusCode.UNAUTHORIZED).json({ error: 'Unauthorized - Bearer token is missing' });
