@@ -117,7 +117,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
       includeMetadata: true,
       filter: {
         workspaceId: workspaceId,
-        dataSetId: dataSetId,
+        datasetId: dataSetId,
       },
     });
 
