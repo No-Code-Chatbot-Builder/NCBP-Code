@@ -11,7 +11,10 @@ import { GenerateIdService } from './generate-id/generate-id.service';
 import { AuthMiddleware } from './auth/auth.middleware';
 
 @Module({
-  imports: [ConfigModule.forRoot(), HttpModule],
+  imports: [ConfigModule.forRoot(), HttpModule.register({
+    timeout: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    maxRedirects: 5,
+  })],
   controllers: [AppController],
   providers: [AppService, PineconeService, LangchainDocLoaderService, DynamoDbService, S3Service, GenerateIdService]
 })
