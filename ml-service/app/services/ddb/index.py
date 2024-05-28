@@ -1,4 +1,4 @@
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key,Attr
 from app.config.ddb_config import table
 import uuid
 
@@ -29,8 +29,8 @@ async def fetch_dataset_info(dataset_id):
     # print("Links : ----------",links)
     return docs,links
 
-
-def save_fine_tuning_job_to_dynamodb(workspace_id, fine_tuning_job, user_id, created_at, instruction, data_id, assistant_name,epochs,lr,batch_size):
+#tested
+async def save_fine_tuning_job_to_dynamodb(workspace_id, fine_tuning_job, user_id, created_at, instruction, data_id, assistant_name,epochs,lr,batch_size):
     id = str(uuid.uuid4())
     table.put_item(
         Item={
@@ -42,11 +42,11 @@ def save_fine_tuning_job_to_dynamodb(workspace_id, fine_tuning_job, user_id, cre
             'purpose': instruction,
             'baseModel' : fine_tuning_job.model,
             'trainingFileId': data_id,
-            'epochs' : '',
-            'batchSize' : '',
-            'learningRate' : '',
+            'epochs' : epochs,
+            'batchSize' : batch_size,
+            'learningRate' : lr,
             'status' : 'In Progress',
-            'organisationId' : fine_tuning_job.organisation_id,
+            'organisationId' : fine_tuning_job.organization_id,
             'createdBy': user_id,
             'createdAt': created_at,
             'deleted' : 'false'
@@ -54,14 +54,15 @@ def save_fine_tuning_job_to_dynamodb(workspace_id, fine_tuning_job, user_id, cre
     )
 
 
-def retrieve_all_fine_tuned_bots(workspace_id):
+async def retrieve_all_fine_tuned_bots(workspace_id):
     response = table.query(
         KeyConditionExpression=Key('PK').eq(f'WORKSPACE#{workspace_id}') &
-                               Key('SK').begins_with('FTASSISTANT#')
+                               Key('SK').begins_with('FTASSISTANT#'),
+        FilterExpression=Attr('status').eq('succeeded') | Attr('status').eq('In Progress')
     )
     return response['Items']
 
-
+#tested
 async def update_fine_tuning_job_on_success(workspace_id,job_id,assistant_id):
     items = table.scan(
         FilterExpression= Key('PK').eq(f'WORKSPACE#{workspace_id}') & Key('SK').begins_with('FTASSISTANT#') & Key('jobId').eq(job_id)

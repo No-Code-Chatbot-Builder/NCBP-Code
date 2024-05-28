@@ -9,22 +9,27 @@ import uvicorn
 from app.services.openAi.process import *
 import openai
 from app.services.ddb.index import retrieve_all_fine_tuned_bots
+from fastapi.middleware import Middleware
+from app.middleware.auth.index import AuthMiddleware
+from fastapi import Request
 
 base_dir = pathlib.Path(__file__).parent
 load_dotenv(base_dir.joinpath('.env'))
 
-app = FastAPI(title = "Fine Tuning Service")
+middleware = [
+    Middleware(AuthMiddleware)
+]
+app = FastAPI(title = "Fine Tuning Service",middleware=middleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["backend url"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 class FineTuneRequest(BaseModel):
-    user_id: str
     dataset_id: str
     workspace_id: str
     model: str
@@ -32,85 +37,90 @@ class FineTuneRequest(BaseModel):
     batch_size : str
     lr : str
     epochs : str
+    purpose : str
     
 
 class Config:
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
-
-@app.get("/")
+@app.get("/model")
 async def root():
     return {"message": "Greetings from ML server!!"}
     
-
-@app.get("/check_status")
-async def check_job_status(job_id: str):
-    status = check_fine_tuning_job_status(job_id)
+#tested
+@app.get("/model/status")
+async def check_job_status(job_id: str,workspace_id : str):
+    status = await check_fine_tuning_job_status(job_id=job_id,workspace_id=workspace_id)
     return {"status": status}
 
-
-@app.get("/cancel_job")
+@app.get("/model/cancel_job")
 async def cancel_job(job_id: str):
     status = cancel_fine_tuning_job(job_id)
     return {"Cancelled status": status}
 
-
-@app.get("/finetuned_bots")
+#tested
+@app.get("/model/models")
 async def get_fine_tuned_bots(workspace_id: str):
-    bots = retrieve_all_fine_tuned_bots(workspace_id)
+    bots = await retrieve_all_fine_tuned_bots(workspace_id)
     return {
         "statusCode": 200,
         "bots": bots
         }
 
-
-@app.post("/fine-tune")
-async def fine_tune_model(request: FineTuneRequest):
-    response = await configure_data( request.user_id, request.workspace_id,request.dataset_id)
-    if response.status_code != 200:
+#tested
+@app.post("/model/fine-tune")
+async def fine_tune_model(request: Request, fine_tune_request: FineTuneRequest):
+    response = await configure_data( request.state.user.get('id'), fine_tune_request.workspace_id,fine_tune_request.dataset_id)
+    data_id = ''
+    if response.get("statuscode") == 202:
+        data_id = await upload_jsonl_to_openAi(response.get("content"))
+        
+    elif response.get("statuscode") == 409:
+        data_id = response.get("content")
+    
+    else:
         return {
-            "statusCode" : response.status_code,
+            "statusCode" : response.get("statuscode"),
             "message" : "There was an error generating data for fine-tuning. Please verify if your dataset is well-formed"
             }
-    else:
-        job_id = await create_fine_tuning_job( file_id=data_id,input=request)
+    
+    response = await create_fine_tuning_job(file_id=data_id,input=fine_tune_request,user_id=request.state.user.get('id'))
 
-        return {
-            "statusCode": 201,
-            "message": "Fine-tuning process started",
-            "fine_tuning_job_id": job_id.id
-        }
-        
+    return {
+        "statusCode": 201,
+        "message": "Fine-tuning process started",
+        "data": response
+    }
+
+
+# @app.websocket("/chat")
+# async def chat(websocket: WebSocket):
+#     client = OpenAI(api_key = Config.OPENAI_API_KEY)
+#     await websocket.accept()
     
-@app.websocket("/chat")
-async def chat(websocket: WebSocket):
-    
-    await websocket.accept()
-    
-    while True:
-        data = await websocket.receive_text()
-        print("user query : ",data)
-        response = await openai.Completion.create(
-            engine="davinci-003",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that answers user's query accurately"},
-                {"role": "user", "content": data}
-                ],
-            # stream=True,
-            # max_tokens=100,
-        )
-        print("response : ",response)
-        async for chunk in response:
-            if "choices" in chunk:
-                delta = chunk.choices[0].delta
-                if "content" in delta:
-                    content = delta.content
-                    print(content, end="")
-                    await websocket.send_text(content)
+#     while True:
+#         data = await websocket.receive_text()
+#         print("user query : ",data)
+#         completion = client.chat.completions.create(
+#             model="ft:gpt-3.5-turbo:my-org:custom_suffix:id",
+#             messages=[
+#                 {"role": "system", "content": "You are a helpful assistant."},
+#                 {"role": "user", "content": "Hello!"}
+#             ]
+#         )
+#         print(completion.choices[0].message)
+#         async for chunk in response:
+#             if "choices" in chunk:
+#                 delta = chunk.choices[0].delta
+#                 if "content" in delta:
+#                     content = delta.content
+#                     print(content, end="")
+#                     await websocket.send_text(content)
+
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=5000, log_level="debug",
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, log_level="debug",
                 proxy_headers=True, reload=True)
 
 

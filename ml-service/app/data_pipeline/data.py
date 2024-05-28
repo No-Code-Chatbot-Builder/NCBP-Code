@@ -18,7 +18,7 @@ async def save_jsonl_to_file(jsonl_str, filename):
 
 
 async def preprocess_links(links):
-    data = web_scraping.web_scrap(links)
+    data = web_scrap(links)
     chunks = await file_processing(data)
     qa_pairs= await llm_pipeline(chunks)
     jsonl_data = await convert_to_jsonl(qa_pairs)
@@ -31,7 +31,7 @@ async def preprocess_docs(docs,user_id, workspace_id, dataset_id):
    print("chunk size--------------",len(chunks))
    qa_obj = await llm_pipeline(chunks)
    jsonl_data = await convert_to_jsonl(qa_obj)
-  
+   await save_data_locally(jsonl_data)
    return jsonl_data
       
 #tested
@@ -41,12 +41,8 @@ async def configure_data(user_id, workspace_id, dataset_id):
             KeyConditionExpression=Key('PK').eq(f'WORKSPACE#{workspace_id}') & Key('SK').eq(f'DATASET#{dataset_id}')
         )
         if response['Items'][0]['jsonlId'] != '':
-            # s3_key = f"USER#{user_id}/WORKSPACE#{workspace_id}/DATASET#{dataset_id}/JSONL#{response['Items'][0]['jsonlId']}"
-            # jsonl_object = s3.get_object(Bucket='ncbp-assets', Key=s3_key)
-            # jsonl_data = jsonl_object['Body'].read()
-            # print("jsonl data already exist : fetching it from s3....")
             data_id = response['Items'][0]['jsonlId']
-            return {"statuscode": 403, "content": data_id}
+            return {"statuscode": 409, "content": data_id}
         else:
             docs, links = await fetch_dataset_info(dataset_id)
             jsonl_scrap_data, jsonl_docs_data = '', ''
@@ -62,8 +58,19 @@ async def configure_data(user_id, workspace_id, dataset_id):
             if not jsonl_scrap_data and not jsonl_docs_data:
                 return {"statuscode": 204, "content": []}
             merged_jsonl_data = await merge_jsonl_data(jsonl_scrap_data, jsonl_docs_data)
-            response = await save_to_db(merged_jsonl_data, user_id, workspace_id, dataset_id)
-            return {"statuscode": 200, "content": response}
+        
+        # with open('local_data.jsonl', 'r') as f:
+        #     merged_jsonl_data = f.read()
+        
+        response = await save_to_db(merged_jsonl_data, user_id, workspace_id, dataset_id)
+        return {"statuscode": 202, "content": merged_jsonl_data}
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"statuscode": 500, "content": str(e)}
+
+
+
+async def save_data_locally(data):
+    with open('local_data.jsonl', 'w') as f:
+        f.write(data)
+
