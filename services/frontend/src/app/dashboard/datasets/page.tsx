@@ -55,6 +55,9 @@ export default function Page() {
   const isWorkspaceLoading = useAppSelector(
     (state) => state.workspaces.isWorkspaceLoading
   );
+  const isAssistantLoading = useAppSelector(
+    (state) => state.assistants.isAssistantLoading
+  );
 
   const {
     data: res,
@@ -99,7 +102,7 @@ export default function Page() {
     }
 
     dispatch(setIsDatasetLoading(false));
-  }, [currentWorkspaceName, isLoading, error]);
+  }, [currentWorkspaceName, isLoading, error, isAssistantLoading]);
 
   const datasetSheet = (
     <CustomSheet

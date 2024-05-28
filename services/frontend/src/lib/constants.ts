@@ -1,5 +1,3 @@
-import { Tooltip } from "@/components/ui/tooltip";
-import { IconToolsKitchen } from "@tabler/icons-react";
 import {
   BookPlus,
   Code,
@@ -8,20 +6,9 @@ import {
   Settings,
   Star,
   Zap,
-  CookingPot,
-  Bell,
-  ShoppingBag,
   PocketKnife,
   AudioWaveform,
 } from "lucide-react";
-
-export type Membership = {
-  workspaceName: string;
-  userId: string;
-  userEmail: string;
-  role: string;
-  createdAt: string;
-};
 
 export type StepCard = {
   title: string;
@@ -167,9 +154,25 @@ export type AssistantType = {
   id: string;
   name: string;
   description: string;
-  allowedDomain: string[]
+  allowedDomain: string[];
   // owner: string;
   // threadId: string;
+};
+
+export type ModelType = {
+  modelId: string;
+  modelName: string;
+  baseModel: string;
+  batchSize: number;
+  createdAt: string;
+  createdBy: string;
+  deleted: string;
+  epochs: number;
+  jobId: string;
+  learningRate: number;
+  purpose : string;
+  status : string;
+  trainingFileId : string;
 };
 
 export type DomainType = {
@@ -202,11 +205,11 @@ export type AddDataBucketType = {
 };
 
 export type DataBucketType = {
-    id: string;
-    name: string;
-    path: string;
-    createdBy: string;
-    createdAt: string;
+  id: string;
+  name: string;
+  path: string;
+  createdBy: string;
+  createdAt: string;
 };
 
 export type DeleteDataBucketType = {

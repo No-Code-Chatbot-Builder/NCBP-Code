@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import CreateAssistantForm from "@/components/forms/create-assistant";
 import CustomSheet from "@/components/global/custom-sheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,19 +11,18 @@ import {
 } from "@/components/ui/card";
 
 import { Separator } from "@/components/ui/separator";
-import { AssistantType } from "@/lib/constants";
+import { AssistantType, ModelType } from "@/lib/constants";
 import { useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import { AudioWaveform, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CreateFineTuneModelForm from "@/components/forms/create-finetune-model";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
-import CreateDomainForm from "@/components/forms/create-domain-form";
 
 export default function Page() {
-  const loader = useAppSelector((state) => state.assistants.isAssistantLoading);
+  const loader = useAppSelector((state) => state.customModel.isModelLoading);
+  const models = useAppSelector((state) => state.customModel.models);
   const { setOpen } = useModal();
-  const assistants = useAppSelector((state) => state.assistants.assistants);
   const router = useRouter();
 
   const finetuneSheet = (
@@ -35,17 +33,6 @@ export default function Page() {
       <CreateFineTuneModelForm />
     </CustomSheet>
   );
-
-  const manageDomains = (assistantId: string) => {
-    setOpen(
-      <CustomSheet
-        title="Add Domains for your assistants"
-        description="Here you can add domains on which your bot will be embedded."
-      >
-        <CreateDomainForm assistantId={assistantId} />
-      </CustomSheet>
-    );
-  }
 
   const handleCreateFinetuner = async () => {
     setOpen(finetuneSheet);
@@ -64,7 +51,7 @@ export default function Page() {
               model or fine tune an existing one.
             </p>
           </div>
-          {assistants.length !== 0 && (
+          {models.length !== 0 && (
             <Button
               size={"lg"}
               className="gap-2"
@@ -93,31 +80,26 @@ export default function Page() {
         </section>
       ) : (
         <section>
-          {assistants.length > 0 ? (
+          {models.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-8">
-              {assistants.map((assistant: AssistantType) => (
-                <Card key={assistant.id}>
+              {models.map((model: ModelType) => (
+                <Card key={model.modelId}>
                   <CardHeader>
-                    <CardTitle>{assistant.name}</CardTitle>
-                    <CardDescription>{assistant.description}</CardDescription>
+                    <div>
+                      <CardTitle>{model.modelName}</CardTitle>
+                      <CardDescription>{model.purpose}</CardDescription>
+                    </div>
+                    <div>{model.status}</div>
                   </CardHeader>
                   <CardContent className="grid gap-3">
-                    <p className="text-muted-foreground">@{assistant.id}</p>
+                    <p className="text-muted-foreground">@{model.status}</p>
                     <Button
                       className="w-full"
-                      onClick={() => {
-                        router.replace(`/assistant/${assistant.id}`);
-                      }}
+                      // onClick={() => {
+                      //   router.replace(`/assistant/${model.}`);
+                      // }}
                     >
                       Use Assistant
-                    </Button>
-                    <Button
-                      className="w-full bg-orange-500 hover:bg-orange-600"
-                      onClick={() => {
-                        manageDomains(assistant.id)
-                      }}
-                    >
-                      Manage Domains
                     </Button>
                   </CardContent>
                 </Card>
