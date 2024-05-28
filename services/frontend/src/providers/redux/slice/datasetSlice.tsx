@@ -3,7 +3,6 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DatasetState {
   datasets: DatasetType[];
-
   isDatasetLoading: boolean;
   isDatasetFilesEmpty: boolean;
 }

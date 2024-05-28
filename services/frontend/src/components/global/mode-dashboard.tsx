@@ -1,7 +1,22 @@
 import { useTheme } from "next-themes";
+import { Switch } from "../ui/switch";
 
 export function ModeDashboardToggle() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
-  return <div></div>;
+  const switchTheme = () => {
+    if (theme == "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
+  };
+  return (
+    <div className="flex justify-start gap-4">
+      <Switch onClick={() => switchTheme()} />
+      <div className="text-muted-foreground">
+        {theme == "light" ? "Light" : "Dark"} Mode
+      </div>
+    </div>
+  );
 }

@@ -27,10 +27,11 @@ import {
 } from "@/components/ui/card";
 import { editWorkspace } from "@/lib/api/workspace/service";
 import { useAppSelector } from "@/lib/hooks";
+import { useDispatch } from "react-redux";
 
 const ManageWorkspaceCard = () => {
   const { toast } = useToast();
-
+  const dispatch = useDispatch();
   const currentWorkspace = useAppSelector(
     (state) => state.workspaces.currentWorkspace
   );
@@ -58,12 +59,14 @@ const ManageWorkspaceCard = () => {
   };
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
-    editWorkspace(
+    const res = await editWorkspace(
       values.workspaceName,
       values.description,
       currentWorkspace?.members!,
       currentWorkspace?.createdAt!
     );
+
+    // dispatch();
   };
   const isLoading = form.formState.isSubmitting;
   return (
@@ -90,7 +93,7 @@ const ManageWorkspaceCard = () => {
                     <FormLabel className="">Workspace Name</FormLabel>
                     <FormControl>
                       <Input
-                        disabled={!isOwner()}
+                        disabled={isOwner()}
                         placeholder="Enter your workspace name"
                         {...field}
                         className="bg-card dark:border-primary/50"
@@ -109,7 +112,7 @@ const ManageWorkspaceCard = () => {
                     <FormLabel className="">Workspace Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        disabled={!isOwner()}
+                        disabled={isOwner()}
                         placeholder="Your workspace description"
                         {...field}
                         className="bg-card dark:border-primary/50"

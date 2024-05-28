@@ -110,13 +110,24 @@ const WorkspaceMenuOptions = ({
   };
 
   useEffect(() => {
+    dispatch(setIsWorkspaceLoading(true));
     const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
     const parsedLocalCurrentWorkspace: CurrentWorkspaceType =
       localCurrentWorkspace != "undefined"
         ? JSON.parse(localCurrentWorkspace!)
         : null;
-    dispatch(setIsWorkspaceLoading(true));
-    if (!isLoading && !error) {
+
+    if (error) {
+      dispatch(setIsWorkspaceLoading(false));
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load workspace.",
+        })
+      );
+      return;
+    }
+    if (!isLoading) {
       if (res.data.workspaces) {
         const formattedWorkspaces: WorkspaceType[] = Object.entries(
           res.data.workspaces
@@ -134,15 +145,14 @@ const WorkspaceMenuOptions = ({
       } else {
         createInitialWorkspace();
       }
+      dispatch(setIsWorkspaceLoading(false));
     }
-  }, [dispatch, error, isLoading, res]);
+  }, [error, isLoading, res]);
 
   const changeCurrentWorkspace = (workspace: WorkspaceType) => {
+    dispatch(setIsWorkspaceLoading(true));
     fetchCurrentWorkspace(workspace.name);
-    localStorage.removeItem("datasets");
-    localStorage.removeItem("assistants");
-    dispatch(setIsDatasetLoading(true));
-    dispatch(setIsAssistantLoading(true));
+    dispatch(setIsWorkspaceLoading(false));
   };
 
   return (
@@ -290,7 +300,7 @@ const WorkspaceMenuOptions = ({
         </CommandList>
       </Command>
       <section>
-        <div>
+        <div className="mb-4 p-4 bg-sidebar-hover rounded-md">
           <ModeDashboardToggle />
         </div>
 

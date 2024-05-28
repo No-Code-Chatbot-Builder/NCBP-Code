@@ -1,27 +1,11 @@
-import { apiClient } from "../apiService";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
 
-// const BASE_URL = "http://localhost:3011";
-
-// export const botApiClient = axios.create({
-//   baseURL: BASE_URL,
-// });
-
-// botApiClient.interceptors.request.use(
-//   (config) => {
-//     const token = sessionStorage.getItem("token");
-//     console.log(token);
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+export const botApiClient = axios.create({
+  baseURL: "http://localhost:3004/",
+  headers: { "Content-Type": "application/json" },
+});
 
 export const createAssistantWithThread = async (
   workspaceName: string,
@@ -40,7 +24,7 @@ export const createAssistantWithThread = async (
       dataSetId: datasetId,
     };
     console.log(body);
-    const response = await apiClient.post(
+    const response = await botApiClient.post(
       `/bot/${workspaceName}/assistant`,
       body
     );
@@ -60,7 +44,7 @@ export const runAssistant = async (workspaceName: string, query: string) => {
   try {
     console.log("running...");
     console.log(workspaceName, query);
-    const response = await apiClient.post(
+    const response = await botApiClient.post(
       `/bot/${workspaceName}/runAssistant`,
       { query: query }
     );
@@ -88,16 +72,16 @@ export const deleteAssistants = async (
   assistantId: string
 ) => {
   try {
-    const response = await apiClient.delete(
-      `/bot/${workspaceName}/${assistantId}`
-    );
+    await botApiClient.delete(`/bot/${workspaceName}`, {
+      data: { assistantId: assistantId },
+    });
     toast(
       CustomToast({
         title: "Success",
         description: "Assistant deleted successfully.",
       })
     );
-    return response.data;
+    return { statusCode: 201 };
   } catch (error) {
     console.log(error);
     toast(
@@ -106,5 +90,6 @@ export const deleteAssistants = async (
         description: "Error creating Assistant.",
       })
     );
+    return { statusCode: 500 };
   }
 };

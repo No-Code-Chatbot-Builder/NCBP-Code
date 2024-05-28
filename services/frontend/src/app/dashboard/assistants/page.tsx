@@ -41,49 +41,65 @@ export default function Page() {
   );
   const [isAssistantDeleting, setIsAssistantDeleting] = useState(false);
   const { setOpen, setClose } = useModal();
-
-  const { data: res, error } = useAxiosSWR(
-    `/bot/${currentWorkspaceName}`
+  const isWorkspaceLoading = useAppSelector(
+    (state) => state.workspaces.isWorkspaceLoading
   );
+  const {
+    data: res,
+    error,
+    isLoading,
+  } = useAxiosSWR(`/bot/${currentWorkspaceName}`);
 
   useEffect(() => {
-    const fetchAssistants = async () => {
-      if (!currentWorkspaceName || error) return;
+    dispatch(setIsAssistantLoading(true));
+    if (isWorkspaceLoading || isLoading) {
+      console.log("assistants exist");
+      return;
+    }
+    if (error) {
+      console.error(error);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load assistants.",
+        })
+      );
+      console.log("assistants exist");
+      dispatch(setIsAssistantLoading(false));
+      return;
+    }
+    console.log(res);
+    if (res?.data?.response?.assistant?.length <= 0) {
+      console.log("empty");
+      dispatch(setAssistant([]));
+      dispatch(setIsAssistantLoading(false));
+      return;
+    }
 
-      try {
-        if (res && res.response && res.response.assistants) {
-          const formattedAssistants: AssistantType[] =
-            res.response.assistants.map((assistant: any) => ({
-              id: assistant.assistantId,
-              name: assistant.assistantName,
-              description: assistant.purpose,
-              allowedDomain: [],
-            }));
+    console.log("assistants exist");
+    const formattedAssistants: AssistantType[] =
+      res?.data?.response?.assistants?.map((assistant: any) => ({
+        id: assistant.assistantId,
+        name: assistant.assistantName,
+        description: assistant.purpose,
+        allowedDomain: [],
+      }));
+    const currentAssistantNames = assistants
+      .map((assistant: AssistantType) => assistant.name)
+      .sort();
+    const newAssistantNames = formattedAssistants
+      ?.map((assistant: AssistantType) => assistant.name)
+      .sort();
+    const assistantsChanged =
+      JSON.stringify(currentAssistantNames) !==
+      JSON.stringify(newAssistantNames);
 
-          const filteredAssistants = formattedAssistants.filter(
-            (assistant: AssistantType) => assistant.name
-          );
-          const currentAssistantNames = assistants
-            .map((assistant: AssistantType) => assistant.name)
-            .sort();
-          const newAssistantNames = filteredAssistants
-            .map((assistant: AssistantType) => assistant.name)
-            .sort();
-          const assistantsChanged =
-            JSON.stringify(currentAssistantNames) !==
-            JSON.stringify(newAssistantNames);
+    if (assistantsChanged) {
+      dispatch(setAssistant(formattedAssistants));
+    }
 
-          if (assistantsChanged || !filteredAssistants.length) {
-            dispatch(setAssistant(filteredAssistants));
-            dispatch(setIsAssistantLoading(false));
-          }
-        }
-      } catch (error: any) {
-        console.error("Failed to fetch assistants:", error);
-      }
-    };
-    fetchAssistants();
-  }, [assistants, currentWorkspaceName, dispatch, error, res]);
+    dispatch(setIsAssistantLoading(false));
+  }, [currentWorkspaceName, error, isLoading]);
 
   const manageDomains = (assistantId: string) => {
     setOpen(
@@ -145,14 +161,16 @@ export default function Page() {
   ) => {
     setIsAssistantDeleting(true);
     try {
-      await deleteAssistants(currentWorkspaceName!, assistant_id);
-      dispatch(removeAssistant(assistant_id));
-      toast(
-        CustomToast({
-          title: `${assistant_name} Deleted`,
-          description: `${assistant_name} has been deleted successfully.`,
-        })
-      );
+      const res = await deleteAssistants(currentWorkspaceName!, assistant_id);
+      if (res.statusCode == 201) {
+        dispatch(removeAssistant(assistant_id));
+        toast(
+          CustomToast({
+            title: `${assistant_name} Deleted`,
+            description: `${assistant_name} has been deleted successfully.`,
+          })
+        );
+      }
     } catch (error) {
       toast(
         CustomToast({
@@ -195,19 +213,12 @@ export default function Page() {
               requirements.
             </p>
           </div>
-
-          {!isAssistantLoading && assistants.length !== 0 && (
-            <Button
-              size={"lg"}
-              className="gap-2"
-              onClick={handleCreateAssistant}
-            >
-              <Plus className="w-5 h-5" />
-              <p className="flex">
-                Create <span className="hidden lg:block">&nbsp;Assistant</span>
-              </p>
-            </Button>
-          )}
+          <Button size={"lg"} className="gap-2" onClick={handleCreateAssistant}>
+            <Plus className="w-5 h-5" />
+            <p className="flex">
+              Create <span className="hidden lg:block">&nbsp;Assistant</span>
+            </p>
+          </Button>
         </div>
         <Separator className="mt-8" />
       </section>
@@ -234,18 +245,9 @@ export default function Page() {
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        {/* <Button
-                          size="icon"
-                          variant={"default"}
-                          onClick={() => {
-                            manageAssistant(assistant.id);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button> */}
                         <Button
                           size="icon"
-                          variant={"destructive"}
+                          variant={"ghost"}
                           onClick={() => {
                             setOpen(
                               deleteAssistantModel(assistant.id, assistant.name)
@@ -258,8 +260,17 @@ export default function Page() {
                     </div>
                   </CardHeader>
 
-                  <CardContent className="grid gap-3">
+                  <CardContent className="grid gap-3 ">
                     {/* <p className="text-muted-foreground">@{assistant.id}</p> */}
+                    <Button
+                      className="w-full"
+                      variant={"outline"}
+                      onClick={() => {
+                        manageDomains(assistant.id);
+                      }}
+                    >
+                      Manage Domains
+                    </Button>
                     <Button
                       className="w-full"
                       onClick={() => {
@@ -267,14 +278,6 @@ export default function Page() {
                       }}
                     >
                       Use Assistant
-                    </Button>
-                    <Button
-                      className="w-full bg-orange-500 hover:bg-orange-600"
-                      onClick={() => {
-                        manageDomains(assistant.id);
-                      }}
-                    >
-                      Manage Domains
                     </Button>
                   </CardContent>
                 </Card>

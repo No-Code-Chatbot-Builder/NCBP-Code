@@ -43,6 +43,7 @@ export default function Page() {
         );
         dispatch(setWorkspaceUsers(users));
         response = await getPendingInvites();
+        console.log(response);
         setMemberships(response.membership);
       } catch (error: any) {
         console.log(error);
@@ -50,6 +51,7 @@ export default function Page() {
     }
     if (currentWorkspaceName != null) fetchData();
   }, [currentWorkspaceName, dispatch]);
+
   return (
     <div className="flex flex-col gap-10">
       <div>
