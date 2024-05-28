@@ -20,6 +20,7 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { Button } from "@/components/ui/button";
+import ReactMarkdown from "react-markdown";
 
 type Props = {
   params: {
@@ -69,7 +70,7 @@ const ChatbotMessage = ({ message }: { message: string }) => {
   };
   return (
     <div className="flex flex-start flex-col">
-      <div className="bg-card p-4 rounded-xl">
+      <div className="bg-card p-4 rounded-xl m-0">
         {chunks.map((chunk, index) => {
           if (
             hasCode &&
@@ -83,7 +84,7 @@ const ChatbotMessage = ({ message }: { message: string }) => {
                   <Button
                     className="absolute top-4 right-2 p-2"
                     size={"icon"}
-                    variant={"outline"}
+                    variant={"ghost"}
                   >
                     <CopyToClipboard text={codeContent} onCopy={() => notify()}>
                       {copied ? (
@@ -108,15 +109,23 @@ const ChatbotMessage = ({ message }: { message: string }) => {
           } else {
             return (
               <p key={index} className="text-base font-medium">
-                {chunk}
+                <ReactMarkdown className="whitespace-pre-wrap p-0 m-0">
+                  {chunk}
+                </ReactMarkdown>
               </p>
             );
           }
         })}
       </div>
-      <div className="flex text-muted-foreground flex-row-reverse mr-4">
-        <Button className="p-1 hover:text-white" variant={"ghost"} size="icon">
-          <CopyIcon className="w-4 h-4" />
+      <div className="flex text-muted-foreground flex-row-reverse mr-4 mt-2">
+        <Button size={"icon"} variant={"ghost"}>
+          <CopyToClipboard text={message} onCopy={() => notify()}>
+            {copied ? (
+              <IoIosCheckmarkCircleOutline className="text-lg m-1 text-green-500 w-4 h-4" />
+            ) : (
+              <CopyIcon className="text-lg m-1  w-4 h-4 hover:text-white" />
+            )}
+          </CopyToClipboard>
         </Button>
         {/* <button className="p-1 hover:text-white">
           <ThumbsUp className="w-4 h-4" />
@@ -145,7 +154,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `ws://fargat-farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
+  const URL = `http://localhost:3004?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );

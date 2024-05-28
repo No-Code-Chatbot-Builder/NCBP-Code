@@ -51,7 +51,7 @@ export default function Page() {
     }
     if (currentWorkspaceName != null) fetchData();
   }, [currentWorkspaceName, dispatch]);
-  
+
   return (
     <div className="flex flex-col gap-10">
       <div>

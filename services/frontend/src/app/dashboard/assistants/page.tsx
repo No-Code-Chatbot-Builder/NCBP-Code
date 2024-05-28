@@ -247,7 +247,7 @@ export default function Page() {
                       <div className="flex gap-2">
                         <Button
                           size="icon"
-                          variant={"destructive"}
+                          variant={"ghost"}
                           onClick={() => {
                             setOpen(
                               deleteAssistantModel(assistant.id, assistant.name)
@@ -260,8 +260,17 @@ export default function Page() {
                     </div>
                   </CardHeader>
 
-                  <CardContent className="grid gap-3">
+                  <CardContent className="grid gap-3 ">
                     {/* <p className="text-muted-foreground">@{assistant.id}</p> */}
+                    <Button
+                      className="w-full"
+                      variant={"outline"}
+                      onClick={() => {
+                        manageDomains(assistant.id);
+                      }}
+                    >
+                      Manage Domains
+                    </Button>
                     <Button
                       className="w-full"
                       onClick={() => {
@@ -269,14 +278,6 @@ export default function Page() {
                       }}
                     >
                       Use Assistant
-                    </Button>
-                    <Button
-                      className="w-full bg-orange-500 hover:bg-orange-600"
-                      onClick={() => {
-                        manageDomains(assistant.id);
-                      }}
-                    >
-                      Manage Domains
                     </Button>
                   </CardContent>
                 </Card>

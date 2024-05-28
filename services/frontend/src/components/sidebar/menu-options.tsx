@@ -190,7 +190,7 @@ const WorkspaceMenuOptions = ({
             </div>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="mt-3 ml-5 w-[25rem] h-fit z-50">
+        <PopoverContent className="mt-3 ml-5 w-[26rem] h-fit z-50">
           <Card className="border border-primary/50">
             <CardHeader>
               <CardTitle className="text-xl">Toggle Workspace</CardTitle>
