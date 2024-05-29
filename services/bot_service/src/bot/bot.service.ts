@@ -113,7 +113,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
 
     const queryResponse: QueryResponse = await index.query({
       vector: query,
-      topK: 1,
+      topK: 3,
       includeMetadata: true,
       filter: {
         workspaceId: workspaceId,
@@ -121,12 +121,11 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
       },
     });
 
-    const response = queryResponse?.matches[0]?.metadata?.text;
-    if (!response) {
-      return '';
-    } else {
-      return response;
-    }
+    const topChunks = queryResponse.matches
+      .map((match, index) => `chunk${index + 1}: ${match.metadata.text}`)
+      .join('\n\n');
+    const context = topChunks || '';
+    return context;
   }
 
   async initiateResponseProcess(
@@ -142,7 +141,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
     );
     try {
       const response = await this.httpService
-        .post('http://langchain-embedding-service.services/queryVectorEmbeddings', {
+        .post('http://0.0.0.0:3010/queryVectorEmbeddings', {
           text: query,
         })
         .toPromise();
@@ -159,19 +158,24 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     if (!context || context.trim() === '') {
-      prompt =
-        'The following text is the query:\n' +
-        query +
-        '. If your answer includes code, please enclose it inside the tags <code> and </code>';
+      prompt = `
+        Query: ${query}
+        Please provide a detailed answer. If your answer includes code, enclose it within <code> and </code> tags.
+      `;
     } else {
-      prompt =
-        'The following text is the query:\n' +
-        query +
-        '\n\nPlease answer while staying in the following context:\n' +
-        context +
-        '. If your answer includes code, please enclose it inside the tags <code> and </code>';
+      prompt = `
+      You are an AI language model with a strict constraint to only use the provided context for generating responses. Do not rely on any outside knowledge or assumptions.
+
+      Query: ${query}
+
+      Context: ${context}
+
+      Please provide a detailed answer based strictly on the given context. Use data only relevant to the query from these 3 chunks. If the context does not contain the necessary information, respond with "I, NoCodeBot, do not have access to data related to the query in the provided context."
+      If your answer includes code, enclose it within <code> and </code> tags.
+      `;
     }
-    console.log("prompt:", prompt)
+
+    console.log('prompt:', prompt);
     return this.createMessage(
       data.data[0].threadId,
       data.data[0].assistantId,
