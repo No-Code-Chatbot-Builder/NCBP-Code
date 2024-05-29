@@ -4,9 +4,9 @@ import CustomToast from "@/components/global/custom-toast";
 
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://localhost:3010";
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
@@ -32,7 +32,7 @@ export const createModel = async (
   datasetId: string,
   baseModel: string,
   name: string,
-  description: string,
+
   lr: string,
   epochs: string,
   batch_size: string

@@ -1,14 +1,9 @@
 {
-  "builds": [
-    {
-      "src": "src/api/proxy.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/src/api/proxy.js"
-    }
-  ]
-}
+    "rewrites": [
+      {
+        "source": "(.*)",
+        "destination": "http://fargat-farga-opbzm5amp8ir-1656924029.us-east-1.elb.amazonaws.com/$1"
+      }
+    ]
+  }
+  

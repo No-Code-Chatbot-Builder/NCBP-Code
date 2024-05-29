@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { Separator } from "@/components/ui/separator";
 import { AssistantType, ModelType } from "@/lib/constants";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
 import {
   AudioWaveform,
@@ -34,6 +34,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import {
+  setIsModelLoading,
+  setModels,
+} from "@/providers/redux/slice/modelSlice";
+import { toast } from "sonner";
+import CustomToast from "@/components/global/custom-toast";
+import { apiClient, fetchModels } from "@/lib/api/model/service";
+import useSWR from "swr";
 
 type StatusType = "All" | "Successfull" | "Failed";
 
@@ -44,7 +53,11 @@ export default function Page() {
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<StatusType>("All");
   const [modelSelected, setModelSelected] = useState<ModelType | null>(null);
+  const isModelLoading = useAppSelector(
+    (state) => state.customModel.isModelLoading
+  );
 
+  const dispatch = useAppDispatch();
   const finetuneSheet = (
     <CustomSheet
       title="Create New FineTuned Model"
@@ -57,12 +70,71 @@ export default function Page() {
   const handleCreateFinetuner = async () => {
     setOpen(finetuneSheet);
   };
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
+  );
 
+  // const fetcher = (url: string) => apiClient.get(url).then((res) => res);
+
+  // const {
+  //   data: res,
+  //   error,
+  //   isLoading,
+  // } = useSWR(`/model/models?workspace_id=${currentWorkspaceName}`, fetcher);
+  // console.log(res);
   useEffect(() => {
-    if (modelSelected !== null) {
-      setModelSelected(models[0]);
-    }
-  }, []);
+    //  dispatch(setIsModelLoading(true));
+    // if (isLoading) {
+    //   return;
+    // }
+    // if (error) {
+    //   console.error(error);
+    //   toast(
+    //     CustomToast({
+    //       title: "Error",
+    //       description: "Failed to load finetuned models.",
+    //     })
+    //   );
+    //   dispatch(setIsModelLoading(false));
+    //   return;
+    // }
+
+    // console.log(res);
+
+    const getModels = async () => {
+      console.log(currentWorkspaceName);
+      const res = await fetchModels(currentWorkspaceName as string);
+      console.log(res);
+    };
+
+    // if (res?.data?.datasets?.length <= 0) {
+    //   dispatch(setModels([]));
+    //   dispatch(setIsModelLoading(false));
+    //   return;
+    // }
+    // const newModels = res.data.datasets;
+    // const currentModelNames = models
+    //   .map((model: ModelType) => model.modelName)
+    //   .sort();
+    // const newModelNames = newModels
+    //   .map((model: ModelType) => model.modelName)
+    //   .sort();
+    // const modelsChanged =
+    //   JSON.stringify(currentModelNames) !== JSON.stringify(newModelNames);
+
+    // if (modelsChanged) {
+    //   dispatch(setModels(newModels));
+    // }
+
+    //dispatch(setIsModelLoading(false));
+    getModels();
+  }, [currentWorkspaceName]);
+
+  // useEffect(() => {
+  //   if (modelSelected !== null) {
+  //     setModelSelected(models[0]);
+  //   }
+  // }, []);
 
   const formatDate = (date: string) => {
     const formattedDate = new Date(date).toLocaleDateString("en-GB", {
