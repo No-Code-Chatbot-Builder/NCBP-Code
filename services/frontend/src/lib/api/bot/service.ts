@@ -1,11 +1,12 @@
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import axios from "axios";
+import { apiClient } from "../apiService";
 
-export const botApiClient = axios.create({
-  baseURL: "http://localhost:3004/",
-  headers: { "Content-Type": "application/json" },
-});
+// export const botApiClient = axios.create({
+//   baseURL: "http://localhost:3002/",
+//   headers: { "Content-Type": "application/json" },
+// });
 
 export const createAssistantWithThread = async (
   workspaceName: string,
@@ -24,7 +25,7 @@ export const createAssistantWithThread = async (
       dataSetId: datasetId,
     };
     console.log(body);
-    const response = await botApiClient.post(
+    const response = await apiClient.post(
       `/bot/${workspaceName}/assistant`,
       body
     );
@@ -44,7 +45,7 @@ export const runAssistant = async (workspaceName: string, query: string) => {
   try {
     console.log("running...");
     console.log(workspaceName, query);
-    const response = await botApiClient.post(
+    const response = await apiClient.post(
       `/bot/${workspaceName}/runAssistant`,
       { query: query }
     );
@@ -72,7 +73,7 @@ export const deleteAssistants = async (
   assistantId: string
 ) => {
   try {
-    await botApiClient.delete(`/bot/${workspaceName}`, {
+    await apiClient.delete(`/bot/${workspaceName}`, {
       data: { assistantId: assistantId },
     });
     toast(

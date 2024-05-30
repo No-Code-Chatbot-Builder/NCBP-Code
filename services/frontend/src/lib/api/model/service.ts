@@ -74,6 +74,7 @@ export const checkStatus = async (
   job_id: string
 ) => {
   try {
+    
     const response = await apiClient.get(
       `/model/status?workspace_id=${currentWorkspaceName}&job_id=${job_id}`
     );
