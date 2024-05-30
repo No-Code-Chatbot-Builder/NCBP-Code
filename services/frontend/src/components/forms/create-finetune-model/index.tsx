@@ -30,6 +30,8 @@ import CustomToast from "@/components/global/custom-toast";
 import { DatasetType } from "@/lib/constants";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { createModel } from "@/lib/api/model/service";
+import { addModel } from "@/providers/redux/slice/modelSlice";
 
 const CreateFineTuneModelForm = () => {
   const dispatch = useAppDispatch();
@@ -108,10 +110,51 @@ const CreateFineTuneModelForm = () => {
 
   const isLoading = form.formState.isSubmitting;
 
+  const currentWorkspaceName = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name
+  );
+
+  const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
+    try {
+      //create model
+      const response = await createModel(
+        currentWorkspaceName ?? "",
+        data.dataset,
+        data.base_model,
+        data.name,
+        data.lr,
+        data.no_epochs,
+        data.batch_size
+      );
+      //update this to the returned model and dispatch on redux
+      dispatch(
+        addModel({
+          modelId: "dummy-model-001",
+          modelName: data.name,
+          baseModel: data.base_model,
+          batchSize: parseInt(data.batch_size, 10),
+          createdAt: new Date().toISOString(),
+          createdBy: "admin",
+          deleted: "false",
+          epochs: parseInt(data.no_epochs, 10),
+          jobId: "job-123",
+          learningRate: parseFloat(data.lr),
+          purpose: "Fine Tuning",
+          status: "In Progress",
+          trainingFileId: data.dataset,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setClose();
+    }
+  };
+
   return (
     <main className="mt-4">
       <Form {...form}>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <FormField
             disabled={isLoading}
             control={form.control}
@@ -120,7 +163,7 @@ const CreateFineTuneModelForm = () => {
               <FormItem className="flex-1">
                 <FormLabel className="text-secondary">Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the assistant name" {...field} />
+                  <Input placeholder="Enter the model name" {...field} />
                 </FormControl>
                 <FormMessage className="text-red-600 text-xs px-1" />
               </FormItem>
@@ -141,7 +184,7 @@ const CreateFineTuneModelForm = () => {
                     value={field.value}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select knowledge base of your assistant" />
+                      <SelectValue placeholder="Select dataset to fine tune on" />
                     </SelectTrigger>
                     <SelectContent>
                       {datasets.map((dataset: DatasetType) => (
@@ -171,7 +214,7 @@ const CreateFineTuneModelForm = () => {
                     value={field.value}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select base model to perform fine tune on" />
+                      <SelectValue placeholder="Select base model to fine tune on" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="babbage-002">babbage-002</SelectItem>

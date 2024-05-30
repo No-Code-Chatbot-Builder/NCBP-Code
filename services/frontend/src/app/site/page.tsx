@@ -193,7 +193,7 @@ export default function Home() {
             needs.
           </p>
 
-          <Link href="/sign-in">
+          <Link href={isLoggedIn ? "/dashboard/assistants" : "/sign-in"}>
             <motion.button
               className="w-fit flex flex-row gap-2 rounded-lg bg-primary px-10 py-4 font-medium text-white text-sm items-center"
               whileTap={{ scale: 0.95 }}
