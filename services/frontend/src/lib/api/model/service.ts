@@ -4,7 +4,7 @@ import CustomToast from "@/components/global/custom-toast";
 
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3010";
+const BASE_URL = "http://localhost:8000";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -38,7 +38,7 @@ export const createModel = async (
   batch_size: string
 ) => {
   try {
-    const response = await apiClient.post(`/model/fine-tune`, {
+    const response = await apiClient.post('/finetune/model/fine-tune', {
       dataset_id: datasetId,
       workspace_id: currentWorkspaceName,
       model: baseModel,
@@ -76,7 +76,7 @@ export const checkStatus = async (
   try {
     
     const response = await apiClient.get(
-      `/model/status?workspace_id=${currentWorkspaceName}&job_id=${job_id}`
+      `/finetune/model/status?workspace_id=${currentWorkspaceName}&job_id=${job_id}`
     );
 
     toast(
@@ -128,7 +128,7 @@ export const cancelJob = async (job_id: string) => {
 export const fetchModels = async (currentWorkspaceName: string) => {
   try {
     const response = await apiClient.get(
-      `/model/models?workspace_id=${currentWorkspaceName}`
+      `/finetune/model/models?workspace_id=${currentWorkspaceName}`
     );
 
     toast(
@@ -137,6 +137,7 @@ export const fetchModels = async (currentWorkspaceName: string) => {
         description: "Models fetched successfully.",
       })
     );
+
     return response.data;
   } catch (error: any) {
     console.log(error);

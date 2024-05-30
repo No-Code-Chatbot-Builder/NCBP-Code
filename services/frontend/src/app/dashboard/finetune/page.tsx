@@ -38,17 +38,18 @@ import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import {
   setIsModelLoading,
   setModels,
+  updateModel,
 } from "@/providers/redux/slice/modelSlice";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
-import { apiClient, fetchModels } from "@/lib/api/model/service";
+import { apiClient, checkStatus, fetchModels } from "@/lib/api/model/service";
 import useSWR from "swr";
 
 type StatusType = "All" | "Successfull" | "Failed";
 
 export default function Page() {
   const loader = useAppSelector((state) => state.customModel.isModelLoading);
-  const models = useAppSelector((state) => state.customModel.models);
+  const models : ModelType[] = useAppSelector((state) => state.customModel.models);
   const { setOpen } = useModal();
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<StatusType>("All");
@@ -58,6 +59,7 @@ export default function Page() {
   );
 
   const dispatch = useAppDispatch();
+
   const finetuneSheet = (
     <CustomSheet
       title="Create New FineTuned Model"
@@ -70,8 +72,12 @@ export default function Page() {
   const handleCreateFinetuner = async () => {
     setOpen(finetuneSheet);
   };
-  const currentWorkspaceName = useAppSelector(
-    (state) => state.workspaces.currentWorkspace?.name
+  const currentWorkspaceName: string = useAppSelector(
+    (state) => state.workspaces.currentWorkspace?.name!
+  );
+
+  const isWorkspaceLoading: boolean = useAppSelector(
+    (state) => state.workspaces.isWorkspaceLoading
   );
 
   // const fetcher = (url: string) => apiClient.get(url).then((res) => res);
@@ -80,10 +86,16 @@ export default function Page() {
   //   data: res,
   //   error,
   //   isLoading,
-  // } = useSWR(`/model/models?workspace_id=${currentWorkspaceName}`, fetcher);
-  // console.log(res);
+  // } = useSWR(
+  //   `http://locahost:8000/finetune/model/models?workspace_id=${currentWorkspaceName}`,
+  //   fetcher
+  // );
+
   useEffect(() => {
-    //  dispatch(setIsModelLoading(true));
+    if (isWorkspaceLoading) {
+      return;
+    }
+    dispatch(setIsModelLoading(true));
     // if (isLoading) {
     //   return;
     // }
@@ -99,12 +111,61 @@ export default function Page() {
     //   return;
     // }
 
-    // console.log(res);
+    const check_status = async (job_id: string) => {
+      const res = await checkStatus(currentWorkspaceName as string, job_id);
+      return res.status;
+    };
 
     const getModels = async () => {
-      console.log(currentWorkspaceName);
       const res = await fetchModels(currentWorkspaceName as string);
-      console.log(res);
+
+      if (res?.models?.length > 0) {
+        const fetchedModels: ModelType[] = res?.models?.map((model: any) => ({
+          modelId: model.modelId,
+          purpose: model.purpose,
+          organisationId: model.purpose,
+          status: model.status,
+          createdAt: model.createdAt,
+          jobId: model.jobId,
+          batchSize: model.batchSize,
+          learningRate: model.learningRate,
+          createdBy: model.createdBy,
+          baseModel: model.baseModel,
+          deleted: model.deleted,
+          trainingFileId: model.trainingFileId,
+          epochs: model.epochs,
+          modelName: model.modelName,
+        }));
+
+        const currentModelNames = models
+          .map((model: ModelType) => model.modelName)
+          .sort();
+        const newModelNames = fetchedModels
+          .map((model: ModelType) => model.modelName)
+          .sort();
+        const modelsChanged =
+          JSON.stringify(currentModelNames) !== JSON.stringify(newModelNames);
+
+        if (modelsChanged) {
+          dispatch(setModels(fetchedModels));
+        }
+        dispatch(setIsModelLoading(false));
+
+        const pendingModels = fetchedModels?.filter(
+          (model: any) => model.status == "In Progress"
+        );
+
+        if (pendingModels.length > 0) {
+          pendingModels?.map(async (model: any) => {
+            const res = await check_status(model.jobId);
+            if (res.status == "succeeded" || res.status == "cancelled") {
+              dispatch(
+                updateModel({ modelId: model.modelId, status: res.status })
+              );
+            }
+          });
+        }
+      }
     };
 
     // if (res?.data?.datasets?.length <= 0) {
@@ -112,21 +173,7 @@ export default function Page() {
     //   dispatch(setIsModelLoading(false));
     //   return;
     // }
-    // const newModels = res.data.datasets;
-    // const currentModelNames = models
-    //   .map((model: ModelType) => model.modelName)
-    //   .sort();
-    // const newModelNames = newModels
-    //   .map((model: ModelType) => model.modelName)
-    //   .sort();
-    // const modelsChanged =
-    //   JSON.stringify(currentModelNames) !== JSON.stringify(newModelNames);
 
-    // if (modelsChanged) {
-    //   dispatch(setModels(newModels));
-    // }
-
-    //dispatch(setIsModelLoading(false));
     getModels();
   }, [currentWorkspaceName]);
 
