@@ -3,6 +3,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { ConfigService } from '@nestjs/config';
 import { CreateIndexRequestMetricEnum } from '@pinecone-database/pinecone';
 import { GenerateIdService } from 'src/generate-id/generate-id.service';
+import { UUID } from 'crypto';
 
 type Embedding = number[]; // Assuming each embedding is an array of numbers
 
@@ -42,48 +43,44 @@ export class PineconeService {
     return response;
   }
 
-  async upsertRecords(records: dataForUpsert, userId: string, workspaceId: string, datasetId: string, dataId: string) {
+  async upsertRecords(id: GenerateIdService, records: dataForUpsert, userId: string, workspaceId: string, datasetId: string, dataId: string) {
     // Upsert the data into your index
     const indexName = this.configService.get<string>('PINECONE_INDEX_NAME');
-
+    
     for (let i = 0; i < records[0].embeddings.length; i++) {
       const embedding = records[0].embeddings[i];
+      console.log('embeddings', embedding);
       const splittedDocument = records[1].splitted_documents[i];
       await this.pineconeClient.index(indexName).upsert([
         {
-          id: GenerateIdService.generateId(),
+          id: id+"_"+(i+1),
           values: embedding,
           metadata: {
             userId: userId,
             workspaceId: workspaceId,
             datasetId: datasetId,
-            text: splittedDocument
+            text: splittedDocument,
+            chunk_id : (i+1),
           }
         }
       ]);
     }
   }
 
-  async deleteVector(dataId: string)
-  {
+  async deleteVector(dataId: string) {
     const indexName = this.configService.get<string>('PINECONE_INDEX_NAME');
 
     try {
       await this.pineconeClient.index(indexName).deleteMany({
         //datasetId : {$eq: datasetId},
         //workspaceId : {$eq: workspaceId},
-        dataId : {$eq: dataId} 
-      
+        dataId: { $eq: dataId }
       });
 
-      console.log("succesfuly deleted vectors");
-      return "succesfuly deleted vectors";
+      console.log('succesfuly deleted vectors');
+      return 'succesfuly deleted vectors';
     } catch (error) {
       console.log(error);
     }
-    
-      
-    
-
   }
 }
