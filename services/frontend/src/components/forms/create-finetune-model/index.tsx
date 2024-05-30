@@ -117,8 +117,10 @@ const CreateFineTuneModelForm = () => {
   const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
     try {
       //create model
+      if(!currentWorkspaceName) return;
+
       const response = await createModel(
-        currentWorkspaceName ?? "",
+        currentWorkspaceName,
         data.dataset,
         data.base_model,
         data.name,

@@ -154,7 +154,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `http://localhost:3004?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
+  const URL = `ws://localhost:3002?workspaceId=hussainworkspace&assistantId=asst_oHMufnVas2LVjvnpk7zLbult`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );

@@ -1,6 +1,30 @@
-import { apiClient } from "../apiService";
+// import { apiClient } from "../apiService";
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
+import axios from "axios";
+
+const BASE_URL = "http://localhost:3001";
+
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+apiClient.interceptors.request.use(
+  async (config) => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.method === "delete" && config.data) {
+      config.headers["Content-Type"] = "application/json";
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 //tested
 export const createDataset = async (
