@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
-from langchain.text_splitter import CharacterTextSplitter
+# from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 
 app = FastAPI()
@@ -16,7 +17,8 @@ class TextModel(BaseModel):  # Define a Pydantic model that matches the expected
 def create_vector_embeddings(texts: Texts):
    
     
-    splitter = CharacterTextSplitter(separator='\n', chunk_size=1000, chunk_overlap=200)
+    # splitter = CharacterTextSplitter(separator='\n', chunk_size=1000, chunk_overlap=200)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800,chunk_overlap=80,length_function=len,is_separator_regex=False)
     
     splitted_documents = []
     for text in texts.texts:
@@ -59,12 +61,7 @@ def createQueryVectorEmbeddings(text: TextModel):
     return embeddings_as_lists[0]
     
 
-    
-
-
-
-
-@app.get("/")
+@app.get("/health")
 def read_root():
-    return {"Hello": "World"}
+    return {"Langchain Embedding Service is running"}
 

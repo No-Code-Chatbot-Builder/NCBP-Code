@@ -1,1 +1,4 @@
 pynest-api==0.1.2
+torch==2.2.1
+sentence_transformers==2.4.0
+langchain==0.1.9
