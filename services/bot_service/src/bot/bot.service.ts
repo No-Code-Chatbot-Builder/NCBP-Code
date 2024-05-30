@@ -141,7 +141,7 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
     );
     try {
       const response = await this.httpService
-        .post('http://0.0.0.0:3010/queryVectorEmbeddings', {
+        .post('http://langchain-embedding-service.services/queryVectorEmbeddings', {
           text: query,
         })
         .toPromise();
@@ -159,19 +159,22 @@ export class BotService implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!context || context.trim() === '') {
       prompt = `
+        You are an AI language model with access to the current conversation thread history for generating responses. If the thread history contains relevant information, use it to provide a detailed answer. If your answer includes code, enclose it within <code> and </code> tags.
+    
         Query: ${query}
-        Please provide a detailed answer. If your answer includes code, enclose it within <code> and </code> tags.
+    
+        If the thread history does not contain the necessary information, respond with "I, NoCodeBot, do not have access to data related to the query in the provided data."
       `;
     } else {
       prompt = `
-      You are an AI language model with a strict constraint to only use the provided context for generating responses. Do not rely on any outside knowledge or assumptions.
-
-      Query: ${query}
-
-      Context: ${context}
-
-      Please provide a detailed answer based strictly on the given context. Use data only relevant to the query from these 3 chunks. If the context does not contain the necessary information, respond with "I, NoCodeBot, do not have access to data related to the query in the provided context."
-      If your answer includes code, enclose it within <code> and </code> tags.
+        You are an AI language model with a strict constraint to only use the provided context and the current conversation thread history for generating responses. Do not rely on any outside knowledge or assumptions.
+    
+        Query: ${query}
+    
+        Context: ${context}
+    
+        Please provide a detailed answer based strictly on the given context and thread history. Use data only relevant to the query. If the context and thread history do not contain the necessary information, respond with "I, NoCodeBot, do not have access to data related to the query in the provided data."
+        If your answer includes code, enclose it within <code> and </code> tags.
       `;
     }
 
