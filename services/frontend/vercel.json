@@ -1,9 +1,0 @@
-{
-    "rewrites": [
-      {
-        "source": "(.*)",
-        "destination": "https://api.solcompute.com/$1"
-      }
-    ]
-  }
-  
