@@ -37,13 +37,7 @@ import {
   setIsDatasetLoading,
   updateDataset,
 } from "@/providers/redux/slice/datasetSlice";
-import {
-  Database,
-  File,
-  Loader2,
-  Plus,
-  Trash,
-} from "lucide-react";
+import { Database, File, Loader2, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { format } from "date-fns";
@@ -74,80 +68,98 @@ const DatasetByIdPage = ({ params }: Props) => {
   const [isDataDeleting, setIsDataDeleting] = useState(false);
 
   const [isDatasetFilesLoading, setIsDatasetFilesLoading] = useState(true);
-
+  const isDatasetLoading = useAppSelector(
+    (state) => state.datasets.isDatasetLoading
+  );
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
   );
-
-  const { data: res } = useAxiosSWR(
-    `/datasets/${currentWorkspaceName}/${params.id}`
+  const isWorkspaceLoading = useAppSelector(
+    (state) => state.workspaces.isWorkspaceLoading
   );
 
+  const {
+    data: res,
+    isLoading,
+    error,
+  } = useAxiosSWR(`/datasets/${currentWorkspaceName}/${params.id}`);
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!dataset || currentWorkspaceName === null) {
-        setIsDatasetFilesLoading(true);
-        return;
-      }
+    setIsDatasetFilesLoading(true);
+    if (isWorkspaceLoading || isLoading || isDatasetLoading) {
+      console.log("loading....");
+      return;
+    }
+    if (error) {
+      console.error(error);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load files.",
+        })
+      );
+      console.log("assistants exist");
+      setIsDatasetFilesLoading(false);
+      return;
+    }
 
-      if (!res) return;
-      try {
-        if (!res?.data?.data.length) {
-          dispatch(setIsDatasetFilesEmpty(true));
-          setIsDatasetFilesLoading(false);
-        } else {
-          const updatedFileArray: DataBucketType[] = res?.data?.data.map(
-            (item: any) => ({
-              id: item.dataId,
-              name: item.name,
-              path: item.path,
-              createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
-              createdBy: item.createdBy,
-            })
-          );
-          console.log(updatedFileArray);
-          dispatch(
-            setFiles({
-              id: res.data.datasetDetails.datasetId,
-              name: res.data.datasetDetails.name,
-              description: res.data.datasetDetails.description,
-              createdAt: format(
-                new Date(res.data.datasetDetails.createdAt),
-                "MM-dd-yy"
-              ),
-              createdBy: res.data.datasetDetails.createdBy,
-              data: updatedFileArray,
-            })
-          );
-          setIsDatasetFilesLoading(false);
-          dispatch(setIsDatasetFilesEmpty(updatedFileArray.length === 0));
-        }
-      } catch (error) {
-        console.error(error);
-        setIsDatasetFilesLoading(false);
+    try {
+      if (res?.data?.data?.length <= 0) {
+        console.log("Data");
         dispatch(setIsDatasetFilesEmpty(true));
+      } else {
+        console.log("Data");
+        const updatedFileArray: DataBucketType[] = res?.data?.data.map(
+          (item: any) => ({
+            id: item.dataId,
+            name: item.name,
+            path: item.path,
+            createdAt: format(new Date(item.createdAt), "MM-dd-yy"),
+            createdBy: item.createdBy,
+          })
+        );
+        console.log(updatedFileArray);
+        dispatch(
+          setFiles({
+            id: res.data.datasetDetails.datasetId,
+            name: res.data.datasetDetails.name,
+            description: res.data.datasetDetails.description,
+            createdAt: format(
+              new Date(res.data.datasetDetails.createdAt),
+              "MM-dd-yy"
+            ),
+            createdBy: res.data.datasetDetails.createdBy,
+            data: updatedFileArray,
+          })
+        );
+        dispatch(setIsDatasetFilesEmpty(updatedFileArray.length === 0));
       }
-    };
-
-    fetchData();
-  }, [currentWorkspaceName, dataset, dispatch, res]);
+      setIsDatasetFilesLoading(false);
+    } catch (error) {
+      console.error(error);
+      setIsDatasetFilesLoading(false);
+      dispatch(setIsDatasetFilesEmpty(true));
+    }
+  }, [isLoading, error, isWorkspaceLoading, isDatasetLoading]);
 
   const handleDataDeletion = async (dataId: string, dataName: string) => {
     try {
       setIsDataDeleting(true);
-      await deleteData(currentWorkspaceName!, dataset!.id, dataId);
-      dispatch(
-        removeFile({
-          datasetId: dataset!.id,
-          dataId: dataId,
-        })
-      );
-      toast(
-        CustomToast({
-          title: `${dataName} Deleted`,
-          description: `${dataName} has been deleted successfully.`,
-        })
-      );
+      const res = await deleteData(currentWorkspaceName!, dataset!.id, dataId);
+      if (res.statusCode == 201) {
+        dispatch(
+          removeFile({
+            datasetId: dataset!.id,
+            dataId: dataId,
+          })
+        );
+        toast(
+          CustomToast({
+            title: `${dataName} Deleted`,
+            description: `${dataName} has been deleted successfully.`,
+          })
+        );
+      }
     } catch (error: any) {
       toast(
         CustomToast({
@@ -165,14 +177,16 @@ const DatasetByIdPage = ({ params }: Props) => {
   const handleDatasetDeletion = async () => {
     try {
       setIsDatasetDeleting(true);
-      await deleteDataset(currentWorkspaceName!, dataset!.id);
-      dispatch(removeDataset(dataset!.id));
-      toast(
-        CustomToast({
-          title: `${dataset!.name} Deleted`,
-          description: `${dataset!.name} has been deleted successfully.`,
-        })
-      );
+      const res = await deleteDataset(currentWorkspaceName!, dataset!.id);
+      if (res.statusCode == 201) {
+        dispatch(removeDataset(dataset!.id));
+        toast(
+          CustomToast({
+            title: `${dataset!.name} Deleted`,
+            description: `${dataset!.name} has been deleted successfully.`,
+          })
+        );
+      }
       window.location.href = "/dashboard/datasets";
     } catch (error: any) {
       toast(

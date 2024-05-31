@@ -9,6 +9,7 @@ import {
 import { MoveDownIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SparklesCore } from "@/components/ui/sparkles";
+import Image from "next/image";
 
 const people = [
   {
@@ -41,7 +42,15 @@ const PeopleComponent = () => {
           key={index}
           className="flex flex-col gap-2 items-center justify-center"
         >
-          <div className="w-40 h-40 bg-card mb-6 rounded-t-full "></div>
+          <div className=" mb-6 rounded-t-full flex items-center justify-center">
+            <Image
+              src="/assets/person.png"
+              alt="Ibrahim Sheikh"
+              width={100}
+              height={100}
+              className="rounded-full"
+            />
+          </div>
           <h2 className="text-lg font-semibold">{person.name}</h2>
           <p className="text-muted-foreground text-sm">{person.role}</p>
         </div>
