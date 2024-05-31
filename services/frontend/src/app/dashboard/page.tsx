@@ -49,7 +49,7 @@ export default function Page() {
 
   return (
     <div className="flex justify-center items-center h-screen">
-      <div className="space-y-4 border-l border-primary pl-4">
+      <div className="space-y-4 border-l dark:border-primary  border-border pl-4">
         <div className="flex flex-col gap-2">
           <div className="text-2xl font-bold">Welcome to NoCodeBot.ai</div>
           <div>
