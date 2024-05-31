@@ -255,7 +255,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(newToken);
       sessionStorage.setItem("token", newToken);
       setIsLoggedIn(true);
-      router.push("/dashboard/featured");
+      router.push("/dashboard");
     } catch (error: any) {
       if (error.name === "UnexpectedSignInInterruptionException") {
         toast(
@@ -266,7 +266,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         );
       } else {
         if (error.name === "UserAlreadyAuthenticatedException") {
-          router.push("/dashboard/featured");
+          router.push("/dashboard");
           toast(
             <CustomToast
               title="Error signing in"
