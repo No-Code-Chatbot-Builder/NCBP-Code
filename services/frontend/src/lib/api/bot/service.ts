@@ -1,12 +1,6 @@
 import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
-import axios from "axios";
 import { apiClient } from "../apiService";
-
-// export const botApiClient = axios.create({
-//   baseURL: "http://localhost:3002/",
-//   headers: { "Content-Type": "application/json" },
-// });
 
 export const createAssistantWithThread = async (
   workspaceName: string,
