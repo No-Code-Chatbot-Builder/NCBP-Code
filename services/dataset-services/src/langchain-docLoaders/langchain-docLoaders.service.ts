@@ -45,7 +45,7 @@ export class LangchainDocLoaderService {
 
     const id = GenerateIdService.generateId();
     for (const response of responses) {
-      this.pineconeService.upsertRecords(id, response.data, userId, workspaceId, datasetId, dataId);
+      this.pineconeService.upsertRecords(id, response, userId, workspaceId, datasetId, dataId);
     }
     
     // try {
@@ -75,7 +75,7 @@ export class LangchainDocLoaderService {
         // Send the current chunk if adding the new text exceeds the maximum chunk size
         try {
           const response = await this.httpService.post(
-            'http://Fargat-Farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com/vectorEmbeddings',
+            'http://langchain-embedding-service.services/vectorEmbeddings',
             { texts: currentChunk }
           ).toPromise();
           responses.push(response.data);
@@ -97,7 +97,7 @@ export class LangchainDocLoaderService {
     if (currentChunk.length > 0) {
       try {
         const response = await this.httpService.post(
-          'http://Fargat-Farga-OpBzm5amP8IR-1656924029.us-east-1.elb.amazonaws.com/vectorEmbeddings',
+          'http://langchain-embedding-service.services/vectorEmbeddings',
           { texts: currentChunk }
         ).toPromise();
         responses.push(response.data);
