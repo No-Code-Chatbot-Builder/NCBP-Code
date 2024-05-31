@@ -32,7 +32,6 @@ export const createModel = async (
   datasetId: string,
   baseModel: string,
   name: string,
-
   lr: string,
   epochs: string,
   batch_size: string
@@ -46,6 +45,7 @@ export const createModel = async (
       batch_size: batch_size,
       lr: lr,
       epochs: epochs,
+      purpose : "To deploy the bot on daraz website"
     });
 
     toast(
@@ -100,9 +100,9 @@ export const checkStatus = async (
 };
 
 //tested
-export const cancelJob = async (job_id: string) => {
+export const cancelJob = async (workspace_id:string,job_id: string) => {
   try {
-    const response = await apiClient.get(`/model/cancel_job?job_id=${job_id}`);
+    const response = await apiClient.get(`/finetune/model/cancel?workspace_id=${workspace_id}&job_id=${job_id}`);
 
     toast(
       CustomToast({

@@ -7,38 +7,7 @@ interface ModelState {
 }
 
 const initialState: ModelState = {
-  models: [
-    {
-      modelId: "dummy-model-001",
-      modelName: "Llama 3",
-      baseModel: "base-model-1",
-      batchSize: 32,
-      createdAt: "2023-01-01T00:00:00Z",
-      createdBy: "admin",
-      deleted: "false",
-      epochs: 10,
-      jobId: "job-123",
-      learningRate: 0.001,
-      purpose: "Testing",
-      status: "Completed",
-      trainingFileId: "file-321",
-    },
-    {
-      modelId: "dummy-model-002",
-      modelName: "Llama 2",
-      baseModel: "base-model-1",
-      batchSize: 64,
-      createdAt: "2023-02-10T00:00:00Z",
-      createdBy: "admin",
-      deleted: "false",
-      epochs: 20,
-      jobId: "job-123",
-      learningRate: 0.03,
-      purpose: "Testing",
-      status: "Completed",
-      trainingFileId: "file-321",
-    },
-  ],
+  models: [],
   isModelLoading: false,
 };
 

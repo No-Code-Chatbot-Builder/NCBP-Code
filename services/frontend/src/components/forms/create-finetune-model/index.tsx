@@ -117,7 +117,7 @@ const CreateFineTuneModelForm = () => {
   const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
     try {
       //create model
-      if(!currentWorkspaceName) return;
+      if (!currentWorkspaceName) return;
 
       const response = await createModel(
         currentWorkspaceName,
@@ -128,24 +128,25 @@ const CreateFineTuneModelForm = () => {
         data.no_epochs,
         data.batch_size
       );
-      //update this to the returned model and dispatch on redux
-      dispatch(
-        addModel({
-          modelId: "dummy-model-001",
-          modelName: data.name,
-          baseModel: data.base_model,
-          batchSize: parseInt(data.batch_size, 10),
-          createdAt: new Date().toISOString(),
-          createdBy: "admin",
-          deleted: "false",
-          epochs: parseInt(data.no_epochs, 10),
-          jobId: "job-123",
-          learningRate: parseFloat(data.lr),
-          purpose: "Fine Tuning",
-          status: "In Progress",
-          trainingFileId: data.dataset,
-        })
-      );
+      if (response.statusCode == 201) {
+        dispatch(
+          addModel({
+            modelId: response.data.modelId,
+            modelName: response.data.modelName,
+            baseModel: response.data.baseModel,
+            batchSize: response.data.batchSize,
+            createdAt: response.data.createdAt,
+            createdBy: response.data.createdBy,
+            deleted: response.data.deleted,
+            epochs: response.data.epochs,
+            jobId: response.data.jobId,
+            learningRate: response.data.learningRate,
+            purpose: response.data.purpose,
+            status: response.data.status,
+            trainingFileId: response.data.trainingFileId,
+          })
+        );
+      }
     } catch (error) {
       console.log(error);
     } finally {
