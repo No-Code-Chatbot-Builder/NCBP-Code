@@ -61,7 +61,7 @@ def createQueryVectorEmbeddings(text: TextModel):
     return embeddings_as_lists[0]
     
 
-@app.get("/health")
+@app.get("/")
 def read_root():
     return {"Langchain Embedding Service is running"}
 
