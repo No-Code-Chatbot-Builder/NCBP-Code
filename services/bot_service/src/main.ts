@@ -37,7 +37,7 @@ export const setEnvironmentVariables = () => {
 async function bootstrap() {
  setEnvironmentVariables();
   const app = await NestFactory.create(AppModule);
-  app.enableCors({ origin: 'http://localhost:3000' });
+  app.enableCors({ origin: '*' });
   await app.listen(80);
 }
 bootstrap();
