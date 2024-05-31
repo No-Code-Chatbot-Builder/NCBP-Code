@@ -37,7 +37,7 @@ export class LangchainDocLoaderService {
       texts.push(document[i].pageContent);
     }
 
-    const maxChunkSizeInBytes = 1024 * 1023; // 1 MB in bytes
+    const maxChunkSizeInBytes = 500 * 500; // 1 MB in bytes
     const responses = await this.sendTextsInChunks(texts, maxChunkSizeInBytes);
 
     // Process responses as needed
@@ -82,7 +82,6 @@ export class LangchainDocLoaderService {
         } catch (error) {
           console.error('Error sending chunk:', error);
         }
-
         // Start a new chunk
         currentChunk = [];
         currentChunkSize = 0;
