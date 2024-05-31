@@ -28,9 +28,12 @@ import { deleteWorkspace } from "@/lib/api/workspace/service";
 import { useAppSelector } from "@/lib/hooks";
 import CustomToast from "@/components/global/custom-toast";
 import { deleteAllDatasets } from "@/lib/api/dataset/service";
+import { useDispatch } from "react-redux";
+import { setDatasets } from "@/providers/redux/slice/datasetSlice";
 
 const DeleteAllDatasetsCard = () => {
   const { toast } = useToast();
+  const dispatch = useDispatch();
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
   );
@@ -51,7 +54,10 @@ const DeleteAllDatasetsCard = () => {
 
   const handleSubmit = async () => {
     try {
-      await deleteAllDatasets(currentWorkspaceName!);
+      const res= await deleteAllDatasets(currentWorkspaceName!);
+      if (res.statusCode === 201) {
+        dispatch(setDatasets([]));
+      }
     } catch (err: any) {
       toast(
         CustomToast({

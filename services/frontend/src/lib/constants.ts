@@ -1,5 +1,3 @@
-import { Tooltip } from "@/components/ui/tooltip";
-import { IconToolsKitchen } from "@tabler/icons-react";
 import {
   BookPlus,
   Code,
@@ -8,9 +6,6 @@ import {
   Settings,
   Star,
   Zap,
-  CookingPot,
-  Bell,
-  ShoppingBag,
   PocketKnife,
   AudioWaveform,
 } from "lucide-react";
@@ -25,11 +20,6 @@ export type StepCard = {
 };
 
 export const icons = [
-  {
-    value: "featured",
-    label: "Featured",
-    path: Star,
-  },
   {
     value: "mygpts",
     label: "My GPTs",
@@ -64,11 +54,6 @@ export const icons = [
     value: "settings",
     label: "Settings",
     path: Settings,
-  },
-  {
-    value: "tools",
-    label: "Tools",
-    path: PocketKnife,
   },
 ];
 
@@ -140,12 +125,9 @@ export const sidebarOpt: SidebarOption[] = [
   {
     heading: "",
     items: [
-      { name: "Featured", icon: "featured", link: "/dashboard/featured" },
       { name: "Assistants", icon: "assistants", link: "/dashboard/assistants" },
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
       { name: "Fine Tuning", icon: "finetune", link: "/dashboard/finetune" },
-
-      { name: "Tools", icon: "tools", link: "/dashboard/tools" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
     ],
   },
@@ -162,6 +144,22 @@ export type AssistantType = {
   allowedDomain: string[];
   // owner: string;
   // threadId: string;
+};
+
+export type ModelType = {
+  modelId: string;
+  modelName: string;
+  baseModel: string;
+  batchSize: number;
+  createdAt: string;
+  createdBy: string;
+  deleted: string;
+  epochs: number;
+  jobId: string;
+  learningRate: number;
+  purpose: string;
+  status: string;
+  trainingFileId: string;
 };
 
 export type DomainType = {

@@ -65,7 +65,6 @@ const CreateAssistantForm = () => {
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
       console.log(values);
-      localStorage.removeItem("assistants");
       const res = await createAssistantWithThread(
         currentWorkspaceName!,
         values.name,
@@ -73,7 +72,6 @@ const CreateAssistantForm = () => {
         values.model,
         values.tool,
         values.dataset
-        // values.site,
       );
       console.log(res.response);
       console.log(res.response[2].split(": ")[1].trim());
