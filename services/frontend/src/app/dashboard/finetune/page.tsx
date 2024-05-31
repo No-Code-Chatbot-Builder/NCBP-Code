@@ -20,6 +20,7 @@ import {
   Plus,
   TimerIcon,
   User,
+  X,
 } from "lucide-react";
 import CreateFineTuneModelForm from "@/components/forms/create-finetune-model";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
@@ -45,7 +46,7 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { cancelJob, checkStatus } from "@/lib/api/model/service";
 
-type StatusType = "All" | "Successful" | "Failed" | "In Progress";
+type StatusType = "All" | "succeeded" | "cancelled" | "In Progress";
 
 export default function Page() {
   const models: ModelType[] = useAppSelector(
@@ -85,84 +86,10 @@ export default function Page() {
     (state) => state.workspaces.isWorkspaceLoading
   );
 
-  const {
-    data: res,
-    error,
-    isLoading,
-  } = useAxiosSWR(
-    `/finetune/model/models?workspace_id=${currentWorkspaceName}`
-  );
-
   const check_status = async (job_id: string) => {
     const res = await checkStatus(currentWorkspaceName as string, job_id);
     return res.status;
   };
-
-  useEffect(() => {
-    dispatch(setIsModelLoading(true));
-
-    if (isWorkspaceLoading || isLoading) {
-      return;
-    }
-    if (error) {
-      console.error(error);
-      toast(
-        CustomToast({
-          title: "Error",
-          description: "Failed to load finetuned models.",
-        })
-      );
-      dispatch(setIsModelLoading(false));
-      return;
-    }
-
-    const getModels = async () => {
-      if (res?.data?.models?.length > 0) {
-        const fetchedModels: ModelType[] = res?.data?.models?.map(
-          (model: any) => ({
-            modelId: model.modelId,
-            purpose: model.purpose,
-            organisationId: model.purpose,
-            status: model.status,
-            createdAt: model.createdAt,
-            jobId: model.jobId,
-            batchSize: model.batchSize,
-            learningRate: model.learningRate,
-            createdBy: model.createdBy,
-            baseModel: model.baseModel,
-            deleted: model.deleted,
-            trainingFileId: model.trainingFileId,
-            epochs: model.epochs,
-            modelName: model.modelName,
-          })
-        );
-        console.log(fetchedModels);
-
-        const currentModelNames = models
-          .map((model: ModelType) => model.modelName)
-          .sort();
-        const newModelNames = fetchedModels
-          .map((model: ModelType) => model.modelName)
-          .sort();
-        const modelsChanged =
-          JSON.stringify(currentModelNames) !== JSON.stringify(newModelNames);
-
-        if (modelsChanged) {
-          console.log("added");
-          console.log(fetchedModels);
-
-          dispatch(setModels(fetchedModels));
-          dispatch(setFilteredModels(fetchedModels));
-        }
-
-        dispatch(setIsModelLoading(false));
-      } else {
-        dispatch(setIsModelLoading(false));
-      }
-    };
-
-    getModels();
-  }, [isWorkspaceLoading, isLoading, error]);
 
   const handleCancellation = async (model_id: string, job_id: string) => {
     const res = await cancelJob(currentWorkspaceName, job_id);
@@ -223,82 +150,41 @@ export default function Page() {
         </section>
       ) : (
         <section>
-          <div className="flex flex-row gap-4 mb-10">
-            <button
-              onClick={() => dispatch(filterModels("All"))}
-              className={cn(
-                "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
-                selectedStatus === "All" && "bg-primary/10 shadow-md"
-              )}
-            >
-              All
-            </button>
-            <button
-              onClick={() => dispatch(filterModels("succeeded"))}
-              className={cn(
-                "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
-                selectedStatus === "Successful" && "bg-primary/10 shadow-md"
-              )}
-            >
-              Successful
-            </button>
-            <button
-              onClick={() => dispatch(filterModels("cancelled"))}
-              className={cn(
-                "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
-                selectedStatus === "Failed" && "bg-primary/10 shadow-md"
-              )}
-            >
-              Failed
-            </button>
-            <button
-              onClick={() => dispatch(filterModels("In Progress"))}
-              className={cn(
-                "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
-                selectedStatus === "In Progress" && "bg-primary/10 shadow-md"
-              )}
-            >
-              In Progress
-            </button>
-          </div>
-
           {filteredModels.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               <div className="flex flex-col gap-4">
                 {filteredModels.map((model: ModelType) => {
-                  const formattedDate = new Date(
-                    model.createdAt
-                  ).toLocaleDateString("en-GB", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  });
+                  const formattedDate = formatDate(model.createdAt);
                   return (
                     <div
                       key={model.modelId}
                       className={cn(
                         "w-full h-[75px] rounded-xl flex items-center justify-between px-4 hover:bg-card mb-1",
-                        modelSelected?.modelId === model.modelId
+                        modelSelected?.jobId === model.jobId
                           ? "border border-primary bg-card"
                           : ""
                       )}
                       onClick={() => setModelSelected(model)}
                     >
                       <div className="flex flex-row gap-4 items-center">
-                        <p className="text-md font-semibold">
-                          {" "}
+                        <p className="text-md font-semibold w-32">
                           {model.modelName}
                         </p>
-                        <button className="bg-green-900/30 px-4 py-2 rounded-md font-medium flex gap-1 items-center justify-center">
-                          <CheckIcon
-                            className={`w-4 h-4 ${
-                              model.status === "In Progress"
-                                ? "text-orange-500"
-                                : model.status === "succeeded"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            }`}
-                          />
+                        <button
+                          className={cn(
+                            " px-4 py-2 rounded-md font-medium flex gap-1 items-center justify-center",
+                            {
+                              "bg-green-900/30": model.status === "In Progress",
+                              "bg-green-800/40": model.status === "succeeded",
+                              "bg-red-800/40": model.status === "cancelled",
+                            }
+                          )}
+                        >
+                          {model.status === "succeeded" ? (
+                            <CheckIcon className={`w-4 h-4 text-green-500`} />
+                          ) : (
+                            <X className="w-4 h-4 text-red-500" />
+                          )}
                           <p
                             className={`text-sm ${
                               model.status === "In Progress"
@@ -308,8 +194,11 @@ export default function Page() {
                                 : "text-red-500"
                             } font-medium`}
                           >
-                            {" "}
-                            {model.status}
+                            {model.status === "In Progress"
+                              ? "In Progress"
+                              : model.status === "succeeded"
+                              ? "Success"
+                              : "Failed"}
                           </p>
                         </button>
                       </div>
@@ -486,7 +375,7 @@ export default function Page() {
                   No {selectedStatus} Models Available
                 </h2>
 
-                <p className="text-muted-foreground text-center mt-2">
+                <p className="t-muted-foreground text-center mt-2">
                   {selectedStatus === "All"
                     ? "Create a new model to get started."
                     : `No models found with ${selectedStatus} status.`}

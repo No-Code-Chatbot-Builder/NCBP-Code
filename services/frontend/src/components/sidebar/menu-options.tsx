@@ -25,7 +25,7 @@ import Image from "next/image";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import PersonalDetails from "./personal-details";
-import { icons } from "@/lib/constants";
+import { AssistantType, DatasetType, ModelType, icons } from "@/lib/constants";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Card,
@@ -49,11 +49,22 @@ import {
 } from "@/providers/redux/slice/workspaceSlice";
 import { toast } from "sonner";
 import CustomToast from "../global/custom-toast";
-import { setIsAssistantLoading } from "@/providers/redux/slice/assistantSlice";
-import { setIsDatasetLoading } from "@/providers/redux/slice/datasetSlice";
+import {
+  setAssistant,
+  setIsAssistantLoading,
+} from "@/providers/redux/slice/assistantSlice";
+import {
+  setDatasets,
+  setIsDatasetLoading,
+} from "@/providers/redux/slice/datasetSlice";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import { cn } from "@/lib/utils";
 import { createWorkspace, fetchWorkspace } from "@/lib/api/workspace/service";
+import {
+  setFilteredModels,
+  setIsModelLoading,
+  setModels,
+} from "@/providers/redux/slice/modelSlice";
 
 type Props = {
   defaultOpen?: boolean;
@@ -74,14 +85,37 @@ const WorkspaceMenuOptions = ({
   const workspaces = useAppSelector(
     (state: { workspaces: { workspaces: any } }) => state.workspaces.workspaces
   );
+  const assistants = useAppSelector((state) => state.assistants.assistants);
   const isWorkspaceLoading = useAppSelector(
     (state) => state.workspaces.isWorkspaceLoading
+  );
+  const models: ModelType[] = useAppSelector(
+    (state) => state.customModel.models
   );
 
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
   );
-  const { data: res, error, isLoading } = useAxiosSWR("/users/");
+  const { data: res, error, isLoading: isWLoading } = useAxiosSWR("/users/");
+  const {
+    data: resDataset,
+    error: errorDataset,
+    isLoading: isDatasetLoading,
+  } = useAxiosSWR(`/datasets/${currentWorkspaceName}/`);
+  const {
+    data: resAssistant,
+    error: errorAssistant,
+    isLoading: isALoading,
+  } = useAxiosSWR(`/bot/${currentWorkspaceName}`);
+  const {
+    data: resModel,
+    error: errorModel,
+    isLoading: isModelLoading,
+  } = useAxiosSWR(
+    `/finetune/model/models?workspace_id=${currentWorkspaceName}`
+  );
+
+  const datasets = useAppSelector((state) => state.datasets.datasets);
 
   const fetchCurrentWorkspace = async (workspaceName: string) => {
     const res = await fetchWorkspace(workspaceName);
@@ -113,8 +147,8 @@ const WorkspaceMenuOptions = ({
     dispatch(setIsWorkspaceLoading(true));
     const localCurrentWorkspace = localStorage.getItem("currentWorkspace");
     const parsedLocalCurrentWorkspace: CurrentWorkspaceType =
-      localCurrentWorkspace != "undefined"
-        ? JSON.parse(localCurrentWorkspace!)
+      localCurrentWorkspace !== "undefined" && localCurrentWorkspace !== null
+        ? JSON.parse(localCurrentWorkspace)
         : null;
 
     if (error) {
@@ -127,8 +161,8 @@ const WorkspaceMenuOptions = ({
       );
       return;
     }
-    if (!isLoading) {
-      if (res.data.workspaces) {
+    if (!isWLoading) {
+      if (res?.data?.workspaces) {
         const formattedWorkspaces: WorkspaceType[] = Object.entries(
           res.data.workspaces
         ).map(([key, value]: [string, unknown]) => ({
@@ -149,7 +183,159 @@ const WorkspaceMenuOptions = ({
       }
       dispatch(setIsWorkspaceLoading(false));
     }
-  }, [error, isLoading, res]);
+    dispatch(setIsAssistantLoading(true));
+    if (isWorkspaceLoading || isALoading) {
+      console.log("assistants exist");
+      return;
+    }
+    if (errorAssistant) {
+      console.error(errorAssistant);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load assistants.",
+        })
+      );
+      console.log("assistants exist");
+      dispatch(setIsAssistantLoading(false));
+      return;
+    }
+
+    if (resAssistant?.data?.response?.assistants?.length <= 0) {
+      console.log("empty");
+      dispatch(setAssistant([]));
+      dispatch(setIsAssistantLoading(false));
+      return;
+    }
+
+    console.log("assistants exist");
+    const formattedAssistants: AssistantType[] =
+      resAssistant?.data?.response?.assistants?.map((assistant: any) => ({
+        id: assistant.assistantId,
+        name: assistant.assistantName,
+        description: assistant.purpose,
+        allowedDomain: [],
+      }));
+    const currentAssistantNames = assistants
+      .map((assistant: AssistantType) => assistant.name)
+      .sort();
+    const newAssistantNames = formattedAssistants
+      ?.map((assistant: AssistantType) => assistant.name)
+      .sort();
+    const assistantsChanged =
+      JSON.stringify(currentAssistantNames) !==
+      JSON.stringify(newAssistantNames);
+
+    if (assistantsChanged) {
+      dispatch(setAssistant(formattedAssistants));
+    }
+
+    dispatch(setIsAssistantLoading(false));
+
+    dispatch(setIsModelLoading(true));
+
+    if (isWorkspaceLoading || isModelLoading) {
+      return;
+    }
+    if (errorModel) {
+      console.error(errorModel);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load finetuned models.",
+        })
+      );
+      dispatch(setIsModelLoading(false));
+    }
+    if (resModel?.data?.models?.length > 0) {
+      const fetchedModels: ModelType[] = resModel?.data?.models?.map(
+        (model: any) => ({
+          modelId: model.modelId,
+          purpose: model.purpose,
+          organisationId: model.purpose,
+          status: model.status,
+          createdAt: model.createdAt,
+          jobId: model.jobId,
+          batchSize: model.batchSize,
+          learningRate: model.learningRate,
+          createdBy: model.createdBy,
+          baseModel: model.baseModel,
+          deleted: model.deleted,
+          trainingFileId: model.trainingFileId,
+          epochs: model.epochs,
+          modelName: model.modelName,
+        })
+      );
+      console.log(fetchedModels);
+
+      const currentModelNames = models
+        .map((model: ModelType) => model.modelName)
+        .sort();
+      const newModelNames = fetchedModels
+        .map((model: ModelType) => model.modelName)
+        .sort();
+      const modelsChanged =
+        JSON.stringify(currentModelNames) !== JSON.stringify(newModelNames);
+
+      if (modelsChanged) {
+        console.log("added");
+        console.log(fetchedModels);
+
+        dispatch(setModels(fetchedModels));
+        dispatch(setFilteredModels(fetchedModels));
+      }
+
+      dispatch(setIsModelLoading(false));
+    } else {
+      dispatch(setIsModelLoading(false));
+    }
+    dispatch(setIsDatasetLoading(true));
+    if (isWorkspaceLoading || isDatasetLoading) {
+      return;
+    }
+    if (error) {
+      console.error(error);
+      toast(
+        CustomToast({
+          title: "Error",
+          description: "Failed to load datasets.",
+        })
+      );
+      dispatch(setIsDatasetLoading(false));
+      return;
+    }
+
+    if (resDataset?.data?.datasets?.length <= 0) {
+      dispatch(setDatasets([]));
+      dispatch(setIsDatasetLoading(false));
+      return;
+    }
+    const newDatasets = resDataset.data.datasets;
+    const currentDatasetNames = datasets
+      .map((dataset: DatasetType) => dataset.name)
+      .sort();
+    const newDatasetNames = newDatasets
+      ? newDatasets.map((dataset: DatasetType) => dataset.name).sort()
+      : [];
+    const datasetsChanged =
+      JSON.stringify(currentDatasetNames) !== JSON.stringify(newDatasetNames);
+
+    if (datasetsChanged) {
+      dispatch(setDatasets(newDatasets));
+    }
+
+    dispatch(setIsDatasetLoading(false));
+  }, [
+    isWLoading,
+    isALoading,
+    isModelLoading,
+    resModel,
+    resAssistant,
+    res,
+    currentWorkspaceName,
+    isDatasetLoading,
+    resDataset,
+  ]);
 
   const changeCurrentWorkspace = (workspace: WorkspaceType) => {
     dispatch(setIsWorkspaceLoading(true));

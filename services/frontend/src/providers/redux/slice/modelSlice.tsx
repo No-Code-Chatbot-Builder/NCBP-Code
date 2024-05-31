@@ -44,9 +44,13 @@ export const modelSlice = createSlice({
     },
     filterModels: (state, action: PayloadAction<string>) => {
       state.filteredModels = [];
-      state.filteredModels = state.models.filter(
-        (model) => model.status === action.payload
-      );
+      if (action.payload === "All") {
+        state.filteredModels = state.models;
+      } else {
+        state.filteredModels = state.models.filter(
+          (model) => model.status === action.payload
+        );
+      }
     },
     setIsModelLoading: (state, action: PayloadAction<boolean>) => {
       state.isModelLoading = action.payload;

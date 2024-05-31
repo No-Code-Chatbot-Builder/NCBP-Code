@@ -52,57 +52,6 @@ export default function Page() {
   const currentWorkspaceName = useAppSelector(
     (state) => state.workspaces.currentWorkspace?.name
   );
-  const isWorkspaceLoading = useAppSelector(
-    (state) => state.workspaces.isWorkspaceLoading
-  );
-  const isAssistantLoading = useAppSelector(
-    (state) => state.assistants.isAssistantLoading
-  );
-
-  const {
-    data: res,
-    error,
-    isLoading,
-  } = useAxiosSWR(`/datasets/${currentWorkspaceName}/`);
-
-  useEffect(() => {
-    dispatch(setIsDatasetLoading(true));
-    if (isWorkspaceLoading || isLoading) {
-      return;
-    }
-    if (error) {
-      console.error(error);
-      toast(
-        CustomToast({
-          title: "Error",
-          description: "Failed to load datasets.",
-        })
-      );
-      dispatch(setIsDatasetLoading(false));
-      return;
-    }
-
-    if (res?.data?.datasets?.length <= 0) {
-      dispatch(setDatasets([]));
-      dispatch(setIsDatasetLoading(false));
-      return;
-    }
-    const newDatasets = res.data.datasets;
-    const currentDatasetNames = datasets
-      .map((dataset: DatasetType) => dataset.name)
-      .sort();
-    const newDatasetNames = newDatasets
-      .map((dataset: DatasetType) => dataset.name)
-      .sort();
-    const datasetsChanged =
-      JSON.stringify(currentDatasetNames) !== JSON.stringify(newDatasetNames);
-
-    if (datasetsChanged) {
-      dispatch(setDatasets(newDatasets));
-    }
-
-    dispatch(setIsDatasetLoading(false));
-  }, [currentWorkspaceName, isLoading, error, isAssistantLoading]);
 
   const datasetSheet = (
     <CustomSheet

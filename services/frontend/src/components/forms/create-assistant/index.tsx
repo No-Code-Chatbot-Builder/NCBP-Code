@@ -28,8 +28,10 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { addAssistant } from "@/providers/redux/slice/assistantSlice";
 import { createAssistantWithThread } from "@/lib/api/bot/service";
-import { DatasetType } from "@/lib/constants";
+import { DatasetType, ModelType } from "@/lib/constants";
 import { Loader2, Trash } from "lucide-react";
+import { Command, CommandGroup } from "@/components/ui/command";
+import { CommandList } from "cmdk";
 
 const CreateAssistantForm = () => {
   const dispatch = useAppDispatch();
@@ -61,6 +63,10 @@ const CreateAssistantForm = () => {
   );
 
   const datasets = useAppSelector((state) => state.datasets.datasets);
+  const finetunedModels = useAppSelector((state) => state.customModel.models);
+  const filteredModels = finetunedModels.filter(
+    (model) => model.status === "succeeded"
+  );
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
@@ -189,8 +195,26 @@ const CreateAssistantForm = () => {
                       <SelectValue placeholder="Select model type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="gpt-3.5-turbo">GPT 3.5</SelectItem>
-                      <SelectItem value="gpt-4">Gpt 4</SelectItem>
+                      <Command>
+                        <CommandList>
+                          <CommandGroup heading="Base Models">
+                            <SelectItem value="gpt-3.5-turbo">
+                              GPT 3.5
+                            </SelectItem>
+                            <SelectItem value="gpt-4">Gpt 4</SelectItem>
+                          </CommandGroup>
+                          <CommandGroup heading="Custom Models">
+                            {filteredModels.map((model: ModelType) => (
+                              <SelectItem
+                                key={model.modelId}
+                                value={model.modelId}
+                              >
+                                {model.modelName}
+                              </SelectItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
                     </SelectContent>
                   </Select>
                 </FormControl>

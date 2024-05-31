@@ -33,7 +33,7 @@ export default function Page() {
   const isAssistantLoading = useAppSelector(
     (state) => state.assistants.isAssistantLoading
   );
-  const assistants = useAppSelector((state) => state.assistants.assistants);
+
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentWorkspaceName = useAppSelector(
@@ -41,65 +41,7 @@ export default function Page() {
   );
   const [isAssistantDeleting, setIsAssistantDeleting] = useState(false);
   const { setOpen, setClose } = useModal();
-  const isWorkspaceLoading = useAppSelector(
-    (state) => state.workspaces.isWorkspaceLoading
-  );
-  const {
-    data: res,
-    error,
-    isLoading,
-  } = useAxiosSWR(`/bot/${currentWorkspaceName}`);
-
-  useEffect(() => {
-    dispatch(setIsAssistantLoading(true));
-    if (isWorkspaceLoading || isLoading) {
-      console.log("assistants exist");
-      return;
-    }
-    if (error) {
-      console.error(error);
-      toast(
-        CustomToast({
-          title: "Error",
-          description: "Failed to load assistants.",
-        })
-      );
-      console.log("assistants exist");
-      dispatch(setIsAssistantLoading(false));
-      return;
-    }
-    console.log(res);
-    if (res?.data?.response?.assistant?.length <= 0) {
-      console.log("empty");
-      dispatch(setAssistant([]));
-      dispatch(setIsAssistantLoading(false));
-      return;
-    }
-
-    console.log("assistants exist");
-    const formattedAssistants: AssistantType[] =
-      res?.data?.response?.assistants?.map((assistant: any) => ({
-        id: assistant.assistantId,
-        name: assistant.assistantName,
-        description: assistant.purpose,
-        allowedDomain: [],
-      }));
-    const currentAssistantNames = assistants
-      .map((assistant: AssistantType) => assistant.name)
-      .sort();
-    const newAssistantNames = formattedAssistants
-      ?.map((assistant: AssistantType) => assistant.name)
-      .sort();
-    const assistantsChanged =
-      JSON.stringify(currentAssistantNames) !==
-      JSON.stringify(newAssistantNames);
-
-    if (assistantsChanged) {
-      dispatch(setAssistant(formattedAssistants));
-    }
-
-    dispatch(setIsAssistantLoading(false));
-  }, [currentWorkspaceName, error, isLoading]);
+  const assistants = useAppSelector((state) => state.assistants.assistants);
 
   const manageDomains = (assistantId: string) => {
     setOpen(
