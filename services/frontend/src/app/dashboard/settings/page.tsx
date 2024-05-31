@@ -69,10 +69,9 @@ export default function Page() {
 
       <div className="">
         <Tabs defaultValue="workspace" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-10">
+          <TabsList className="grid w-full grid-cols-2 mb-10">
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="invites">Invites</TabsTrigger>
-            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
           </TabsList>
           <TabsContent value="invites">
             <ManagePendingInvitesCard memberships={memberships} />
@@ -81,11 +80,6 @@ export default function Page() {
             <ManageWorkspaceCard />
             <ManageUsersCard />
             <DeleteAllDatasetsCard />
-            <DeleteWorkspaceCard />
-          </TabsContent>
-
-          <TabsContent value="subscriptions">
-            <PricingCards />
           </TabsContent>
         </Tabs>
       </div>

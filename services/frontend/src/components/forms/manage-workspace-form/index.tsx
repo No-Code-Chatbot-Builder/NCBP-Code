@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -54,11 +54,19 @@ const ManageWorkspaceCard = () => {
     },
   });
 
+  useEffect(() => {
+    form.reset({
+      workspaceName: currentWorkspace?.name ?? "",
+      description: currentWorkspace?.description ?? "",
+    });
+  }, [currentWorkspace, form]);
+
   const isOwner = () => {
     return true;
   };
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+    console.log(values);
     const res = await editWorkspace(
       values.workspaceName,
       values.description,

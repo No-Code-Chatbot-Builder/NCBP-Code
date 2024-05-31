@@ -137,7 +137,9 @@ const WorkspaceMenuOptions = ({
         }));
 
         if (parsedLocalCurrentWorkspace == null) {
-          fetchCurrentWorkspace(formattedWorkspaces[0].name);
+          if (formattedWorkspaces.length > 0) {
+            fetchCurrentWorkspace(formattedWorkspaces[0].name);
+          }
         } else {
           dispatch(setCurrentWorkspace(parsedLocalCurrentWorkspace));
         }
@@ -191,7 +193,7 @@ const WorkspaceMenuOptions = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="mt-3 ml-5 w-[26rem] h-fit z-50">
-          <Card className="bg-card border border-primary/50">
+          <Card className="bg-card border dark:border-primary/50 border-border bg-gradient-to-l from-card to-card">
             <CardHeader>
               <CardTitle className="text-xl">Toggle Workspace</CardTitle>
               <CardDescription className="text-xs">
@@ -219,9 +221,9 @@ const WorkspaceMenuOptions = ({
                           onClick={() => changeCurrentWorkspace(workspace)}
                           key={workspace.name}
                           className={cn(
-                            "p-3 bg-sidebar/60 hover:cursor-pointer w-fit text-primry rounded-full border-primary hover:bg-sidebar transition-all ease-in-out duration-300 text-sm ",
+                            "p-3 bg-neutral-200 dark:bg-sidebar/60 hover:cursor-pointer w-fit text-primry rounded-full  dark:hover:bg-sidebar hover:bg-primarytransition-all ease-in-out duration-300 text-sm",
                             {
-                              "bg-primary/50 hover:bg-primary/50 scale-[1.01] font-medium":
+                              "dark:bg-primary/50 bg-primary dark:hover:bg-primary/50 scale-[1.01] font-medium text-white":
                                 workspace.name === currentWorkspaceName,
                             }
                           )}
@@ -276,7 +278,7 @@ const WorkspaceMenuOptions = ({
                       <CommandItem
                         key={option.name}
                         className={clsx(
-                          "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1 hover:scale-105 transition-all hover:text-white",
+                          "md:w-[250px] w-full text-muted-foreground font-normal hover:bg-sidebar-hover mb-1 hover:scale-[1.02] hover:text-black dark:hover:text-white",
                           {
                             "bg-sidebar-hover text-sidebar-foreground":
                               pathname === option.link,
@@ -300,10 +302,6 @@ const WorkspaceMenuOptions = ({
         </CommandList>
       </Command>
       <section>
-        <div className="mb-4 p-4 bg-sidebar-hover rounded-md">
-          <ModeDashboardToggle />
-        </div>
-
         <Popover>
           <PopoverTrigger className="hover:bg-card rounded-lg p-1">
             <PersonalDetails />
@@ -313,10 +311,15 @@ const WorkspaceMenuOptions = ({
               <CommandList>
                 <CommandGroup heading="">
                   <CommandItem>
+                    <ModeDashboardToggle />
+                  </CommandItem>
+                  <CommandItem>
                     <Button onClick={logout} className="w-full bg-card">
                       <div className="flex justify-start w-full items-center">
-                        <User className="w-4 h-4 mr-4" />
-                        <p className="text-center">Sign Out</p>
+                        <User className="w-4 h-4 mr-4 text-muted-foreground dark:text-white" />
+                        <p className="text-center text-muted-foreground dark:text-white">
+                          Sign Out
+                        </p>
                       </div>
                     </Button>
                   </CommandItem>

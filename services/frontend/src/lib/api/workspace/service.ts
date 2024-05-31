@@ -44,7 +44,7 @@ export const editWorkspace = async (
       members: members,
       createdAt: createdAt,
       website: "",
-      description: description,
+      description: "owner",
       workspaceName: workspaceName,
     });
     toast(
@@ -95,8 +95,7 @@ export const deleteWorkspace = async (workspaceName: string) => {
 //fetch workspace by name
 export const fetchWorkspace = async (workspaceName: string) => {
   try {
-    const response = await apiClient.get(`/workspaces/${workspaceName}`, {
-    });
+    const response = await apiClient.get(`/workspaces/${workspaceName}`, {});
     console.log(response);
     return response.data;
   } catch (error: any) {

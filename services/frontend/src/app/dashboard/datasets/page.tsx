@@ -317,7 +317,7 @@ export default function Page() {
           ) : (
             <div className="w-full h-[65vh] flex items-center justify-center">
               <div className="flex items-center justify-center">
-                <div className="bg-card border border-primary p-16 rounded-lg flex flex-col gap-2">
+                <div className="bg-card border dark:border-primary border-border p-16 rounded-lg flex flex-col gap-2">
                   <h2 className="text-2xl font-bold text-center">
                     No Datasets Available
                   </h2>

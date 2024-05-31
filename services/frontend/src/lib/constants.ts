@@ -21,11 +21,6 @@ export type StepCard = {
 
 export const icons = [
   {
-    value: "featured",
-    label: "Featured",
-    path: Star,
-  },
-  {
     value: "mygpts",
     label: "My GPTs",
     path: Zap,
@@ -59,11 +54,6 @@ export const icons = [
     value: "settings",
     label: "Settings",
     path: Settings,
-  },
-  {
-    value: "tools",
-    label: "Tools",
-    path: PocketKnife,
   },
 ];
 
@@ -135,12 +125,9 @@ export const sidebarOpt: SidebarOption[] = [
   {
     heading: "",
     items: [
-      { name: "Featured", icon: "featured", link: "/dashboard/featured" },
       { name: "Assistants", icon: "assistants", link: "/dashboard/assistants" },
       { name: "Datasets", icon: "datasets", link: "/dashboard/datasets" },
       { name: "Fine Tuning", icon: "finetune", link: "/dashboard/finetune" },
-
-      { name: "Tools", icon: "tools", link: "/dashboard/tools" },
       { name: "Settings", icon: "settings", link: "/dashboard/settings" },
     ],
   },
@@ -170,9 +157,9 @@ export type ModelType = {
   epochs: number;
   jobId: string;
   learningRate: number;
-  purpose : string;
-  status : string;
-  trainingFileId : string;
+  purpose: string;
+  status: string;
+  trainingFileId: string;
 };
 
 export type DomainType = {

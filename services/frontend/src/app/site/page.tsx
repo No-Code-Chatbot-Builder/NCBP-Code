@@ -180,17 +180,17 @@ export default function Home() {
             borderRadius="1.75rem"
             className="p-2 border border-primary rounded-full text-sm bg-info text-info-foreground"
           >
-            NoCodeBot.ai is currently in Development Mode.{" "}
+            Welcome to NoCodeBot.ai V1.0
           </MovingButton>
 
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative">
             <h1 className="text-5xl lg:text-6xl font-bold text-center">
-              Make Custom AI Assistants
+              Power Your Platform: Harness AI Without Coding
             </h1>
           </div>
           <p className="text-muted-foreground text-md">
-            Easily create custom AI Agents according to your specific longterm
-            needs.
+            Overcome AI adoption barriers with NoCodeBot.ai: Deploy
+            high-precision AI effortlessly.
           </p>
 
           <Link href={isLoggedIn ? "/dashboard/assistants" : "/sign-in"}>
@@ -309,18 +309,7 @@ export default function Home() {
           </div>
         </div>
         {/**Early Access Section */}
-        <div className="grid gap-12 w-9/12 lg:w-8/12 mx-auto my-32">
-          <h1 className="text-5xl font-bold text-center text-secondary">
-            Join the Waitlist
-          </h1>
-          <div className="flex gap-4">
-            <Input
-              placeholder="Enter your email address"
-              className="rounded-lg bg-card p-6 dark:border-primary text-xs text-clip"
-            />
-            <Button className="rounded-lg p-6">Subscribe</Button>
-          </div>
-        </div>
+
         <div className="hidden">
           <Button onClick={logout}>Sign Out</Button>
           <div>
