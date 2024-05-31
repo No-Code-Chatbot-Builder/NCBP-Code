@@ -20,11 +20,14 @@ const Steps = ({ title, description, className, stepCard }: Props) => {
       )}
     >
       {/* Shading Effect: Behind the Image */}
+
       <div className="-z-50 absolute inset-0">
         {className ? (
-          <div className="absolute top-5 right-32 w-1/4 h-full bg-primary/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
+          <div className="dark:block hidden">
+            <div className="absolute top-5 right-32 w-1/4 h-full bg-primary/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
+          </div>
         ) : (
-          <div className="">
+          <div className="dark:block hidden">
             <div className="absolute top-5 left-32 w-1/4 h-full bg-primary/50 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob" />
           </div>
         )}

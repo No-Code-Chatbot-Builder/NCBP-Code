@@ -34,27 +34,36 @@ const Navigation = () => {
           <Link href={"/features"} className="hover:underline">
             Features
           </Link>
-          {isLoggedIn ? (
+          {/* {isLoggedIn ? (
             <Link href={"/dashboard"} className="hover:underline">
               Dashboard
             </Link>
           ) : (
             ""
-          )}
+          )} */}
         </ul>
       </nav>
       <aside className="flex gap-2 items-center">
+        <ModeToggle />
         <div className="hidden md:block">
           {isLoggedIn ? (
-            <Button onClick={logout}>Sign Out</Button>
+            <Button onClick={logout} variant={"outline"}>
+              Sign Out
+            </Button>
           ) : (
             <Link href="/sign-in">
               <Button>Sign In</Button>
             </Link>
           )}
         </div>
+        {isLoggedIn ? (
+          <Link href={"/dashboard/assistants"} className="hover:underline">
+            <Button>Dashboard</Button>
+          </Link>
+        ) : (
+          ""
+        )}
 
-        <ModeToggle />
         <div className="md:hidden block">
           <SignInToggle />
         </div>
