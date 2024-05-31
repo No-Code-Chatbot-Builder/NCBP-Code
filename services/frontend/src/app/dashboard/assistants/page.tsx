@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { AssistantType } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useModal } from "@/providers/modal-provider";
-import { Code, Loader2, Plus, Trash } from "lucide-react";
+import { Code, CopyIcon, Loader2, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LoadingSkeleton from "@/components/ui/loading-skeleton";
 import {
@@ -28,11 +28,14 @@ import CustomToast from "@/components/global/custom-toast";
 import { toast } from "sonner";
 import CustomModel from "@/components/global/custom-model";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
 export default function Page() {
   const isAssistantLoading = useAppSelector(
     (state) => state.assistants.isAssistantLoading
   );
+  const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -42,6 +45,23 @@ export default function Page() {
   const [isAssistantDeleting, setIsAssistantDeleting] = useState(false);
   const { setOpen, setClose } = useModal();
   const assistants = useAppSelector((state) => state.assistants.assistants);
+
+  const copy = (id: string) => {
+    setCopied({ ...copied, [id]: true });
+    setTimeout(() => {
+      setCopied({ ...copied, [id]: false });
+    }, 5000);
+  };
+  const notify = (id: string) => {
+    copy(id);
+    toast(
+      CustomToast({
+        title: "Copied to clipboard!",
+        description:
+          "Use this link to integrate the assistant in your website.",
+      })
+    );
+  };
 
   const manageDomains = (assistantId: string) => {
     setOpen(
@@ -201,18 +221,35 @@ export default function Page() {
                       </div>
                     </div>
                   </CardHeader>
-
                   <CardContent className="grid gap-3 ">
-                    {/* <p className="text-muted-foreground">@{assistant.id}</p> */}
-                    <Button
-                      className="w-full"
-                      variant={"outline"}
-                      onClick={() => {
-                        manageDomains(assistant.id);
-                      }}
-                    >
-                      Manage Domains
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        className="w-full"
+                        variant={"outline"}
+                        onClick={() => {
+                          manageDomains(assistant.id);
+                        }}
+                      >
+                        Manage Domains
+                      </Button>
+                      <Button
+                        className="w-full"
+                        variant={"outline"}
+                        onClick={() => {}}
+                      >
+                        <CopyToClipboard
+                          text={`http://localhost:3000/chatbot?workspaceId=${currentWorkspaceName}&assistantId=${assistant.id}`}
+                          onCopy={() => notify(assistant.id)}
+                        >
+                          {copied[assistant.id] ? (
+                            <p>Copied To Clipboard</p>
+                          ) : (
+                            <p> Integrate Assistant</p>
+                          )}
+                        </CopyToClipboard>
+                      </Button>
+                    </div>
+
                     <Button
                       className="w-full"
                       onClick={() => {
