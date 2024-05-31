@@ -154,7 +154,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `ws://api.solcompute.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
+  const URL = `wss://api.solcompute.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );
