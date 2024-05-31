@@ -154,7 +154,7 @@ const AssistantIdByPage = ({ params }: Props) => {
     getAssistantById(state, params.id)
   );
   const dispatch = useAppDispatch();
-  const URL = `ws://fargat-farga-opbzm5amp8ir-1656924029.us-east-1.elb.amazonaws.com?workspaceId=hussainworkspace&assistantId=asst_oHMufnVas2LVjvnpk7zLbult`;
+  const URL = `ws://api.solcompute.com?workspaceId=${currentWorkspaceName}&assistantId=${params.id}`;
   const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(
     null
   );

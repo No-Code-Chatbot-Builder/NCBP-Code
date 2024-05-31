@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CustomSheet from "@/components/global/custom-sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -49,12 +49,14 @@ export default function Page() {
   const models: ModelType[] = useAppSelector(
     (state) => state.customModel.models
   );
+
   const { setOpen } = useModal();
   const [selectedStatus, setSelectedStatus] = useState<StatusType>("All");
   const [modelSelected, setModelSelected] = useState<ModelType | null>(null);
   const isModelLoading = useAppSelector(
     (state) => state.customModel.isModelLoading
   );
+  const filteredModelsRef = useRef<ModelType[]>([]);
 
   const dispatch = useAppDispatch();
 
@@ -79,26 +81,11 @@ export default function Page() {
     (state) => state.workspaces.isWorkspaceLoading
   );
 
-  const succeededModels: ModelType[] = models.filter(
-    (model: ModelType) => model.status === "succeeded"
-  );
-  const failedModels: ModelType[] = models.filter(
-    (model: ModelType) => model.status === "cancelled"
-  );
-  const inProgressModels: ModelType[] = models.filter(
-    (model: ModelType) => model.status === "In Progress"
-  );
-  
-  const selectedModels: ModelType[] =
-    selectedStatus === "All"
-      ? models
-      : selectedStatus === "Successful"
-      ? succeededModels
-      : selectedStatus === "Failed"
-      ? failedModels
-      : inProgressModels;
-
-  const { data: res, error, isLoading } = useAxiosSWR(
+  const {
+    data: res,
+    error,
+    isLoading,
+  } = useAxiosSWR(
     `/finetune/model/models?workspace_id=${currentWorkspaceName}`
   );
 
@@ -157,29 +144,26 @@ export default function Page() {
 
         if (modelsChanged) {
           console.log("added");
+          console.log(fetchedModels);
+
           dispatch(setModels(fetchedModels));
         }
 
-        const pendingModels = fetchedModels?.filter(
-          (model: any) => model.status === "In Progress"
-        );
-
-        if (pendingModels.length > 0) {
-          pendingModels?.map(async (model: any) => {
-            const res = await check_status(model.jobId);
-            if (res.status === "succeeded" || res.status === "cancelled") {
-              dispatch(
-                updateModel({ modelId: model.modelId, status: res.status })
-              );
-            }
-          });
-        }
         dispatch(setIsModelLoading(false));
       }
+      filteredModelsRef.current = models;
     };
 
     getModels();
   }, [isWorkspaceLoading, isLoading, error]);
+
+  const filterModels = (status: string) => {
+    console.log(status);
+    filteredModelsRef.current = models.filter(
+      (model) => model.status === status
+    ); // Update the .current property
+    console.log(filteredModelsRef.current);
+  };
 
   const handleCancellation = async (model_id: string, job_id: string) => {
     const res = await cancelJob(currentWorkspaceName, job_id);
@@ -196,6 +180,8 @@ export default function Page() {
     });
     return formattedDate;
   };
+
+  console.log(filteredModelsRef.current);
 
   return (
     <div className="flex flex-col gap-10">
@@ -242,7 +228,7 @@ export default function Page() {
         <section>
           <div className="flex flex-row gap-4 mb-10">
             <button
-              onClick={() => setSelectedStatus("All")}
+              onClick={() => filterModels("All")}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "All" && "bg-primary/10 shadow-md"
@@ -251,7 +237,7 @@ export default function Page() {
               All
             </button>
             <button
-              onClick={() => setSelectedStatus("Successful")}
+              onClick={() => filterModels("succeeded")}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "Successful" && "bg-primary/10 shadow-md"
@@ -260,7 +246,7 @@ export default function Page() {
               Successful
             </button>
             <button
-              onClick={() => setSelectedStatus("Failed")}
+              onClick={() => filterModels("cancelled")}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "Failed" && "bg-primary/10 shadow-md"
@@ -269,7 +255,7 @@ export default function Page() {
               Failed
             </button>
             <button
-              onClick={() => setSelectedStatus("In Progress")}
+              onClick={() => filterModels("In Progress")}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "In Progress" && "bg-primary/10 shadow-md"
@@ -279,10 +265,10 @@ export default function Page() {
             </button>
           </div>
 
-          {selectedModels.length > 0 ? (
+          {filteredModelsRef.current.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               <div className="flex flex-col gap-4">
-                {selectedModels.map((model: ModelType) => {
+                {filteredModelsRef.current.map((model: ModelType) => {
                   const formattedDate = new Date(
                     model.createdAt
                   ).toLocaleDateString("en-GB", {

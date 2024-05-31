@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "(.*)",
-        "destination": "http://fargat-farga-opbzm5amp8ir-1656924029.us-east-1.elb.amazonaws.com/$1"
+        "destination": "https://api.solcompute.com/$1"
       }
     ]
   }
