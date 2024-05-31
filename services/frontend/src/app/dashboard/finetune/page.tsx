@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/pagination";
 import { useAxiosSWR } from "@/lib/api/useAxiosSWR";
 import {
+  filterModels,
+  setFilteredModels,
   setIsModelLoading,
   setModels,
   updateModel,
@@ -56,7 +58,9 @@ export default function Page() {
   const isModelLoading = useAppSelector(
     (state) => state.customModel.isModelLoading
   );
-  const filteredModelsRef = useRef<ModelType[]>([]);
+  const filteredModels = useAppSelector(
+    (state) => state.customModel.filteredModels
+  );
 
   const dispatch = useAppDispatch();
 
@@ -132,6 +136,7 @@ export default function Page() {
             modelName: model.modelName,
           })
         );
+        console.log(fetchedModels);
 
         const currentModelNames = models
           .map((model: ModelType) => model.modelName)
@@ -147,23 +152,17 @@ export default function Page() {
           console.log(fetchedModels);
 
           dispatch(setModels(fetchedModels));
+          dispatch(setFilteredModels(fetchedModels));
         }
 
         dispatch(setIsModelLoading(false));
+      } else {
+        dispatch(setIsModelLoading(false));
       }
-      filteredModelsRef.current = models;
     };
 
     getModels();
   }, [isWorkspaceLoading, isLoading, error]);
-
-  const filterModels = (status: string) => {
-    console.log(status);
-    filteredModelsRef.current = models.filter(
-      (model) => model.status === status
-    ); // Update the .current property
-    console.log(filteredModelsRef.current);
-  };
 
   const handleCancellation = async (model_id: string, job_id: string) => {
     const res = await cancelJob(currentWorkspaceName, job_id);
@@ -180,8 +179,6 @@ export default function Page() {
     });
     return formattedDate;
   };
-
-  console.log(filteredModelsRef.current);
 
   return (
     <div className="flex flex-col gap-10">
@@ -228,7 +225,7 @@ export default function Page() {
         <section>
           <div className="flex flex-row gap-4 mb-10">
             <button
-              onClick={() => filterModels("All")}
+              onClick={() => dispatch(filterModels("All"))}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "All" && "bg-primary/10 shadow-md"
@@ -237,7 +234,7 @@ export default function Page() {
               All
             </button>
             <button
-              onClick={() => filterModels("succeeded")}
+              onClick={() => dispatch(filterModels("succeeded"))}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "Successful" && "bg-primary/10 shadow-md"
@@ -246,7 +243,7 @@ export default function Page() {
               Successful
             </button>
             <button
-              onClick={() => filterModels("cancelled")}
+              onClick={() => dispatch(filterModels("cancelled"))}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "Failed" && "bg-primary/10 shadow-md"
@@ -255,7 +252,7 @@ export default function Page() {
               Failed
             </button>
             <button
-              onClick={() => filterModels("In Progress")}
+              onClick={() => dispatch(filterModels("In Progress"))}
               className={cn(
                 "px-4 py-2 border border-primary rounded-full text-muted-foreground transition-all text-sm",
                 selectedStatus === "In Progress" && "bg-primary/10 shadow-md"
@@ -265,10 +262,10 @@ export default function Page() {
             </button>
           </div>
 
-          {filteredModelsRef.current.length > 0 ? (
+          {filteredModels.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               <div className="flex flex-col gap-4">
-                {filteredModelsRef.current.map((model: ModelType) => {
+                {filteredModels.map((model: ModelType) => {
                   const formattedDate = new Date(
                     model.createdAt
                   ).toLocaleDateString("en-GB", {
