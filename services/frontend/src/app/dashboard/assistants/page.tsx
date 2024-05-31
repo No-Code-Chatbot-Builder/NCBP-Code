@@ -58,7 +58,7 @@ export default function Page() {
       CustomToast({
         title: "Copied to clipboard!",
         description:
-          "Use this link to integrate the assistant in your website.",
+          "Use this iframe component to integrate the assistant in your website.",
       })
     );
   };
@@ -238,7 +238,10 @@ export default function Page() {
                         onClick={() => {}}
                       >
                         <CopyToClipboard
-                          text={`http://localhost:3000/chatbot?workspaceId=${currentWorkspaceName}&assistantId=${assistant.id}`}
+                          text={`<iframe
+                          src="http://localhost:3000/chatbot?workspaceId=${currentWorkspaceName}&assistantId=${assistant.id}"
+                          title="${assistant.name}"
+                        />`}
                           onCopy={() => notify(assistant.id)}
                         >
                           {copied[assistant.id] ? (
