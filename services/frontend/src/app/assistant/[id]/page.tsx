@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import CustomToast from "@/components/global/custom-toast";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
+import Image from "next/image";
 
 type Props = {
   params: {
@@ -70,52 +71,58 @@ const ChatbotMessage = ({ message }: { message: string }) => {
   };
   return (
     <div className="flex flex-start flex-col">
-      <div className="bg-card p-4 rounded-xl m-0">
-        {chunks.map((chunk, index) => {
-          if (
-            hasCode &&
-            chunk.startsWith("<code>") &&
-            chunk.endsWith("</code>")
-          ) {
-            const codeContent = chunk.slice(7, -8);
-            return (
-              <>
-                <div className="relative">
-                  <Button
-                    className="absolute top-4 right-2 p-2"
-                    size={"icon"}
-                    variant={"ghost"}
+      <div className="flex flex-row gap-3">
+        <Image src={"/assets/ncbai.svg"} width={30} height={30} alt="NBP AI" />
+        <div className="bg-card p-4 rounded-xl m-0">
+          {chunks.map((chunk, index) => {
+            if (
+              hasCode &&
+              chunk.startsWith("<code>") &&
+              chunk.endsWith("</code>")
+            ) {
+              const codeContent = chunk.slice(7, -8);
+              return (
+                <>
+                  <div className="relative">
+                    <Button
+                      className="absolute top-4 right-2 p-2"
+                      size={"icon"}
+                      variant={"ghost"}
+                    >
+                      <CopyToClipboard
+                        text={codeContent}
+                        onCopy={() => notify()}
+                      >
+                        {copied ? (
+                          <IoIosCheckmarkCircleOutline className="text-lg m-1 text-green-500 w-4 h-4" />
+                        ) : (
+                          <CopyIcon className="text-lg m-1  w-4 h-4 hover:text-white" />
+                        )}
+                      </CopyToClipboard>
+                    </Button>
+                  </div>
+                  <SyntaxHighlighter
+                    key={index}
+                    language="javascript"
+                    style={vscDarkPlus}
+                    customStyle={customStyle}
+                    showLineNumbers
                   >
-                    <CopyToClipboard text={codeContent} onCopy={() => notify()}>
-                      {copied ? (
-                        <IoIosCheckmarkCircleOutline className="text-lg m-1 text-green-500 w-4 h-4" />
-                      ) : (
-                        <CopyIcon className="text-lg m-1  w-4 h-4 hover:text-white" />
-                      )}
-                    </CopyToClipboard>
-                  </Button>
-                </div>
-                <SyntaxHighlighter
-                  key={index}
-                  language="javascript"
-                  style={vscDarkPlus}
-                  customStyle={customStyle}
-                  showLineNumbers
-                >
-                  {codeContent}
-                </SyntaxHighlighter>
-              </>
-            );
-          } else {
-            return (
-              <p key={index} className="text-base font-medium">
-                <ReactMarkdown className="whitespace-pre-wrap p-0 m-0">
-                  {chunk}
-                </ReactMarkdown>
-              </p>
-            );
-          }
-        })}
+                    {codeContent}
+                  </SyntaxHighlighter>
+                </>
+              );
+            } else {
+              return (
+                <p key={index} className="text-base font-medium">
+                  <ReactMarkdown className="whitespace-pre-wrap p-0 m-0">
+                    {chunk}
+                  </ReactMarkdown>
+                </p>
+              );
+            }
+          })}
+        </div>
       </div>
       <div className="flex text-muted-foreground flex-row-reverse mr-4 mt-2">
         <Button size={"icon"} variant={"ghost"}>
