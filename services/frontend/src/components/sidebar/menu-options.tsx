@@ -183,9 +183,11 @@ const WorkspaceMenuOptions = ({
       }
       dispatch(setIsWorkspaceLoading(false));
     }
+  }, [isWLoading, currentWorkspaceName]);
+
+  useEffect(() => {
     dispatch(setIsAssistantLoading(true));
     if (isWorkspaceLoading || isALoading) {
-      console.log("assistants exist");
       return;
     }
     if (errorAssistant) {
@@ -196,19 +198,16 @@ const WorkspaceMenuOptions = ({
           description: "Failed to load assistants.",
         })
       );
-      console.log("assistants exist");
       dispatch(setIsAssistantLoading(false));
       return;
     }
 
     if (resAssistant?.data?.response?.assistants?.length <= 0) {
-      console.log("empty");
       dispatch(setAssistant([]));
       dispatch(setIsAssistantLoading(false));
       return;
     }
 
-    console.log("assistants exist");
     const formattedAssistants: AssistantType[] =
       resAssistant?.data?.response?.assistants?.map((assistant: any) => ({
         id: assistant.assistantId,
@@ -231,7 +230,9 @@ const WorkspaceMenuOptions = ({
     }
 
     dispatch(setIsAssistantLoading(false));
+  }, [isWLoading, isALoading, errorAssistant]);
 
+  useEffect(() => {
     dispatch(setIsModelLoading(true));
 
     if (isWorkspaceLoading || isModelLoading) {
@@ -289,6 +290,9 @@ const WorkspaceMenuOptions = ({
     } else {
       dispatch(setIsModelLoading(false));
     }
+  }, [isWLoading, isModelLoading, errorModel]);
+
+  useEffect(() => {
     dispatch(setIsDatasetLoading(true));
     if (isWorkspaceLoading || isDatasetLoading) {
       return;
@@ -325,17 +329,7 @@ const WorkspaceMenuOptions = ({
     }
 
     dispatch(setIsDatasetLoading(false));
-  }, [
-    isWLoading,
-    isALoading,
-    isModelLoading,
-    resModel,
-    resAssistant,
-    res,
-    currentWorkspaceName,
-    isDatasetLoading,
-    resDataset,
-  ]);
+  }, [isDatasetLoading, isWLoading, errorDataset]);
 
   const changeCurrentWorkspace = (workspace: WorkspaceType) => {
     dispatch(setIsWorkspaceLoading(true));
